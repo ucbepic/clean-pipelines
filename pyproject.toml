@@ -1,0 +1,82 @@
+[project]
+name = "prap"
+version = "0.1.0a0"
+description = "Police Records Access Project — modular document-extraction pipelines."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "PRAP Contributors" }]
+
+dependencies = [
+    "prap-core",
+    "prap-case-type",
+    "prap-incident-date",
+    "prap-split-officer-names",
+    "prap-redactions",
+    "prap-location",
+    "prap-involved-agency",
+    "prap-mentioned-agencies",
+    "prap-page-stream-segmentation",
+    "prap-clustering",
+]
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+prap-core = { workspace = true }
+prap-case-type = { workspace = true }
+prap-incident-date = { workspace = true }
+prap-split-officer-names = { workspace = true }
+prap-redactions = { workspace = true }
+prap-location = { workspace = true }
+prap-involved-agency = { workspace = true }
+prap-mentioned-agencies = { workspace = true }
+prap-page-stream-segmentation = { workspace = true }
+prap-clustering = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# typer requires Option() in default args
+"**/cli.py" = ["B008"]
+# prompt text embedded as raw string; line length follows the prompt's content
+"**/summary_filter.py" = ["E501"]
+# prap-clustering: prompt strings in .py prompt modules and legacy scripts'
+# commented-out config blocks legitimately exceed the line-length limit.
+# Legacy scripts also use bare ``except:`` / one-line conditionals / unused
+# loop vars that are preserved verbatim in this structural-only port.
+"packages/clustering/src/prap_clustering/feature_extraction/prompts/*.py" = ["E501"]
+"packages/clustering/src/prap_clustering/clustering/**" = ["E501", "E722", "E701", "B007", "F821"]
+"packages/clustering/src/prap_clustering/feature_extraction/**" = ["E501", "E722", "E701", "B007", "F821", "E402"]
+"packages/clustering/src/prap_clustering/embeddings_pipeline/**" = ["E501", "E722", "E701", "B007", "F821", "E402"]
+"packages/clustering/src/prap_clustering/metadata_pipeline/**" = ["E501", "E722", "E701", "B007", "F821", "E402"]
+"packages/clustering/src/prap_clustering/evaluation.py" = ["E501", "E722", "E701", "B007", "E402"]
+"packages/clustering/src/prap_clustering/metrics.py" = ["E501", "E722"]
+"packages/clustering/tests/test_cluster_embeddings.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "packages/core/tests",
+    "packages/case-type/tests",
+    "packages/incident-date/tests",
+    "packages/split-officer-names/tests",
+    "packages/redactions/tests",
+    "packages/location/tests",
+    "packages/involved-agency/tests",
+    "packages/mentioned-agencies/tests",
+    "packages/page-stream-segmentation/tests",
+    "packages/clustering/tests",
+]
+addopts = "-ra --import-mode=importlib"

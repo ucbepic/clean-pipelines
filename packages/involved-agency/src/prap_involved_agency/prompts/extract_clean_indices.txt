@@ -1,0 +1,23 @@
+
+    <task>
+    Your task is to extract only the document indices from the following text. 
+    The original LLM was asked to identify the {{count}} most important documents out of {{num_summaries}} total documents.
+    </task>
+
+    <input_text>
+    {{llm_response}}
+    </input_text>
+
+    <instructions>
+    1. Look for numbers in the text that represent document indices
+    2. Only consider indices that are valid (between 0 and {{max_index}} inclusive)
+    3. Return exactly {{count}} indices if possible
+    4. If there are more than {{count}} indices mentioned, prioritize the ones that appear to be most important
+    5. If there are fewer than {{count}} valid indices mentioned, only return those that are valid
+    </instructions>
+
+    <output_format>
+    Return ONLY a comma-separated list of indices, with no brackets or other text.
+    For example: "0, 3, 5"
+    </output_format>
+    

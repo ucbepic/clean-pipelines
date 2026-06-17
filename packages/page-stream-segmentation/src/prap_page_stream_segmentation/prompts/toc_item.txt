@@ -1,0 +1,130 @@
+
+<background>
+The following metadata was extracted by an automated extraction tool,
+page-by-page from a document related to a law enforcement case (which may
+involve misconduct investigations, use-of-force incidents, officer-involved
+shootings, or a combination of these). We are building an indexed database of
+case documents to enable investigators, attorneys, and oversight bodies to
+easily determine key dates, agencies, and actors directly involved, and also to
+retrieve specific documents.
+</background>
+<instructions>
+A *canonical index entry* for a document consists of four fields, any of which
+might be empty if the information is not available:
+
+- Headline: A concise title for the document, ideally including the document type and the name. The headline should capture everything known about the purpose of the document.
+- Date: The date of the document, in ISO format (YYYY-MM-DD).
+- People: People directly involved in the creation, dissemination, or receipt of the document, or who are the subject of the document. For interview transcripts, these are the interviewer(s) and interviewee(s).
+- Agency or agencies: The law enforcement or other organization(s) listed on the letterhead or affiliated with the authors or recipients of the document.
+
+Review the extracted metadata, and create a canonical index entry for this document. Note that the metadata may include additional pieces of information beyond those needed for the index entry; only include the requested fields and information. Do not add additional fields. For the "People" field, only include document authors, senders, recipients, interviewers, interviewees, or the subjects of the doucment, even if other people are mentioned in the metadata. For the date field, only include the date of the document itself, not incident dates or other dates. For the "Agency or agencies" field, only include the agency associated with the document itself, via the letterhead/header or the affiliation of the author.
+
+There may be various dates mentioned in the metadata. We are ONLY interested in the date of the document itself, not incident dates or other dates. If the document is an interview transcript, then the date should be the date of the interview. For a letter or memo, the date should be the date on the letterhead/header. For communications, we are interested in the date the communication was sent; however if only the receipt date is available, use that. Many documents contain one or more signatures with dates, we are only interested in the date the document itself was created/sent, not the dates of the signatures; however, if no other date is available, use the date of the earliest signature.
+</instructions>
+
+YOU MUST USE THE FOLLOWING JSON FORMAT EXACTLY, INCLUDING FIELD NAMES AND STRUCTURE. If a field is not available, use an empty string or an empty list, as appropriate.
+
+<json format>
+    {
+        "Headline": "...",
+        "Date": "YYYY-MM-DD",
+        "People": {"name_1": "role_1", "name_2": "role_2", ...}, # DICT of people => role
+        "Agency or agencies": ["agency1 name", "agency2 name", ...] # LIST of agency names
+    }
+</json format>
+
+<example>
+    <example input>
+    # page 1
+        - Document type: MEMORANDUM
+        - Date: November 27, 2018
+        - Sender: Captain Jerry Hara, Southeastern Division
+        - Recipient: Officer Alan Dyemartin (#6642)
+        - Agency: City of San Diego Police Department, Southeastern Division
+        - Subject: Notice of Reprimand and Disciplinary Transfer
+        - Incident Date: October 14, 2018
+    # page 2
+        - Document type: MEMORANDUM - CONTINUATION
+    # page 3
+        - Document type: MEMORANDUM - CONTINUATION
+    </example input>
+    <example output>
+    {
+        "Headline": "Notice of Reprimand and Disciplinary Transfer for Officer Alan Dyemartin",
+        "Date": "2018-11-27", # ISO format, notice we use the document date, not the incident date
+        "People": {
+            "Captain Jerry Hara": "Sender",
+            "Officer Alan Dyemartin": "Recipient"
+        }
+        "Agency or agencies": ["City of San Diego Police Department, Southeastern Division"]
+    }
+    </example output>
+</example>
+<example>
+<example input>
+    # page 1
+        - Document type: PRE-DISCIPLINARY HEARING NOTICE
+        - Sent Date: March 15, 2019
+        - Sender: Lieutenant Susan Miller, Internal Affairs Division
+        - Recipient: Officer John Smith (#1234)
+        - Agency: Metro City Police Department, Internal Affairs Division
+        - Subject: Notice of Pre-Disciplinary Hearing
+        - Case Number: 2019-045
+        - Investigating Officer: Detective Jane Doe
+    # page 2
+        - Document type: PRE-DISCIPLINARY HEARING NOTICE - CONTINUATION
+        - Additional Notes: Hearing scheduled for March 25, 2019
+        - Incident Date: February 10, 2019
+        - Recipient: Officer John Smith (#1234)
+        - Reciept Date: March 16, 2019
+</example input>
+<example output>
+    {
+        "Headline": "Notice of Pre-Disciplinary Hearing for Officer John Smith",
+        "Date": "2019-03-15", # Date the notice was sent
+        "People": {
+            "Lieutenant Susan Miller": "Sender",
+            "Officer John Smith": "Recipient",
+        },
+        "Agency or agencies": ["Metro City Police Department, Internal Affairs Division"]
+    }
+</example input>
+</example>
+<example>
+<example input>
+    # page 1
+        - Document type: DISTRICT ATTORNEY REVIEW LETTER
+        - Date: July 8, 2024
+        - Sender: District Attorney George Marquez
+        - Recipient: Chief of Police Armando Orozco, Calexico Police Department
+        - Letterhead agency: Imperial County District Attorney's Office
+        - Subject: Officer Involved Shooting Review for Officer Alexander Hernandez #547
+        - Case Number: ICDA BOI 24-01548
+    # page 2
+        - Document type: DISTRICT ATTORNEY REVIEW LETTER - CONTINUATION
+    # page 3
+        - Document type: DISTRICT ATTORNEY REVIEW LETTER - CONTINUATION
+        - Signature: District Attorney George Marquez
+        - Signature date: July 8, 2024
+</example input>
+<example output>
+    {
+        "Headline": "District Attorney Review of Officer Involved Shooting - Officer Alexander Hernandez",
+        "Date": "2024-07-08",
+        "People": {
+            "District Attorney George Marquez": "Sender",
+            "Chief of Police Armando Orozco": "Recipient",
+            "Officer Alexander Hernandez": "Subject Officer"
+        },
+        "Agency or agencies": ["Imperial County District Attorney's Office"]
+    }
+</example output>
+</example>
+Here is the extracted metadata:
+<metadata>
+{% for page in page_classifications %}
+# page {{ loop.index }}
+{{ page.meta | indent(4) }}
+{% endfor %}
+</metadata>
+Provide the canonical index entry in JSON format, following the structure in the example.

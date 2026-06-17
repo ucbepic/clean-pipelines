@@ -1,0 +1,70 @@
+
+Review the following case about an incident involving the police.
+Based on the document provided to you, determine if the police used force during a SINGLE, SPECIFIC incident.
+This classification is CRITICAL for identifying file corruption.
+
+USE OF FORCE includes but is not limited to:
+   - Physical control holds or takedowns
+   - Strikes with hands, feet, or objects
+   - Impact weapons (batons, flashlights)
+   - Chemical agents (pepper spray, tear gas)
+   - Electronic control devices (Tasers)
+   - Pointing or discharge of firearms
+   - K9 deployments with contact
+   - Vehicle interventions (PIT maneuvers)
+   - Enhanced restraints beyond standard handcuffing
+
+NOT use of force:
+   - Verbal commands/threats
+   - Officer presence only
+   - Standard handcuffing without resistance
+   - Vague references without specific force actions described
+
+AUTOMATIC DISQUALIFIERS - MUST RETURN 'false' or 'unclear' if ANY of these apply:
+1. Document is an autopsy report or medical examination
+2. Document describes multiple separate incidents with different officers/dates
+3. Document appears to be a compilation, summary report, or statistical report
+4. Document mentions injuries without explicitly describing officer actions that caused them
+5. Document describes gunshot wounds without explicitly stating police officers fired the shots
+
+EXTREMELY IMPORTANT RULES:
+1) To be classified as 'true', the text must EXPLICITLY describe specific officer(s) applying force to a specific person in a single incident.
+2) You must ALWAYS return 'false' or 'unclear' if multiple different uses of force from separate incidents are mentioned.
+3) You must NOT infer force - it must be clearly stated in the document.
+4) If the document is ambiguous about whether force was used, return 'unclear'.
+5) Autopsy reports or medical examiner findings CANNOT be classified as 'true' unless they explicitly state which officers used what specific force actions.
+
+FEW-SHOT EXAMPLES:
+
+Example 1: TRUE
+"On January 15, 2022, Officer Johnson responded to a disturbance call. Upon arrival, he observed the suspect fleeing. Officer Johnson pursued on foot and deployed his taser, which struck the suspect in the back."
+Classification: true (explicitly describes a single officer using specific force in one incident)
+
+Example 2: FALSE - No Force
+"Officers Smith and Jones responded to the scene. They gave verbal commands to the suspect who was eventually taken into custody without incident."
+Classification: false (no explicit force described, only presence and commands)
+
+Example 3: FALSE - Multiple Incidents
+"The excerpt contains multiple interoffice memoranda detailing various incidents involving the use of force by law enforcement officers. The incidents span from 2015 to 2016 and involve different officers and suspects. In one incident on December 19, 2015, Officer Kelley struck an inmate in the facial area. In another incident on February 10, 2016, a taser was used to subdue an inmate."
+Classification: false (describes multiple separate incidents - indicates file corruption)
+
+Example 4: FALSE - Autopsy Report
+"The autopsy revealed multiple gunshot wounds to various parts of the body, including the chest, right lateral chest, abdomen, right arm/shoulder, right arm, right elbow, right hand/wrist, left finger, and left leg. The cause of death was determined to be multiple gunshot wounds, and the manner of death was ruled as homicide."
+Classification: false (autopsy report describing wounds without explicitly stating which officers fired weapons)
+
+Example 5: UNCLEAR - Vague Description
+"A struggle ensued between the officer and the suspect. The suspect was later observed to have injuries."
+Classification: unclear (doesn't explicitly describe what specific force actions officers took)
+
+Example 6: FALSE - Medical Report
+"Medical intervention was evident, including an endotracheal tube, adhesive electrocardiogram electrodes, defibrillator pads, an intraosseous catheter, intravascular catheter, needle thoracotomy, chest seals, tourniquet, gauze, and tape overlying gunshot wounds, thoracotomy tubes, and a pulse oximeter."
+Classification: false (medical description without explicitly stating officer actions)
+
+Please respond with either 'true', 'false', or 'unclear'.
+Limit your response to 'true', 'false', or 'unclear'
+
+--------------------
+
+$source_text
+
+--------------------

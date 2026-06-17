@@ -1,0 +1,86 @@
+<incident_date_extraction_prompt>
+<context>
+Your task is to analyze police documents to identify the MOST LIKELY INCIDENT DATE when either:
+1. A use of force incident occurred - focusing on when the force was FIRST applied
+2. A misconduct incident occurred - focusing on when the misconduct behavior took place
+
+You must carefully distinguish incident dates from administrative dates in police documentation.
+
+Key definitions:
+- USE OF FORCE INCIDENT DATE: The specific date when force was first applied by the police officer
+- MISCONDUCT INCIDENT DATE: The specific date when the misconduct behavior occurred by the police officer
+- NOT incident dates: Report filing dates, investigation dates, witness interview dates, disciplinary hearing dates, or case closure dates
+
+The document may contain conflicting dates or multiple references to the same date. Focus on identifying the SINGLE MOST RELIABLE date based on frequency of mention and strength of supporting context.
+</context>
+
+<format_requirements>
+- The incident date must include month, day, and year (MM/DD/YYYY or equivalent format)
+- For incidents spanning multiple days, identify the START date as the incident date
+- For use of force incidents near midnight, the date when force began is the incident date
+- Only return multiple dates when:
+  a) There are clearly separate, distinct incidents described (not conflicting accounts of the same incident)
+  b) Each incident has a different, clearly documented date
+- If no clear incident date is present, report that no incident date could be extracted
+</format_requirements>
+
+<document_for_review>
+$source_text
+</document_for_review>
+
+<thinking_process>
+1. First, identify all dates mentioned in the document and their frequency
+2. For each date, determine its context: incident occurrence, report filing, investigation, etc.
+3. Determine the incident type (use of force vs. misconduct) Your goal is to extract the date on which the shooting occurred, the date on which the use of force occurred or the date on which the misconduct occurred
+4. For each potential incident date, evaluate:
+   a) Frequency of mention in the document
+   b) Strength of contextual evidence linking it to the incident
+   c) Consistency with other details in the document
+5. If there are conflicting dates for the same incident, select the date with the strongest supporting evidence
+6. Only identify multiple dates if they clearly refer to separate, distinct incidents
+7. For incidents spanning multiple days, identify the START date
+8. Verify that the selected date(s) have sufficient context to confirm they are incident dates
+9. Check that each date includes month, day, and year
+</thinking_process>
+
+<verification_steps>
+1. Re-examine the text surrounding each identified incident date
+2. For use of force incidents:
+   - Confirm the date is connected to phrases like "force was used," "officer applied force," etc.
+   - If the incident spans midnight, verify you've identified when force BEGAN
+3. For misconduct incidents:
+   - Confirm the date is connected to the actual misconduct behavior
+4. If there are conflicting dates, evaluate which has:
+   - The most frequent mentions
+   - The strongest contextual support
+   - The most reliable source within the document
+5. Verify these are not report completion dates, witness interview dates, or other administrative dates
+6. Ensure the dates are not referring to different incidents mentioned in passing
+7. Check for conflicting information that might contradict these dates
+</verification_steps>
+
+<output_format>
+INCIDENT TYPE: [Use of Force / Misconduct / Both / Unclear]
+
+PRIMARY INCIDENT DATE: [MM/DD/YYYY or "No clear incident date found"]
+
+CONFIDENCE LEVEL: [High/Medium/Low]
+
+SUPPORTING EVIDENCE:
+[Direct quotes from document that identify this as the incident date]
+
+REASONING:
+[Explanation of why this date represents the incident occurrence, including frequency analysis and why it was chosen over any conflicting dates]
+
+ADDITIONAL INCIDENTS (only if clearly separate incidents):
+- Incident: [Brief description]
+  Date: [MM/DD/YYYY]
+  Evidence: [Direct quote supporting this as a separate incident date]
+
+CONFLICTING DATES CONSIDERED:
+[List any conflicting dates mentioned for the same incident and explain why they were rejected in favor of the primary date]
+
+OTHER ADMINISTRATIVE DATES:
+[List any administrative dates (report filing, etc.) mentioned in the document]
+</output_format>
+</incident_date_extraction_prompt>

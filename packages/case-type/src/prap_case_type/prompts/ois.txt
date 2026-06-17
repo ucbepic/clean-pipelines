@@ -1,0 +1,16 @@
+
+OFFICER-INVOLVED SHOOTING (OIS) requires:
+   - Discharge of firearm with metal bullets
+   NOT OIS:
+   - Less-lethal weapons (tasers, bean bags, rubber bullets)
+   - Brandishing without discharge
+   - Threats only
+
+Based on the summary of the incident below, did the incident include an officer involved shooting?
+Please respond with either 'true', 'false', or 'unclear'.
+Limit your response to 'true', 'false', or 'unclear'.
+--------------------
+
+$source_text
+
+--------------------

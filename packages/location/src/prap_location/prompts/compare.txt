@@ -1,0 +1,46 @@
+
+Your task is to determine if two city descriptions refer to the same incident city.
+
+EXTRACTED CITY: $extracted_location
+GROUNDTRUTH CITY: $groundtruth_location
+
+Consider these as MATCHING if they refer to the same city, even if:
+- One is more detailed than the other (includes state, county)
+- They use different formatting
+- One includes additional descriptors (like county names, jurisdictional info)
+- Minor spelling differences exist
+- One uses abbreviations while the other spells out words
+- Different state formats (CA vs California vs Calif.)
+- One derived from police department name vs direct city name
+
+Examples of MATCHING cities:
+- "Sacramento, CA" vs "Sacramento, California"
+- "Oakland" vs "Oakland, CA"
+- "San Jose, CA" vs "San Jose, Santa Clara County, CA"
+- "Fresno, CA" vs "City of Fresno"
+- "Sacramento" vs "Sacramento Police Department jurisdiction"
+- "Los Angeles" vs "LA, California"
+- "New York" vs "NYC, NY"
+- "Saint Paul" vs "St. Paul, MN"
+
+Examples of NON-MATCHING cities:
+- "Sacramento, CA" vs "Loomis, CA" (different cities)
+- "Oakland, CA" vs "San Francisco, CA" (different cities)
+- "Fresno, CA" vs "Modesto, CA" (different cities)
+- "Los Angeles, CA" vs "San Diego, CA" (different cities)
+- "Portland, OR" vs "Portland, ME" (same name, different states)
+- "Springfield, IL" vs "Springfield, MA" (same name, different states)
+
+Special considerations:
+- Cities with same names in different states are NOT matches unless state context confirms they're the same
+- Neighboring cities are NOT matches (e.g., "San Francisco" vs "Oakland")
+- City vs unincorporated area distinctions matter (e.g., "Los Angeles" vs "East LA")
+- Regional terms like "Bay Area" should not match specific cities unless explicitly specified
+
+<output_instructions>
+Return ONLY:
+1 - if the cities match (refer to the same city)
+0 - if the cities do not match (refer to different cities)
+
+Include nothing else in your response except for 1 or 0.
+</output_instructions>

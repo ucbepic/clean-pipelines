@@ -1,0 +1,52 @@
+<objective>
+Analyze this page to determine if it contains citations that PROVE a specific location where an incident occurred. You are looking for evidence of actual incident locations, NOT administrative or policy locations.
+</objective>
+
+<location_citation_definition>
+LOCATION CITATIONS must describe ACTUAL INCIDENT LOCATIONS:
+- Specific addresses or intersections where incidents occurred
+- City names with clear incident context ("shooting occurred in [city]")
+- Jurisdictional references with incident context ("within [city] city limits")
+- Geographic landmarks where incidents happened
+- Neighborhood references where incidents took place
+
+EXPLICITLY NOT location citations:
+- Police department names or headquarters
+- Administrative locations (police stations, courts, jails)
+- Medical examiner or coroner facilities
+- Where reports were processed or reviewed
+- Policy statements about jurisdictions
+- Training facility locations
+</location_citation_definition>
+
+<validation_process>
+You are reviewing both the original page and a primary analysis. Your job is to:
+1. Determine: Does this page contain citations that PROVE where a specific incident occurred?
+2. Find the best supporting quote that describes the actual incident location
+3. Provide clear reasoning for your decision
+4. CRITICAL: Administrative and policy locations should be classified as NO
+</validation_process>
+
+<original_page_text>
+$page_text
+</original_page_text>
+
+<primary_analysis_for_reference>
+$primary_response
+</primary_analysis_for_reference>
+
+<output_instructions>
+Provide your final determination about whether this page contains citations proving where an incident occurred.
+
+You MUST respond with EXACTLY this JSON structure (no additional text before or after):
+
+{
+  "validation_decision": "confirm|update|override",
+  "final_decision": "YES|NO",
+  "validator_reasoning": "Explain why this page does or does not contain citations proving where an incident occurred. If it's administrative/policy location, explicitly state that and classify as NO.",
+  "verified_quote": "Exact quote from the page that best supports your YES/NO decision",
+  "confidence": "high|medium|low"
+}
+
+Remember: You are looking for citations that prove WHERE an incident happened, not administrative locations.
+</output_instructions>

@@ -1,0 +1,278 @@
+
+<agency_verification_prompt>
+
+<objective>
+Verify whether this agency extraction is accurate and should be INCLUDED or EXCLUDED from final results.
+Apply the same clear-linkage standard used during extraction: the source text must contain a passage
+where the AGENCY NAME and ACTION VERB are clearly connected. Inferred associations from unrelated
+sections of the document are not sufficient.
+
+ADDITIONALLY: Identify any agencies present in the source text that appear to be MISSING from the
+full extraction context. This is a recall-recovery step.
+</objective>
+
+<agency_to_verify>
+Agency Name: {{agency.agency_name}}
+Proposed Agency Type: {{agency_type}}
+Evidence Provided: {{agency.evidence}}
+Role Description: {{agency.role_description}}
+</agency_to_verify>
+
+<full_extraction_context>
+{{all_extraction_context}}
+</full_extraction_context>
+
+<document_for_review>
+{{source_text}}
+</document_for_review>
+
+<common_agency_types>
+Use this checklist during the missed-agency recovery step to ensure no common agency types
+were overlooked.
+
+TYPICALLY RESPONDING:
+- City Police Departments (e.g., Los Angeles Police Department, San Jose Police Department)
+- County Sheriff's Departments (e.g., Riverside County Sheriff's Department)
+- Highway Patrol (e.g., California Highway Patrol)
+- Specialized / Transit / Port Police (e.g., Los Angeles Port Police)
+- State Corrections (e.g., California Department of Corrections and Rehabilitation)
+
+TYPICALLY INVESTIGATING:
+- County District Attorney's Offices (e.g., Los Angeles County District Attorney's Office)
+- State Departments of Justice (e.g., California Department of Justice)
+- Medical Examiners / Coroners (e.g., Los Angeles County Medical Examiner-Coroner)
+- Oversight bodies (e.g., Office of Inspector General, Department of Police Accountability)
+
+COMMONLY DUAL-ROLE:
+- Sheriff's Departments often respond AND investigate via internal affairs or homicide bureau
+- Large Police Departments often respond AND investigate their own officers via internal divisions
+</common_agency_types>
+
+<verification_rules>
+RULE 1 — NO FEDERAL AGENCIES:
+FBI, DEA, ATF, U.S. Marshals, Border Patrol, DHS, ICE → REJECTED regardless of evidence.
+NOTE: State-level agencies (California DOJ, California Highway Patrol, state corrections) are
+NOT federal and should NOT be rejected under this rule.
+
+RULE 2 — GEOGRAPHIC IDENTIFIER REQUIRED:
+Agency name must start with city or county name (or be a state-level agency).
+If missing, search the source document for geographic context. If found, correct it. If not found, REJECT.
+
+RULE 3 — PARENT AGENCY ONLY:
+Remove sub-divisions, bureaus, units, station names, court locations.
+Normalize to parent agency name.
+
+RULE 4 — LAW ENFORCEMENT AND OVERSIGHT AGENCIES ONLY:
+Exclude fire departments, EMS, hospitals, and multi-agency task forces.
+INCLUDE formal government oversight bodies with investigative authority (OIG, Police
+Accountability departments, Police Commissions with investigative mandates).
+</verification_rules>
+
+<explicit_linkage_check>
+This is the most important check. For each piece of evidence:
+
+1. Find the passage in the source document
+2. Confirm the AGENCY NAME and the ACTION VERB are clearly connected within the same passage
+   (same statement or closely adjacent sentences where the officer-agency relationship is established)
+3. If the evidence says "Officer X did Z" and the agency name appears in a nearby sentence establishing
+   Officer X as a member of that agency, this IS acceptable linkage.
+4. If the agency name only appears in a completely separate section (e.g., a roster, header, or
+   unrelated paragraph), this is NOT acceptable linkage. Mark as REJECTED.
+
+For INVESTIGATING: The source must contain a passage where [Agency Name] + [verb about investigating USE OF FORCE or MISCONDUCT] are clearly connected.
+Valid: investigated the shooting, reviewed whether force was justified, declined charges against the officer, determined cause of death, investigated officer misconduct
+Invalid: investigated the burglary, investigated a call for service, interviewed crime witnesses (these are RESPONDING actions)
+
+For RESPONDING: The source must contain a passage where Officer [Name] of/from [Agency Name] + [incident verb] are clearly connected.
+Valid: responded, used force, fired weapon, pursued, was present, secured scene, violated policy, investigated the underlying crime
+</explicit_linkage_check>
+
+<critical_investigating_vs_responding_distinction>
+INVESTIGATING = investigated WHETHER THE OFFICER'S FORCE WAS JUSTIFIED or WHETHER THE OFFICER COMMITTED MISCONDUCT
+RESPONDING = officers were involved in the incident, INCLUDING investigating the underlying crime
+
+The agency that investigated the burglary/robbery/assault is RESPONDING.
+The agency that investigated whether the officers shooting was lawful is INVESTIGATING.
+
+If the proposed type is INVESTIGATING but the evidence shows the agency investigated the underlying crime (not the force), correct the type to RESPONDING.
+If the proposed type is INVESTIGATING but the evidence only shows passive actions like was notified or received report, REJECT entirely.
+</critical_investigating_vs_responding_distinction>
+
+<verification_steps>
+Step 1: Apply Rules 1-4. If any rule causes rejection, stop and return REJECTED.
+
+Step 2: Locate each evidence passage in the source document.
+- Is the evidence actually present in the source text?
+- Does the passage clearly connect the agency name to the action verb?
+- If evidence cannot be found or lacks clear linkage, mark as REJECTED.
+
+Step 3: Independently determine agency type from the evidence.
+- Verbs about investigating use of force or misconduct → INVESTIGATING
+- Incident involvement verbs OR investigating the underlying crime → RESPONDING
+- Both use-of-force-investigation AND incident involvement → BOTH
+- Neither or only passive verbs (notified, received, employed by) → REJECTED
+
+Step 4: Compare your independent assessment with the proposed type.
+- Matches and no name corrections needed → CONFIRMED
+- Matches but name was corrected (Rules 2-3) → CORRECTED
+- Does not match but agency is valid → CORRECTED with new type
+- Agency should be rejected → REJECTED
+
+Step 5: Final recommendation.
+- INCLUDE only if: passes all rules, evidence has clear linkage, type is confirmed or corrected
+- EXCLUDE if: federal agency, missing geography, no clear linkage, weak/passive evidence
+</verification_steps>
+
+<missed_agency_recovery>
+IMPORTANT: After verifying the agency above, perform a RECALL RECOVERY check.
+
+Review the source document and the full extraction context. Identify any agencies that:
+1. Are mentioned in the source text with clear linkage to an action
+2. Are NOT already present in the full extraction context
+3. Fit one of the agency types in <common_agency_types>
+
+Pay special attention to these commonly missed patterns:
+- DUAL ROLES: An agency already extracted as RESPONDING that also investigated the use of force
+  (or vice versa). Check if the agency appears in only one role but should appear in both.
+- DISTRICT ATTORNEYS: DA offices that investigated or reviewed the officer-involved shooting,
+  declined to prosecute, or presented findings. These are often mentioned briefly.
+- MEDICAL EXAMINERS / CORONERS: Mentioned in connection with autopsy, cause of death, or
+  manner of death determination. These are INVESTIGATING agencies.
+- STATE-LEVEL AGENCIES: California DOJ, state corrections, Arizona DPS, etc. These are sometimes
+  mentioned as conducting independent investigations.
+- OVERSIGHT BODIES: OIG, Police Accountability departments, Police Commissions — often mentioned
+  in procedural language about review processes.
+- SECONDARY RESPONDING AGENCIES: Additional police departments, sheriffs, or highway patrol
+  units that assisted at the scene but are not the primary agency.
+
+For each missed agency found, provide:
+- agency_name (normalized, with geographic identifier)
+- agency_type (RESPONDING or INVESTIGATING)
+- evidence (passage from source text with clear linkage)
+- role_description (brief description of their role)
+
+If no missed agencies are found, return an empty list.
+</missed_agency_recovery>
+
+<few_shot_examples>
+
+Example 1 — CONFIRMED, officer used force with agency named:
+Agency: San Diego Police Department (RESPONDING)
+Evidence: Officer Butera of SDPD fired at suspect
+Source contains: Officer Butera of the San Diego Police Department fired at the suspect
+Assessment: Agency name and action verb in same statement. CONFIRMED, INCLUDE.
+
+Example 2 — CONFIRMED, DA investigated the shooting:
+Agency: Los Angeles County District Attorney's Office (INVESTIGATING)
+Evidence: LA County DA investigated the officer-involved shooting
+Source contains: The Los Angeles County District Attorney's Office investigated the officer-involved shooting and determined it was justified.
+Assessment: DA investigated the shooting which is use of force investigation. Agency name and verb in same statement. CONFIRMED, INCLUDE.
+
+Example 3 — CORRECTED, agency investigated the crime not the force:
+Agency: Glendale Police Department (INVESTIGATING)
+Evidence: Glendale PD detectives investigated the attempted burglary
+Source contains: Glendale Police Department detectives investigated the attempted burglary and interviewed the homeowner.
+Assessment: Glendale PD investigated the burglary which is the underlying crime not the use of force. This is RESPONDING activity not INVESTIGATING. CORRECTED type to RESPONDING, INCLUDE.
+
+Example 4 — CORRECTED, officers responded to and investigated a call:
+Agency: Sacramento Police Department (INVESTIGATING)
+Evidence: Sacramento PD officers responded to and investigated a domestic disturbance
+Source contains: Sacramento Police Department officers responded to and investigated a report of a domestic disturbance.
+Assessment: SPD investigated a domestic disturbance call which is the underlying crime. This is RESPONDING not INVESTIGATING. CORRECTED type to RESPONDING, INCLUDE.
+
+Example 5 — REJECTED, no clear linkage:
+Agency: Glendale Police Department (RESPONDING)
+Evidence: Officer Jones fired his weapon striking the suspect
+Source contains: Officer Jones fired his weapon. Agency name appears only in a document header.
+Assessment: Agency name only in header with no narrative connection to actions. REJECTED, EXCLUDE.
+
+Example 6 — REJECTED, passive evidence only:
+Agency: Internal Affairs Division (INVESTIGATING)
+Evidence: IA received the case file
+Source contains: Internal Affairs received the case file on March 15
+Assessment: Received is passive administrative action not investigation of force. REJECTED, EXCLUDE.
+
+Example 7 — REJECTED, federal agency:
+Agency: Federal Bureau of Investigation (INVESTIGATING)
+Evidence: FBI investigated the incident
+Assessment: Rule 1 — federal agency. REJECTED, EXCLUDE.
+
+Example 8 — CORRECTED, sub-division normalized:
+Agency: Los Angeles County Sheriff's Department - Internal Affairs Bureau (INVESTIGATING)
+Evidence: LASD Internal Affairs Bureau investigated whether the use of force was within policy
+Source contains: Los Angeles County Sheriff's Department Internal Affairs Bureau investigated whether the deputy's use of force was within policy.
+Assessment: Rule 3 — remove sub-division. Investigated use of force policy which is force investigation. CORRECTED to Los Angeles County Sheriff's Department, INCLUDE.
+
+Example 9 — CORRECTED, geographic identifier found:
+Agency: District Attorney's Office (INVESTIGATING)
+Evidence: DA Office investigated the deputy-involved shooting and declined charges
+Source contains: Document references Los Angeles County. The District Attorney's Office investigated the deputy-involved shooting.
+Assessment: Rule 2 — geographic identifier found. Investigated the shooting which is force investigation. CORRECTED to Los Angeles County District Attorney's Office, INCLUDE.
+
+Example 10 — CONFIRMED, dual role:
+Agency: Los Angeles Police Department (RESPONDING)
+Evidence: Officer Martinez of LAPD used taser, LAPD Internal Affairs investigated the use of force
+Source contains: Officer Martinez of LAPD used his taser. LAPD Internal Affairs investigated whether the use of force was within policy.
+Assessment: Responding via used taser AND investigating via reviewed force policy. Both have clear linkage. CORRECTED type to BOTH, INCLUDE.
+
+Example 11 — REJECTED, evidence not in source:
+Agency: Sacramento Police Department (RESPONDING)
+Evidence: Sacramento PD officers responded to the scene
+Source contains: No mention of Sacramento Police Department anywhere
+Assessment: Agency not in source text. REJECTED, EXCLUDE.
+
+Example 12 — CORRECTED, ambiguous investigating verb clarified:
+Agency: Riverside Police Department (INVESTIGATING)
+Evidence: Riverside PD investigated the incident
+Source contains: Riverside Police Department officers responded to the scene and investigated the armed robbery. During the encounter Officer Davis fired his weapon.
+Assessment: RPD investigated the armed robbery which is the underlying crime and their officer used force. This is RESPONDING not INVESTIGATING. CORRECTED type to RESPONDING, INCLUDE.
+
+Example 13 — Missed agency recovery, DA not extracted:
+Agency being verified: Long Beach Police Department (RESPONDING) — CONFIRMED, INCLUDE.
+Missed agency found: Source text contains "The Los Angeles County District Attorney's Office reviewed the officer-involved shooting and declined to file charges."
+LA County DA is not in the full extraction context.
+Missed agency: Los Angeles County District Attorney's Office (INVESTIGATING), evidence: LA County DA reviewed the officer-involved shooting and declined to file charges.
+
+Example 14 — Missed agency recovery, dual role not captured:
+Agency being verified: Los Angeles County Sheriff's Department (RESPONDING) — CONFIRMED, INCLUDE.
+Missed role found: Source text contains "LASD Homicide Bureau investigated the deputy-involved shooting to determine whether the use of force was justified."
+LASD is extracted as RESPONDING but not as INVESTIGATING.
+Missed agency: Los Angeles County Sheriff's Department (INVESTIGATING), evidence: LASD Homicide Bureau investigated the deputy-involved shooting to determine whether force was justified.
+
+Example 15 — Missed agency recovery, coroner not extracted:
+Agency being verified: San Francisco Police Department (RESPONDING) — CONFIRMED, INCLUDE.
+Missed agency found: Source text contains "The San Francisco Medical Examiner's Office conducted the autopsy and determined the cause of death."
+SF Medical Examiner is not in the full extraction context.
+Missed agency: San Francisco Medical Examiner's Office (INVESTIGATING), evidence: SF Medical Examiner conducted the autopsy and determined the cause of death.
+
+</few_shot_examples>
+
+<output_instructions>
+Return JSON matching this structure:
+{
+  "verification_status": "CONFIRMED" or "CORRECTED" or "REJECTED",
+  "corrected_agency_type": "INVESTIGATING" or "RESPONDING" or "BOTH" or null,
+  "verified_agency_name": "full corrected agency name" or null if rejected,
+  "verified_evidence": ["list of verified evidence strings with clear linkage"],
+  "verified_role_description": "verified role description",
+  "confidence_level": "HIGH" or "MEDIUM" or "LOW",
+  "verification_reasoning": "explanation including linkage check and investigating vs responding distinction",
+  "changes_made": ["list of corrections"] or [],
+  "recommendation": "INCLUDE" or "EXCLUDE",
+  "type_mismatch_explanation": "explanation if type changed" or null,
+  "missed_agencies": [
+    {
+      "agency_name": "full agency name with geographic identifier",
+      "agency_type": "INVESTIGATING" or "RESPONDING",
+      "evidence": ["evidence string from source text"],
+      "role_description": "brief description of role",
+      "recovery_reasoning": "why this agency was likely missed and why it should be included"
+    }
+  ]
+}
+
+All strings: single line, no quotation marks inside values, no line breaks, max 200 characters per evidence string, third person.
+If no missed agencies are found, return "missed_agencies": [].
+</output_instructions>
+
+</agency_verification_prompt>

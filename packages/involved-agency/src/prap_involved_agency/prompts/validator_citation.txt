@@ -1,0 +1,278 @@
+
+<objective>
+Verify whether this page contains a valid citation proving {{agency_name}} is a {{agency_type}} agency.
+You must verify the page text itself (not the extraction context or primary analysis) supports the claim.
+</objective>
+
+<agency_information>
+Agency Name: {{agency_name}}
+Agency Type: {{agency_type}}
+</agency_information>
+
+<definitions>
+{% if agency_type == "INVESTIGATING" %}
+INVESTIGATING AGENCY = an agency that investigates the USE OF FORCE or OFFICER MISCONDUCT, NOT the underlying crime.
+
+VALID (investigating whether officer actions were justified):
+- Investigated the officer-involved shooting
+- Reviewed whether use of force was within policy
+- Determined the shooting was lawful or unlawful
+- Declined to file charges against the officer
+- Conducted autopsy and determined cause of death
+- Investigated officer misconduct or policy violations
+- Oversight review of use of force
+
+INVALID (investigating the underlying crime — this is RESPONDING activity):
+- Investigated the burglary, robbery, assault, etc.
+- Interviewed crime witnesses or collected crime scene evidence
+- Responded to and investigated a call for service
+- Arrested the suspect
+
+The agency that investigated the crime the suspect committed is a RESPONDING agency.
+The agency that investigated WHETHER THE OFFICER'S FORCE WAS JUSTIFIED is the INVESTIGATING agency.
+{% else %}
+RESPONDING AGENCY = officers participated in or were present at the incident.
+
+VALID: responded to scene, used force, fired weapon, pursued, present at scene, secured scene, collected evidence, transported suspect, violated policy, witnessed or reported misconduct
+
+INVALID: employed by (without incident), was notified (passive), mentioned without incident context
+{% endif %}
+</definitions>
+
+<critical_agency_identity_verification>
+The page text is the GROUND TRUTH for agency identity.
+
+VERIFY:
+1. Does the page text contain {{agency_name}} or a clear abbreviation?
+2. Does the page connect the actions to {{agency_name}} specifically?
+3. If the page says "Officer X from Agency B" and you are validating for Agency A — that is a CONTRADICTION, final_decision must be false.
+4. If officers perform actions but no agency is named on this page — evidence_strength is WEAK at best.
+
+The primary analysis may have assumed an officer belongs to {{agency_name}} based on extraction context. CHECK THE PAGE TEXT to confirm or contradict this.
+</critical_agency_identity_verification>
+
+<primary_analysis>
+Primary Analysis Found:
+- Has Citation: {{primary_has_citation}}
+- Reasoning: {{primary_reasoning}}
+- Quote: {{primary_quote}}
+- Confidence: {{primary_confidence}}
+</primary_analysis>
+
+<page_text>
+{{page_text}}
+</page_text>
+
+<few_shot_examples>
+{% if agency_type == "INVESTIGATING" %}
+EXAMPLE 1 — VALID: DA investigated officer-involved shooting:
+Agency: Sacramento County District Attorney's Office (INVESTIGATING)
+Primary Quote: Sacramento County DA Office investigated the officer-involved shooting
+Page Text: The Sacramento County District Attorney's Office investigated the officer-involved shooting and concluded that the officers acted in lawful self-defense.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "DA Office investigated officer-involved shooting and concluded on lawfulness which is a use of force investigation. Agency name Sacramento County District Attorney Office appears on page connected to the investigation.",
+  "verified_quote": "Sacramento County District Attorney Office investigated officer-involved shooting and concluded officers acted in lawful self-defense",
+  "evidence_strength": "EXPLICIT"
+}
+
+EXAMPLE 2 — VALID: Coroner determined cause of death:
+Agency: Riverside County Coroner (INVESTIGATING)
+Primary Quote: Coroner performed autopsy
+Page Text: The Riverside County Coroner performed the autopsy of the decedent on October 4 2018 and determined the cause of death to be multiple gunshot wounds.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "Coroner performed autopsy and determined cause of death from gunshot wounds which is inherently about the use of force outcome. Agency name confirmed on page.",
+  "verified_quote": "Riverside County Coroner performed autopsy and determined cause of death to be multiple gunshot wounds",
+  "evidence_strength": "EXPLICIT"
+}
+
+EXAMPLE 3 — INVALID: Agency investigated the underlying crime not the force:
+Agency: Glendale Police Department (INVESTIGATING)
+Primary Quote: Glendale PD detectives investigated the attempted burglary
+Page Text: Glendale Police Department detectives investigated the attempted burglary at the residence. Detective Francis interviewed the homeowner who reported hearing someone trying to break in through the back door.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "Glendale PD investigated the burglary which is the underlying crime not the use of force. Interviewing the homeowner about the burglary is crime investigation not use of force accountability. An agency investigating the crime is a responding agency not an investigating agency.",
+  "verified_quote": "Glendale Police Department detectives investigated attempted burglary and Detective Francis interviewed homeowner",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 4 — INVALID: Officers responded to and investigated a call for service:
+Agency: Los Angeles Police Department (INVESTIGATING)
+Primary Quote: LAPD investigated the incident
+Page Text: Los Angeles Police Department officers responded to and investigated a report of shots fired. Officers secured the scene and interviewed neighbors about what they heard.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "LAPD investigated a shots fired call which is investigating the underlying criminal incident not investigating whether any officers use of force was justified. Responding to calls and investigating crimes is responding agency activity.",
+  "verified_quote": "Los Angeles Police Department officers responded to and investigated report of shots fired and interviewed neighbors",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 5 — INVALID: CONTRADICTION — different agency on page:
+Agency: Los Angeles County Sheriff's Department (INVESTIGATING)
+Primary Quote: Detective Martinez reviewed evidence regarding the shooting
+Page Text: Detective Martinez from the Orange County District Attorney's Office reviewed all body camera footage and conducted follow-up interviews regarding the deputy-involved shooting.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "CONTRADICTION: Page identifies Detective Martinez as from Orange County DA Office not Los Angeles County Sheriff's Department. The use of force investigation is attributed to a different agency on the page.",
+  "verified_quote": "Detective Martinez from Orange County District Attorney Office reviewed body camera footage regarding deputy-involved shooting",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 6 — INVALID: No agency name on page:
+Agency: Glendale Police Department (INVESTIGATING)
+Primary Quote: Officer Jones discharged his weapon
+Page Text: Officer Jones exited his vehicle removed his service weapon and discharged it striking the suspect who was then taken into custody.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "No agency name appears on this page. Officer actions are present but cannot be attributed to Glendale Police Department from the page text alone. Additionally these are responding actions not use of force investigation actions.",
+  "verified_quote": "Officer Jones exited vehicle and discharged weapon striking suspect but no agency named on page",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 7 — INVALID: Passive notification:
+Agency: Internal Affairs Bureau (INVESTIGATING)
+Primary Quote: Internal Affairs was notified
+Page Text: Internal Affairs was notified of the complaint on June 3rd.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "Was notified is passive administrative action not an active investigation of use of force.",
+  "verified_quote": "Internal Affairs was notified of the complaint",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 8 — VALID: Agency found shooting within policy:
+Agency: Los Angeles County Sheriff's Department (INVESTIGATING)
+Primary Quote: LASD Internal Affairs reviewed the shooting
+Page Text: The Los Angeles County Sheriff's Department Internal Criminal Investigations Bureau reviewed the deputy-involved shooting and determined it was consistent with department policy.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "LASD ICIB reviewed deputy-involved shooting and made a policy determination which is a use of force investigation. Agency name Los Angeles County Sheriff's Department appears on page connected to the review.",
+  "verified_quote": "Los Angeles County Sheriff's Department Internal Criminal Investigations Bureau reviewed deputy-involved shooting and determined consistent with policy",
+  "evidence_strength": "EXPLICIT"
+}
+{% else %}
+EXAMPLE 1 — VALID: Officer used force with agency on page:
+Agency: San Diego Police Department (RESPONDING)
+Primary Quote: Officer Butera of SDPD fired at suspect
+Page Text: Officer Butera of the San Diego Police Department fired three shots at the suspect who was fleeing the scene.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "Officer Butera fired weapon which is use of force. Agency name San Diego Police Department appears on page connected to the officer.",
+  "verified_quote": "Officer Butera of San Diego Police Department fired three shots at suspect who was fleeing",
+  "evidence_strength": "EXPLICIT"
+}
+
+EXAMPLE 2 — VALID: Officers responded to crime (this is RESPONDING):
+Agency: Glendale Police Department (RESPONDING)
+Primary Quote: GPD officers responded to burglary call
+Page Text: Glendale Police Department officers responded to the burglary in progress call. Officer Jones confronted the suspect in the driveway and discharged his weapon.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "GPD officers responded to scene and Officer Jones used force by discharging weapon. Agency name Glendale Police Department appears on page. Officers who investigated the underlying crime and were involved in the incident are responding.",
+  "verified_quote": "Glendale Police Department officers responded to burglary call and Officer Jones confronted suspect and discharged weapon",
+  "evidence_strength": "EXPLICIT"
+}
+
+EXAMPLE 3 — INVALID: No agency named on page:
+Agency: La Habra Police Department (RESPONDING)
+Primary Quote: Officer Martinez had rifle on suspect and was identified as one who shot
+Page Text: K-9 Officer Martinez had his rifle on the suspect and gave commands. Officer Navarro and K-9 Officer Martinez were identified as those who shot the suspect.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "Officers performed clear use of force actions including aiming rifle and shooting suspect but no agency name appears on this page. Cannot confirm these officers belong to La Habra Police Department from the page text alone.",
+  "verified_quote": "K-9 Officer Martinez had rifle on suspect and Navarro and Martinez identified as those who shot but no agency on page",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 4 — INVALID: CONTRADICTION — officer from different agency:
+Agency: Riverside County Sheriff's Department (RESPONDING)
+Primary Quote: Deputy Pulido fired six shots
+Page Text: Deputy Jaime Pulido from the San Bernardino County Sheriff's Department was assigned to patrol. Deputy Pulido sprayed pepper spray inside the vehicle and fired six shots.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "CONTRADICTION: Page states Deputy Pulido is from San Bernardino County Sheriff's Department not Riverside County Sheriff's Department. Use of force actions are attributed to a different agency on the page.",
+  "verified_quote": "Deputy Jaime Pulido from San Bernardino County Sheriff's Department sprayed pepper spray and fired six shots",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 5 — INVALID: Employment only:
+Agency: Seattle Police Department (RESPONDING)
+Primary Quote: Officer employed by Seattle PD
+Page Text: Officer Davis has been employed by the Seattle Police Department for twelve years.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "Employment alone without incident involvement is insufficient.",
+  "verified_quote": "Officer Davis employed by Seattle Police Department for twelve years",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 6 — VALID: Agency confirmed with force:
+Agency: San Bernardino County Sheriff's Department (RESPONDING)
+Primary Quote: Deputy Pulido from SBCSD fired duty weapon
+Page Text: Deputy Pulido from the San Bernardino County Sheriff's Department arrived at the scene deployed pepper spray and fired his duty weapon.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "Deputy Pulido used force by deploying pepper spray and firing weapon. Agency name San Bernardino County Sheriff's Department appears on page connected to the officer and actions.",
+  "verified_quote": "Deputy Pulido from San Bernardino County Sheriff's Department arrived at scene deployed pepper spray and fired duty weapon",
+  "evidence_strength": "EXPLICIT"
+}
+
+EXAMPLE 7 — INVALID: Passive notification:
+Agency: Fullerton Police Department (RESPONDING)
+Primary Quote: Fullerton PD was notified
+Page Text: The Fullerton Police Department was notified of the incident.
+Validation:
+{
+  "final_decision": false,
+  "validator_reasoning": "Was notified is passive administrative action without incident involvement.",
+  "verified_quote": "Fullerton Police Department was notified of the incident",
+  "evidence_strength": "WEAK"
+}
+
+EXAMPLE 8 — VALID: Officers present and secured scene:
+Agency: California Highway Patrol (RESPONDING)
+Primary Quote: CHP officers on scene
+Page Text: CHP officers were on scene when the vehicle crashed. Officer Martinez secured the perimeter while paramedics attended to the suspect.
+Validation:
+{
+  "final_decision": true,
+  "validator_reasoning": "CHP officers present at scene and secured perimeter which is incident involvement. CHP is clear abbreviation appearing on page.",
+  "verified_quote": "CHP officers were on scene when vehicle crashed and Officer Martinez secured perimeter",
+  "evidence_strength": "EXPLICIT"
+}
+{% endif %}
+</few_shot_examples>
+
+<output_instructions>
+Complete this mandatory checklist:
+1. AGENCY NAME CHECK: Does the page text contain {{agency_name}} or a clear abbreviation? YES/NO
+2. ACTION CHECK: {% if agency_type == "INVESTIGATING" %}Does the page show investigation of USE OF FORCE or MISCONDUCT (not the underlying crime)?{% else %}Does the page show incident involvement?{% endif %} YES/NO
+3. ATTRIBUTION CHECK: Are the actions connected to {{agency_name}} on THIS page? YES/NO
+4. CONTRADICTION CHECK: Does the page attribute the same actions to a DIFFERENT agency? YES/NO
+
+If checks 1-3 are not all YES, or if check 4 is YES, final_decision must be false.
+
+Return JSON matching ValidatorCitationResult:
+{
+  "final_decision": true or false,
+  "validator_reasoning": "explanation including checklist results and agency identity verification",
+  "verified_quote": "text from page WITHOUT quotation marks max 300 chars",
+  "evidence_strength": "EXPLICIT or CIRCUMSTANTIAL or WEAK"
+}
+</output_instructions>

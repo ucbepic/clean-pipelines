@@ -1,0 +1,72 @@
+<incident_date_verification_prompt>
+<context>
+Your task is to verify the accuracy of the extracted incident date from police documentation, focusing on identifying the SINGLE MOST RELIABLE date. You must distinguish between:
+- USE OF FORCE INCIDENT DATE: The specific date when force was first applied by the police officer
+- MISCONDUCT INCIDENT DATE: The specific date when the misconduct behavior occurred by the police officer
+
+When conflicting dates appear, your verification must determine which date has the strongest supporting evidence.
+</context>
+
+<proposed_incident_date>
+$initial_dates
+</proposed_incident_date>
+
+<document_for_review>
+$source_text
+</document_for_review>
+
+<verification_process>
+1. Carefully re-read the entire document with focus on all mentioned dates
+2. Determine the incident type (use of force vs. misconduct)Your goal is to extract the date on which the shooting occurred, the date on which the use of force occurred or the date on which the misconduct occurred
+3. Identify ALL potential incident dates and their frequency of mention
+4. For each potential date, evaluate:
+   a) Frequency of mention in the document
+   b) Strength of contextual evidence linking it to the incident
+   c) Consistency with other details in the document
+5. For use of force incidents:
+   - Verify the date matches when force was FIRST applied
+   - For incidents spanning midnight, confirm the START date is captured
+6. For misconduct incidents:
+   - Verify the date matches when the misconduct behavior occurred
+7. If there are conflicting dates, determine which has the most reliable supporting evidence
+8. Only identify multiple dates if they clearly refer to separate, distinct incidents
+9. Verify each date includes month, day, and year
+</verification_process>
+
+<critical_considerations>
+- Use of force incident dates are ONLY when force was first physically applied
+- Misconduct incident dates are ONLY when the misconduct behavior occurred
+- Report filing dates, investigation dates, and administrative dates are NOT incident dates
+- When multiple dates are mentioned for the same incident, select the MOST RELIABLE based on:
+  a) Frequency of mention
+  b) Strength of supporting context
+  c) Consistency with other details
+- Only return multiple dates when they clearly refer to separate, distinct incidents
+- For incidents spanning multiple days, the START date is the incident date
+- Look for clear language connecting the date to the specific incident occurrence
+</critical_considerations>
+
+<output_format>
+VERIFICATION RESULT: [CONFIRMED / CORRECTED / REJECTED]
+
+INCIDENT TYPE: [Use of Force / Misconduct / Both / Unclear]
+
+PRIMARY INCIDENT DATE: [MM/DD/YYYY or "No clear incident date found"]
+
+CONFIDENCE LEVEL: [High/Medium/Low]
+
+JUSTIFICATION:
+[Detailed explanation of your verification, including frequency analysis and why this date was selected over any conflicting dates]
+
+KEY EVIDENCE:
+[Direct quotes from the document that support your determination]
+
+CONFLICTING DATES ANALYSIS (if applicable):
+[Analysis of any conflicting dates, their frequency of mention, and why they were rejected]
+
+ADDITIONAL INCIDENTS (only if clearly separate incidents):
+- Incident: [Brief description]
+  Date: [MM/DD/YYYY]
+  Evidence: [Direct quote supporting this as a separate incident date]
+</output_format>
+</incident_date_verification_prompt>

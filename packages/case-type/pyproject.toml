@@ -1,0 +1,28 @@
+[project]
+name = "prap-case-type"
+version = "0.1.0a0"
+description = "PRAP pipeline: classify each police case as use-of-force / misconduct / officer-involved shooting."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+dependencies = [
+    "prap-core",
+    "pandas>=2.0",
+    "tiktoken>=0.7",
+    "tqdm>=4.66",
+    "typer>=0.12",
+]
+
+[project.scripts]
+prap-case-type = "prap_case_type.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prap_case_type"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/prap_case_type/prompts" = "prap_case_type/prompts"

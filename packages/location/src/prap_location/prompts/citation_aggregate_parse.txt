@@ -1,0 +1,20 @@
+<objective>
+Extract the final location validation recommendation from the detailed analysis provided.
+</objective>
+
+<analysis_to_parse>
+$reasoning_response
+</analysis_to_parse>
+
+<parsing_instructions>
+Look for the final recommendation in the analysis above. The recommendation should be one of:
+- True
+- False
+- Unclear
+
+Extract ONLY the validation recommendation. Do not provide any additional text or explanation.
+</parsing_instructions>
+
+<output_format>
+Respond with exactly one word: true, false, or unclear
+</output_format>

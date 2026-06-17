@@ -1,0 +1,13 @@
+
+Extract the DOCUMENT TYPE from the following metadata extracted from a page of a document. If the metadata indicates that this page is a continuation of a document (rather than the start of a new document), then add the word CONTINUATION after the document type. If you cannot determine the document type, respond with UNKNOWN.
+<example>
+INVESTIGATIVE REPORT
+</example>
+<example>
+NOTICE OF INTENT TO DISCIPLINE CONTINUATION
+</example>
+Respond with the DOCUMENT TYPE, plus CONTINUATION if applicable, and nothing else. Here is the extracted metadata to analyze:
+
+
+Metadata:
+{{ meta }}

@@ -1,0 +1,84 @@
+# Directory structure
+SRC_DIR := src
+DATA_CSV := ../label/data/output/labeled_df_train.csv
+TEST_CSV := ../label/data/output/labeled_df_test.csv
+EXPERIMENT_DIR := experiments
+LOG_DIR := logs
+
+# Python settings
+PYTHON := python3
+
+# Base settings (used as defaults in grid search)
+SEED := 42
+DEVICE := cuda
+
+# Training arguments (minimal since grid search handles most parameters)
+TRAIN_ARGS := --data-csv $(DATA_CSV) \
+              --test-csv $(TEST_CSV) \
+              --seed $(SEED) \
+              --device $(DEVICE) \
+              --output-dir $(EXPERIMENT_DIR)
+
+# Default target
+.PHONY: all
+all: init train
+
+# Create project structure
+.PHONY: init
+init:
+	@echo "Creating project structure..."
+	@mkdir -p $(SRC_DIR)
+	@mkdir -p $(EXPERIMENT_DIR)
+	@mkdir -p $(LOG_DIR)
+	@touch $(SRC_DIR)/__init__.py
+	@echo "Project structure created:"
+	@echo "  Experiments will be saved to: $(EXPERIMENT_DIR)"
+	@echo "  Logs will be saved to: $(LOG_DIR)"
+
+# Train models with grid search
+.PHONY: train
+train: init
+	@echo "Starting systematic model training with grid search..."
+	@mkdir -p $(EXPERIMENT_DIR)
+	@PYTHONPATH=. $(PYTHON) $(SRC_DIR)/single-page-grid.py $(TRAIN_ARGS) 2>&1 | tee $(LOG_DIR)/training_$(shell date +%Y%m%d_%H%M%S).log
+	@echo "Training complete. Check $(LOG_DIR) for training log and $(EXPERIMENT_DIR) for experiment results."
+
+# Clean generated files but keep directories
+.PHONY: clean
+clean:
+	@echo "Cleaning generated files..."
+	@rm -f $(LOG_DIR)/*
+	@rm -f $(EXPERIMENT_DIR)/*
+	@echo "Clean complete."
+
+# Remove all generated directories and files
+.PHONY: clean-all
+clean-all:
+	@echo "Removing all generated directories and files..."
+	@rm -rf $(EXPERIMENT_DIR)
+	@rm -rf $(LOG_DIR)
+	@echo "Clean complete."
+
+# Help target
+.PHONY: help
+help:
+	@echo "Available targets:"
+	@echo "  make init      - Create project structure"
+	@echo "  make train     - Run systematic model training with grid search"
+	@echo "  make clean     - Remove generated files but keep directories"
+	@echo "  make clean-all - Remove all generated directories and files"
+	@echo "  make help      - Show this help message"
+	@echo ""
+	@echo "Base Configuration:"
+	@echo "  SEED         - Random seed (default: $(SEED))"
+	@echo "  DEVICE       - Training device: cuda/cpu (default: $(DEVICE))"
+	@echo ""
+	@echo "Directory Structure:"
+	@echo "  $(SRC_DIR)          - Source code directory"
+	@echo "  $(EXPERIMENT_DIR)   - Experiments directory (contains all model versions and results)"
+	@echo "  $(LOG_DIR)          - Training logs directory"
+	@echo ""
+	@echo "Note: Most training parameters are now handled by grid search in the code"
+	@echo "Example usage:"
+	@echo "  make train DEVICE=cuda"
+	@echo "  make train DEVICE=cpu"

@@ -1,0 +1,29 @@
+[project]
+name = "prap-page-stream-segmentation"
+version = "0.1.0a0"
+description = "PRAP pipeline: segment concatenated PDF page streams into documents + extract per-document metadata."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+dependencies = [
+    "prap-core",
+    "jinja2>=3.1",
+    "openpyxl>=3.1",
+    "pandas>=2.0",
+    "tqdm>=4.66",
+    "typer>=0.12",
+]
+
+[project.scripts]
+prap-page-stream-segmentation = "prap_page_stream_segmentation.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prap_page_stream_segmentation"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/prap_page_stream_segmentation/prompts" = "prap_page_stream_segmentation/prompts"

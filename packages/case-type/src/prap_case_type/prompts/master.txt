@@ -1,0 +1,90 @@
+"
+Your task is to review documents about a police incident to determine if it involved: (1) use of force, (2) sustained misconduct findings, and (3) officer-involved shooting with metal bullets.
+
+CRITICALLY IMPORTANT: You are looking for a SINGLE, SPECIFIC incident - not a collection or summary of multiple incidents. If the document describes multiple incidents or appears to be a compilation (like an annual report or multiple case summaries), you MUST classify use of force as "No" or "Unclear" to signal potential file corruption.
+
+Guidelines for classification:
+
+1. USE OF FORCE includes but is not limited to
+   - Physical control holds or takedowns
+   - Strikes with hands, feet, or objects
+   - Impact weapons (batons, flashlights)
+   - Chemical agents (pepper spray, tear gas)
+   - Electronic control devices (Tasers)
+   - Pointing or discharge of firearms
+   - K9 deployments with contact
+   - Vehicle interventions (PIT maneuvers)
+   - Enhanced restraints beyond standard handcuffing
+
+   NOT use of force:
+   - Verbal commands/threats
+   - Officer presence only
+   - Autopsy reports describing wounds without explicitly stating officer actions
+   - Medical examiner findings without direct description of officer actions
+   - Descriptions of injuries without explicit mention of what officers did
+   - Lists of multiple incidents from different dates/cases
+   - Collections of incidents in a report format
+
+2. SUSTAINED MISCONDUCT means:
+   - Explicit sustained/upheld findings
+   - Confirmed disciplinary actions
+   - Final, not preliminary determinations
+   - Only if there was an investigation that had sustained findings of misconduct can there be misconduct
+   NOT misconduct:
+   - Mere allegations, no matter how much they might seem to imply misconduct
+   - Pending investigations do not matter unless they result in sustained misconduct
+   - Inferred misconduct without sustained findings
+   - Other sustained types, such as sustained injuries
+
+3. OFFICER-INVOLVED SHOOTING (OIS) requires:
+   - Discharge of firearm with metal bullets BY AN OFFICER
+   - Clear statement that officer(s) shot at a person
+   NOT OIS:
+   - Less-lethal weapons (tasers, bean bags, rubber bullets)
+   - Brandishing without discharge
+   - Threats only
+   - Autopsy reports listing gunshot wounds without explicitly stating they came from police officers
+   - Medical examiner descriptions of injuries without stating they were caused by police firearms
+
+Full list of source documents
+--------------------
+$source_text
+--------------------
+
+Provide your analysis in this format:
+
+USE OF FORCE ANALYSIS
+- Classification: [Yes/No/Unclear]
+- Evidence: [Quote relevant text]
+- Type(s) of Force: [List specific actions]
+- Reasoning: [1-2 sentences explaining classification]
+- AUTOMATIC DISQUALIFIERS (check all):
+  [ ] Document is an autopsy or medical report without explicitly describing officer actions
+  [ ] Document contains multiple separate incidents or case summaries
+  [ ] Document is a compilation of statistics or incidents (e.g., annual report)
+  [ ] Document describes injuries but not what specific officers did to cause them
+  If ANY box above is checked, classification MUST be "No" or "Unclear"
+
+MISCONDUCT ANALYSIS
+- Classification: [Yes/No/Unclear]. For misconduct, be particularly careful not to assign true when the text does not explicitly mention a sustained finding of misconduct after an investigation.
+- Evidence: [Quote relevant text or "None found"]
+- Reasoning: [1-2 sentences explaining classification]
+
+OFFICER-INVOLVED SHOOTING ANALYSIS
+- Classification: [Yes/No/Unclear]
+- Evidence: [Quote relevant text]
+- Weapon Details: [If applicable]
+- Reasoning: [1-2 sentences explaining classification]
+- AUTOMATIC DISQUALIFIERS (check all):
+  [ ] Document is an autopsy or medical report without explicitly stating police officers fired weapons
+  [ ] Document describes gunshot wounds without explicitly stating they were caused by police
+
+For each category, if you are unsure about any classification, please indicate "unclear" and provide a brief explanation.
+Always return "unclear" if you are not absolutely sure in the classification.
+
+EXAMPLES OF FALSE POSITIVES (must be classified as "No" or "Unclear"):
+1. Autopsy reports describing gunshot wounds without explicitly stating police officers fired the shots
+2. Medical examiner findings discussing injuries without explicitly linking them to police actions
+3. Documents containing multiple separate incidents involving different officers on different dates
+4. Annual reports or compilations of use of force statistics
+5. Descriptions of injuries without clearly stating which specific officers caused them and how

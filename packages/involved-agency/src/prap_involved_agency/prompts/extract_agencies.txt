@@ -1,0 +1,392 @@
+
+<agency_extraction_prompt>
+
+<objective>
+Extract INVESTIGATING and RESPONDING agencies from police document summaries.
+Only extract agencies where the text clearly links an agency name to an action.
+Prefer under-extraction over incorrect extraction.
+</objective>
+
+<definitions>
+INVESTIGATING AGENCY: An agency that investigated the USE OF FORCE or OFFICER MISCONDUCT — NOT the underlying crime.
+
+This is about inter-law-enforcement accountability. We are looking for agencies that reviewed, investigated, or made decisions about WHETHER AN OFFICER'S ACTIONS WERE JUSTIFIED.
+
+- Required pattern: [Agency Name] investigated the shooting / reviewed the use of force / determined the shooting was lawful / declined charges against the officer / conducted autopsy / investigated officer misconduct
+- The agency name and the investigation-of-force verb must appear together in the same passage.
+
+VALID investigating actions (reviewing WHETHER FORCE WAS JUSTIFIED):
+- Investigated the officer-involved shooting
+- Reviewed whether the use of force was within policy
+- Determined the shooting was lawful or unlawful
+- Declined to file charges against the officer
+- Conducted autopsy and determined cause of death
+- Investigated officer misconduct or policy violations
+- Oversight review of use of force
+
+INVALID investigating actions (investigating the UNDERLYING CRIME — this makes them RESPONDING):
+- Investigated the burglary, robbery, assault, domestic disturbance
+- Responded to and investigated a call for service
+- Interviewed crime witnesses or collected crime scene evidence
+- Arrested the suspect
+
+CRITICAL: The agency that investigated the crime the suspect committed is a RESPONDING agency. The agency that investigated WHETHER THE OFFICER'S FORCE WAS JUSTIFIED is the INVESTIGATING agency.
+
+RESPONDING AGENCY: An agency whose officers were involved in or present at the incident.
+- Required pattern: Officer [Name] of/from [Agency Name] responded / used force / fired weapon / pursued / was present / secured scene / violated policy
+- Also includes agencies whose officers investigated the underlying crime (burglary, robbery, etc.)
+- The officer, agency name, and action verb must appear together in the same passage.
+</definitions>
+
+<common_agency_types>
+These are the typical agency types involved in use-of-force and misconduct cases.
+Use this as a checklist — if you see evidence of any of these, look carefully
+for both their RESPONDING and INVESTIGATING roles.
+
+TYPICALLY RESPONDING:
+- City Police Departments (e.g., Los Angeles Police Department, San Jose Police Department)
+- County Sheriff's Departments (e.g., Riverside County Sheriff's Department)
+- Highway Patrol (e.g., California Highway Patrol)
+- Specialized / Transit / Port Police (e.g., Los Angeles Port Police, East Bay Regional Park District Police)
+- State Corrections (e.g., California Department of Corrections and Rehabilitation)
+
+TYPICALLY INVESTIGATING:
+- County District Attorney's Offices (e.g., Los Angeles County District Attorney's Office)
+- State Departments of Justice (e.g., California Department of Justice)
+- Medical Examiners / Coroners (e.g., Los Angeles County Medical Examiner-Coroner, Riverside County Coroner's Office)
+- Oversight bodies with investigative authority (e.g., Office of Inspector General, San Francisco Department of Police Accountability)
+
+COMMONLY DUAL-ROLE (both RESPONDING and INVESTIGATING):
+- Sheriff's Departments often respond AND investigate via internal affairs or homicide bureau
+- Large Police Departments (LAPD, SFPD, Long Beach PD, etc.) often respond AND investigate their own officers via internal divisions (Force Investigation Division, Internal Affairs, etc.)
+
+IMPORTANT: When you extract an agency as RESPONDING, actively re-read the text for evidence
+they ALSO investigated the use of force. When you extract an agency as INVESTIGATING, actively
+re-read the text for evidence their officers were ALSO present at the incident. If both roles
+are supported, list the agency in BOTH responding_agencies AND investigating_agencies.
+</common_agency_types>
+
+<core_rule>
+CLEAR LINKAGE REQUIRED:
+Every extraction must be supported by clear linkage between an AGENCY NAME and an ACTION VERB
+within the same passage (paragraph or closely adjacent sentences).
+
+VALID: "Officer Jones of the Glendale Police Department fired his weapon" — agency and action in same statement.
+VALID: "Officer Jones, a Glendale Police Department patrol officer, responded to the call. Jones fired his weapon at the suspect." — agency clearly established for this officer in same passage, action follows immediately.
+VALID: "The Los Angeles County District Attorney's Office investigated the officer-involved shooting" — agency and action in same statement.
+INVALID: Agency mentioned only in a roster, organizational chart, or document header with no connection to incident actions.
+INVALID: Agency name appears only in letterhead or footer with no narrative linkage to actions.
+INVALID: Officer named in one section of the document, agency named in a completely separate section with no narrative connection.
+
+If you cannot find a passage that clearly connects the agency name to the action, do not extract it.
+</core_rule>
+
+<extraction_rules>
+RULE 1 — NO FEDERAL AGENCIES:
+Skip FBI, DEA, ATF, U.S. Marshals, Border Patrol, DHS, ICE, and all other federal agencies.
+NOTE: State-level agencies are NOT federal and SHOULD be extracted. This includes:
+- State Departments of Justice (e.g., California Department of Justice)
+- State Highway Patrols (e.g., California Highway Patrol)
+- State Departments of Corrections (e.g., California Department of Corrections and Rehabilitation)
+- State-level investigative agencies (e.g., Arizona Department of Public Safety)
+
+RULE 2 — GEOGRAPHIC IDENTIFIER REQUIRED:
+Agency names must start with a city or county name.
+- CORRECT: "Los Angeles County District Attorney's Office"
+- INCORRECT: "District Attorney's Office" (missing geography)
+- If the summary text provides the geographic context elsewhere in the same document, you may add it. If not, reject the agency.
+- EXCEPTION: State-level agencies already carry their geographic identifier (e.g., "California Department of Justice").
+
+RULE 3 — PARENT AGENCY ONLY:
+Normalize sub-divisions to their parent agency.
+- "LASD Internal Affairs Bureau" → "Los Angeles County Sheriff's Department"
+- "Orange County Crime Laboratory" → "Orange County Sheriff's Department"
+- "LAPD Force Investigation Division" → "Los Angeles Police Department"
+- Remove court locations, station names, bureau names from the agency name.
+
+RULE 4 — LAW ENFORCEMENT AND OVERSIGHT AGENCIES ONLY:
+Exclude fire departments, EMS, hospitals, and multi-agency task forces.
+INCLUDE formal government oversight bodies with investigative authority, such as:
+- Office of Inspector General (OIG)
+- Department of Police Accountability
+- Police Commissions with investigative mandates
+These oversight bodies should be classified as INVESTIGATING when they review use of force or misconduct.
+</extraction_rules>
+
+<evidence_rules>
+Every evidence string MUST follow this pattern:
+
+For RESPONDING: [Officer Name] of [Full Agency Name] [action verb describing incident involvement]
+For INVESTIGATING: [Full Agency Name] [action verb describing investigation of use of force or misconduct]
+
+If you cannot write the evidence string in this pattern using information from the text, do not extract the agency.
+
+Maximum 200 characters per evidence string. No quotation marks. Single line. Third person.
+</evidence_rules>
+
+<few_shot_examples>
+
+Example 1 — Simple use of force (EXTRACT):
+Input: On January 26, 2014, Officer Butera of the San Diego Police Department fired at the suspect. The San Diego County District Attorney's Office investigated the officer-involved shooting.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "San Diego Police Department",
+      "evidence": ["Officer Butera of the San Diego Police Department fired at the suspect"],
+      "role_description": "Officer used lethal force by firing weapon"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "San Diego County District Attorney's Office",
+      "evidence": ["San Diego County District Attorney's Office investigated the officer-involved shooting"],
+      "role_description": "Investigated officer-involved shooting"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "SDPD officer fired weapon as responding. DA investigated the shooting itself which is use of force investigation."
+}
+
+Example 2 — No explicit linkage (DO NOT EXTRACT):
+Input: Officer Davis is employed by the Riverside Police Department. The suspect was shot during the encounter. The District Attorney's Office was notified.
+Output:
+{
+  "responding_agencies": [],
+  "investigating_agencies": [],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Officer Davis linked to Riverside PD only by employment without incident action. Shooting not attributed to any named agency. DA only notified which is passive. No clear linkage found."
+}
+
+Example 3 — Agency investigated the CRIME not the force (RESPONDING not INVESTIGATING):
+Input: Glendale Police Department officers responded to a burglary in progress call. Officer Jones of the Glendale Police Department confronted the suspect and fired his weapon. Glendale Police Department detectives investigated the attempted burglary and interviewed the homeowner. The Los Angeles County District Attorney's Office investigated the officer-involved shooting and determined it was justified.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Glendale Police Department",
+      "evidence": ["Officer Jones of the Glendale Police Department confronted the suspect and fired his weapon", "Glendale Police Department officers responded to a burglary in progress call"],
+      "role_description": "Officers responded to scene and officer used lethal force"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "Los Angeles County District Attorney's Office",
+      "evidence": ["Los Angeles County District Attorney's Office investigated the officer-involved shooting and determined it was justified"],
+      "role_description": "Investigated officer-involved shooting and determined justification"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Glendale PD investigated the burglary which is the underlying crime making them RESPONDING not INVESTIGATING. They also had officers who used force. LA County DA investigated whether the shooting was justified which is use of force investigation making them INVESTIGATING."
+}
+
+Example 4 — Dual role agency (EXTRACT):
+Input: Officer Martinez of the Los Angeles Police Department used his taser on the suspect. LAPD Internal Affairs Division investigated whether the use of force was within department policy.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Los Angeles Police Department",
+      "evidence": ["Officer Martinez of the Los Angeles Police Department used his taser on the suspect"],
+      "role_description": "Officer used force via taser deployment"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "Los Angeles Police Department",
+      "evidence": ["LAPD Internal Affairs Division investigated whether the use of force was within department policy"],
+      "role_description": "Investigated whether use of force was within policy via Internal Affairs"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "LAPD is both responding via Officer Martinez using taser and investigating via IA reviewing the force."
+}
+
+Example 5 — Federal agency excluded:
+Input: Border Patrol Agent Rodriguez from U.S. Customs and Border Protection used pepper spray. San Diego Police Department officers assisted at the scene. San Diego County District Attorney's Office reviewed the use of force.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "San Diego Police Department",
+      "evidence": ["San Diego Police Department officers assisted at the scene"],
+      "role_description": "Officers assisted at scene"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "San Diego County District Attorney's Office",
+      "evidence": ["San Diego County District Attorney's Office reviewed the use of force"],
+      "role_description": "Reviewed use of force"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "CBP excluded as federal agency. SDPD responded. DA reviewed use of force which is investigating."
+}
+
+Example 6 — Normalize sub-divisions (EXTRACT with correction):
+Input: Los Angeles County Sheriff's Department Internal Affairs Bureau investigated whether Deputy Smith's use of force was within policy.
+Output:
+{
+  "responding_agencies": [],
+  "investigating_agencies": [
+    {
+      "agency_name": "Los Angeles County Sheriff's Department",
+      "evidence": ["Los Angeles County Sheriff's Department Internal Affairs Bureau investigated whether Deputy Smith use of force was within policy"],
+      "role_description": "Investigated whether use of force was within policy via Internal Affairs"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Internal Affairs Bureau normalized to parent agency LASD. Statement explicitly names agency with use of force investigation verb."
+}
+
+Example 7 — Missing geographic identifier, found in context (EXTRACT with correction):
+Input: The incident occurred in Sacramento County. The District Attorney's Office investigated the deputy-involved shooting and declined to file charges against the deputy.
+Output:
+{
+  "investigating_agencies": [
+    {
+      "agency_name": "Sacramento County District Attorney's Office",
+      "evidence": ["Sacramento County District Attorney's Office investigated the deputy-involved shooting and declined to file charges"],
+      "role_description": "Investigated deputy-involved shooting and declined charges"
+    }
+  ],
+  "responding_agencies": [],
+  "confidence_level": "MEDIUM",
+  "extraction_reasoning": "Geographic identifier Sacramento County found in document. DA investigated the shooting which is use of force investigation."
+}
+
+Example 8 — Missing geographic identifier, NOT in context (REJECT):
+Input: The District Attorney's Office investigated the shooting. Officer Williams used force during the arrest.
+Output:
+{
+  "responding_agencies": [],
+  "investigating_agencies": [],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "DA Office has no geographic identifier and none found in document. Officer Williams used force but no agency named in that statement. Both rejected."
+}
+
+Example 9 — Officers investigated call for service (RESPONDING not INVESTIGATING):
+Input: Sacramento Police Department officers responded to and investigated a report of a domestic disturbance. During the encounter, Officer Kim of the Sacramento Police Department used his taser on the suspect. The Sacramento County District Attorney's Office reviewed the use of force.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Sacramento Police Department",
+      "evidence": ["Officer Kim of the Sacramento Police Department used his taser on the suspect", "Sacramento Police Department officers responded to and investigated a report of a domestic disturbance"],
+      "role_description": "Officers responded to scene investigated the crime and officer used force"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "Sacramento County District Attorney's Office",
+      "evidence": ["Sacramento County District Attorney's Office reviewed the use of force"],
+      "role_description": "Reviewed use of force"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "SPD investigated the domestic disturbance which is the underlying crime making them RESPONDING. Officer Kim also used force. DA reviewed the use of force itself which is INVESTIGATING."
+}
+
+Example 10 — Misconduct case with explicit linkage:
+Input: Officer Garcia of the Miami-Dade Police Department allegedly falsified an arrest report. Officer Ramirez of Miami-Dade PD reported the misconduct to his supervisor. The Florida Department of Law Enforcement investigated the misconduct allegations against Officer Garcia.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Miami-Dade Police Department",
+      "evidence": ["Officer Garcia of Miami-Dade Police Department allegedly falsified an arrest report", "Officer Ramirez of Miami-Dade PD reported the misconduct to his supervisor"],
+      "role_description": "Officer accused of falsifying report and officer who reported misconduct"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "Florida Department of Law Enforcement",
+      "evidence": ["Florida Department of Law Enforcement investigated the misconduct allegations against Officer Garcia"],
+      "role_description": "Investigated misconduct allegations"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Both officers explicitly linked to Miami-Dade PD with action verbs. FDLE investigated the misconduct which is investigating officer conduct."
+}
+
+Example 11 — Officer identified with agency then acts in nearby sentences (EXTRACT):
+Input: Officer Jones is a patrol officer with the Glendale Police Department. Jones responded to a burglary call and fired his weapon at the fleeing suspect.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Glendale Police Department",
+      "evidence": ["Officer Jones of the Glendale Police Department responded to a burglary call and fired his weapon at the fleeing suspect"],
+      "role_description": "Officer responded to call and used lethal force"
+    }
+  ],
+  "investigating_agencies": [],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Officer Jones is clearly identified as Glendale PD in the immediately preceding sentence and performs incident actions in the next sentence. The passage clearly links the agency to the actions. Extracted as RESPONDING."
+}
+
+Example 12 — Coroner as investigating (EXTRACT):
+Input: The Riverside County Coroner performed the autopsy and determined the cause of death to be multiple gunshot wounds. Officer Davis of the Riverside Police Department had fired his weapon during the encounter.
+Output:
+{
+  "responding_agencies": [
+    {
+      "agency_name": "Riverside Police Department",
+      "evidence": ["Officer Davis of the Riverside Police Department had fired his weapon during the encounter"],
+      "role_description": "Officer used lethal force by firing weapon"
+    }
+  ],
+  "investigating_agencies": [
+    {
+      "agency_name": "Riverside County Coroner",
+      "evidence": ["Riverside County Coroner performed the autopsy and determined the cause of death to be multiple gunshot wounds"],
+      "role_description": "Performed autopsy and determined cause of death"
+    }
+  ],
+  "confidence_level": "HIGH",
+  "extraction_reasoning": "Coroner determined cause of death which is inherently about the use of force outcome making them INVESTIGATING. Officer Davis explicitly linked to Riverside PD with force verb."
+}
+
+</few_shot_examples>
+
+<dual_role_check>
+REQUIRED: After completing your initial extraction, perform this second pass:
+
+1. For each agency in responding_agencies: Re-read the source text for ANY evidence that
+   this same agency ALSO investigated the use of force or misconduct (internal affairs review,
+   policy review, force investigation division, administrative investigation, etc.).
+   If found, add the agency to investigating_agencies as well.
+
+2. For each agency in investigating_agencies: Re-read the source text for ANY evidence that
+   officers from this same agency were ALSO present at or involved in the incident.
+   If found, add the agency to responding_agencies as well.
+
+3. Review the <common_agency_types> checklist: Are there any agency types listed there
+   (District Attorney, Medical Examiner/Coroner, oversight bodies, state DOJ) that appear
+   in the source text but are missing from your extraction? If so, evaluate them for inclusion.
+
+Do not skip this step. Dual-role agencies are common and frequently missed.
+</dual_role_check>
+
+<document_for_review>
+{{source_text}}
+</document_for_review>
+
+<output_instructions>
+Return a structured JSON response matching the AgencyExtraction schema.
+
+Before outputting each agency, verify:
+1. Can I point to a passage where the agency name and action verb are clearly linked?
+2. Does the agency name have a geographic identifier (or is it a state-level agency)?
+3. Is it a non-federal law enforcement or oversight agency?
+4. Is the name normalized to the parent agency?
+5. If INVESTIGATING: Is the agency investigating the USE OF FORCE or MISCONDUCT (not the underlying crime)?
+6. If the agency investigated the underlying crime (burglary, robbery, etc.): classify as RESPONDING, not INVESTIGATING.
+
+If any answer is NO and cannot be corrected from the document text, do not include that agency.
+
+Return empty lists rather than extracting agencies with weak or inferred evidence.
+</output_instructions>
+
+</agency_extraction_prompt>

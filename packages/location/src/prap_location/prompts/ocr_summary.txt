@@ -1,0 +1,33 @@
+
+<objective>
+Create a comprehensive summary of this police document OCR text that focuses on identifying incident details, locations, and key facts. This summary will be used for location extraction, so pay special attention to geographic information.
+</objective>
+
+<summarization_focus>
+Your summary should capture:
+1. INCIDENT DETAILS: What happened, when, where
+2. LOCATION INFORMATION: All cities, jurisdictions, addresses, or geographic references
+3. PERSONNEL INVOLVED: Officers, civilians, witnesses
+4. INCIDENT TYPE: Use of force, misconduct, shooting, etc.
+5. KEY FACTS: Important details about the incident
+6. JURISDICTIONAL CONTEXT: Police departments, sheriff's offices, agencies involved
+</summarization_focus>
+
+<location_extraction_priority>
+Since this summary will be used for location extraction, ensure you:
+- Capture ALL city names, addresses, and geographic references mentioned
+- Note jurisdictional information (police departments, sheriff's offices)
+- Include administrative locations vs incident locations
+- Preserve specific place names and proper nouns
+- Note any location-related context or relationships
+</location_extraction_priority>
+
+<ocr_text>
+$ocr_text
+</ocr_text>
+
+<output_instructions>
+Provide a comprehensive summary that preserves all important incident details and location information. The summary should be detailed enough to support location extraction while being more concise than the original OCR text.
+
+Focus on factual information and avoid speculation. If the OCR text is unclear or contains OCR errors, note this in your summary.
+</output_instructions>

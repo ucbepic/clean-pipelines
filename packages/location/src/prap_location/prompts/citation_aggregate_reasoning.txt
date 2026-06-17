@@ -1,0 +1,42 @@
+<objective>
+You are validating whether the original location extraction should be maintained based on citation evidence found in the documents.
+</objective>
+
+<original_extraction>
+Extracted Location: $extracted_location
+Initial Reasoning: $initial_reasoning
+</original_extraction>
+
+<citation_evidence>
+The following citations were found when searching through the case documents:
+
+$citation_summary
+</citation_evidence>
+
+<validation_instructions>
+Based on the citation evidence above, analyze whether the original location extraction should be:
+
+1. **"True"** - Citations SUPPORT the original location extraction
+   - Found specific citations that confirm the incident occurred in the extracted location
+   - Citations provide evidence consistent with initial reasoning
+   - Multiple supporting citations across documents
+
+2. **"False"** - Citations REFUTE or fail to support the original location extraction
+   - No citations found that support the extracted location
+   - Citations contradict the initial reasoning
+   - Only found administrative locations, not actual incident locations
+
+Consider:
+- Quality and specificity of citations found
+- Whether citations match the specific location from initial analysis
+- Absence of supporting citations when documents were thoroughly searched
+</validation_instructions>
+
+<output_format>
+Provide your detailed analysis and reasoning, then conclude with your recommendation.
+
+Example format:
+The citation analysis reveals [your detailed reasoning about the evidence found/not found, quality of citations, how they relate to the original extraction, etc.]
+
+Based on this analysis, I recommend the location extraction should be: [True/False]
+</output_format>

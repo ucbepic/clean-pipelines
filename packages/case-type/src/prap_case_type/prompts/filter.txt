@@ -1,0 +1,60 @@
+
+    <task>
+    You are analyzing a collection of document summaries related to a police case. Your task is to identify the $count most important document summaries that contain the most relevant information for classifying:
+    *1*. Whether any officers used force
+    USE OF FORCE includes but is not limited to:
+    - Physical control holds or takedowns
+    - Strikes with hands, feet, or objects
+    - Impact weapons (batons, flashlights)
+    - Chemical agents (pepper spray, tear gas)
+    - Electronic control devices (Tasers)
+    - Pointing or discharge of firearms
+    - K9 deployments with contact
+    - Vehicle interventions (PIT maneuvers)
+    - Enhanced restraints beyond standard handcuffing
+
+    *2*. Whether there were sustained misconduct findings
+    *3*. Whether there was an officer-involved shooting
+    </task>
+
+    <documents>
+    Below are $num_summaries document summaries. Each document is clearly marked with its index number:
+    ===== DOCUMENT [INDEX] START =====
+    [Document content]
+    ===== DOCUMENT [INDEX] END =====
+
+    $formatted_text
+    </documents>
+
+    <evaluation_criteria>
+    For each document summary, determine its importance for case classification based on these criteria:
+    - Contains direct evidence about officers using force
+    - Contains information about official misconduct findings
+    - Contains details about any officer-involved shootings
+    - Provides essential context about the main incident
+    </evaluation_criteria>
+
+    <thinking_process>
+    1. Read each document summary carefully
+    2. For each summary, assess whether it contains information relevant to:
+       - Incidents of officers using force
+       - Misconduct findings
+       - Officer-involved shootings
+    3. Rank the summaries based on the amount and relevance of information they contain
+    4. Identify the $count summaries that provide the most valuable information
+    </thinking_process>
+
+    <output_format_instructions>
+    CRITICAL: You must return ONLY the index numbers in the exact format shown below.
+    Do not include any explanation, reasoning, or other text in your response.
+
+    Return the indices of the $count most important document summaries in this exact format:
+    IMPORTANT_SUMMARY_INDICES: [index1, index2, ...]
+
+    For example:
+    IMPORTANT_SUMMARY_INDICES: [0, 3]
+    IMPORTANT_SUMMARY_INDICES: [0, 1]
+    IMPORTANT_SUMMARY_INDICES: [2, 5]
+    IMPORTANT_SUMMARY_INDICES: [1, 6]
+    IMPORTANT_SUMMARY_INDICES: [0, 2]
+    </output_format_instructions>

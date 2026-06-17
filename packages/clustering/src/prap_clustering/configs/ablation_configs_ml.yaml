@@ -1,0 +1,165 @@
+# ============================================================================
+# ML ABLATION CONFIGURATIONS — ATOMIC FEATURE EXPERIMENT
+# ============================================================================
+#
+# Research question: Are Tier 1 (regex) and Tier 2 (LLM) extraction methods
+# complementary? Does an ML model perform better when it has access to BOTH
+# extraction sources than when it only has access to one?
+#
+# Experimental design:
+#   - All models trained on ATOMIC features only (no pre-computed combinations,
+#     no cross-tier aggregations). The model must discover combinations itself.
+#   - Three feature conditions: tier1_only | tier2_only | both
+#   - Three model types: decision_tree | random_forest | lightgbm
+#   - If both > max(tier1_only, tier2_only): tiers are complementary.
+#     This result is attributable to information content, not feature engineering.
+#
+# Model files saved by learn_matching_rules.py as dicts:
+#   {"model": clf, "feature_cols": [...], "use_nan": bool}
+# The feature_cols list is the authoritative source for inference features.
+#
+# Output directory: data/output/ablations_ml/
+# ============================================================================
+
+ablations:
+
+  # --------------------------------------------------------------------------
+  # DECISION TREE — tier1, tier2, both
+  # --------------------------------------------------------------------------
+
+  # - name: "dt_tier1_only"
+  #   description: >
+  #     Decision Tree trained on Tier 1 atomic features only (regex from filepath/filename).
+  #     Baseline: what can regex extraction alone learn?
+  #   date_proximity_days: 365
+  #   require_dates_present: false
+  #   enabled_tiers: [1, 2]
+  #   enabled_rules:
+  #     tier1_case_id: true
+  #     tier1_name_date: true
+  #     tier2_case_id: true
+  #     tier2_subject_date_or_case: true
+  #     tier2_date_officer_case_or_subject: true
+  #   disable_case_ids: false
+  #   disable_dates: false
+  #   disable_subject_names: false
+  #   disable_officer_names: false
+  #   use_learned_model: true
+  #   model_path: "../../data/output/learned_rules/decision_tree_tier1_only.pkl"
+  #   feature_subset: "tier1_only"
+
+  # - name: "dt_tier2_only"
+  #   description: >
+  #     Decision Tree trained on Tier 2 atomic features only (LLM extraction from OCR).
+  #     Baseline: what can LLM extraction alone learn?
+  #   date_proximity_days: 365
+  #   require_dates_present: false
+  #   enabled_tiers: [1, 2]
+  #   enabled_rules:
+  #     tier1_case_id: true
+  #     tier1_name_date: true
+  #     tier2_case_id: true
+  #     tier2_subject_date_or_case: true
+  #     tier2_date_officer_case_or_subject: true
+  #   disable_case_ids: false
+  #   disable_dates: false
+  #   disable_subject_names: false
+  #   disable_officer_names: false
+  #   use_learned_model: true
+  #   model_path: "../../data/output/learned_rules/decision_tree_tier2_only.pkl"
+  #   feature_subset: "tier2_only"
+
+  # - name: "dt_both"
+  #   description: >
+  #     Decision Tree trained on ALL atomic features (Tier 1 + Tier 2).
+  #     Key test: does combining both extraction sources improve ML performance?
+  #     If dt_both > max(dt_tier1_only, dt_tier2_only): tiers are complementary.
+  #   date_proximity_days: 365
+  #   require_dates_present: false
+  #   enabled_tiers: [1, 2]
+  #   enabled_rules:
+  #     tier1_case_id: true
+  #     tier1_name_date: true
+  #     tier2_case_id: true
+  #     tier2_subject_date_or_case: true
+  #     tier2_date_officer_case_or_subject: true
+  #   disable_case_ids: false
+  #   disable_dates: false
+  #   disable_subject_names: false
+  #   disable_officer_names: false
+  #   use_learned_model: true
+  #   model_path: "../../data/output/learned_rules/decision_tree_both.pkl"
+  #   feature_subset: "both"
+
+  # --------------------------------------------------------------------------
+  # RANDOM FOREST — tier1, tier2, both
+  # --------------------------------------------------------------------------
+
+  - name: "rf_tier1_only"
+    description: >
+      Random Forest trained on Tier 1 atomic features only.
+      Robustness check: does the complementarity result hold across model types?
+    date_proximity_days: 365
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: true
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: true
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: false
+    use_learned_model: true
+    model_path: "../../data/output/learned_rules/random_forest_tier1_only.pkl"
+    feature_subset: "tier1_only"
+
+  - name: "rf_tier2_only"
+    description: >
+      Random Forest trained on Tier 2 atomic features only.
+    date_proximity_days: 365
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: true
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: true
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: false
+    use_learned_model: true
+    model_path: "../../data/output/learned_rules/random_forest_tier2_only.pkl"
+    feature_subset: "tier2_only"
+
+  - name: "rf_both"
+    description: >
+      Random Forest trained on ALL atomic features (Tier 1 + Tier 2).
+      Key test: if rf_both > max(rf_tier1_only, rf_tier2_only), corroborates DT result.
+    date_proximity_days: 365
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: true
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: true
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: false
+    use_learned_model: true
+    model_path: "../../data/output/learned_rules/random_forest_both.pkl"
+    feature_subset: "both"
+
+
+# Evaluation settings
+evaluation:
+  ground_truth_column: "provisional_case_name"
+  output_dir: "../../data/output/ablations_ml"
+  reports_dir: "../../evaluation/reports/ablations_ml"

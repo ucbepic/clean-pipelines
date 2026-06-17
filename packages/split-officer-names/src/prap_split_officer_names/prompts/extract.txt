@@ -1,0 +1,139 @@
+<objective>
+Analyze this string to determine if it represents a valid human name with a FULL first name and FULL last name.
+</objective>
+
+<name_string>
+$name_string
+</name_string>
+
+<valid_name_definition>
+A VALID human name must have:
+- REQUIRED: Full first name (given name) - must be a complete given name, NOT just an initial
+- REQUIRED: Full last name (surname/family name)
+- OPTIONAL: Middle name or middle initial
+- OPTIONAL: Suffix (Jr., Sr., III, IV, etc.)
+
+CRITICAL: Single initials like "G.", "A.", "J." are NOT valid first names.
+The name must have a complete, spelled-out first name.
+</valid_name_definition>
+
+<few_shot_examples>
+Example 1 - VALID (standard name):
+Input: "Matthew Shook"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Matthew", "last_name": "Shook", "middle_name": "", "suffix": ""}}
+
+Example 2 - VALID (Hispanic name):
+Input: "Arnaldo Hernandez"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Arnaldo", "last_name": "Hernandez", "middle_name": "", "suffix": ""}}
+
+Example 3 - VALID (name with middle initial):
+Input: "James A. Romero"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "James", "last_name": "Romero", "middle_name": "A.", "suffix": ""}}
+
+Example 4 - INVALID (inverted with only initial):
+Input: "Martin, G."
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "Martin", "middle_name": "", "suffix": ""}}
+
+Example 5 - VALID (common name):
+Input: "Jose Galvez"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Jose", "last_name": "Galvez", "middle_name": "", "suffix": ""}}
+
+Example 6 - VALID (name with multiple parts):
+Input: "Gerard Eamon Hynes"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Gerard", "last_name": "Hynes", "middle_name": "Eamon", "suffix": ""}}
+
+Example 7 - INVALID (role description):
+Input: "Counselor III"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "", "middle_name": "", "suffix": ""}}
+
+Example 8 - INVALID (only initial for first name):
+Input: "A. Marks"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "Marks", "middle_name": "", "suffix": ""}}
+
+Example 9 - VALID (name with suffix):
+Input: "Robert Johnson Jr."
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Robert", "last_name": "Johnson", "middle_name": "", "suffix": "Jr."}}
+
+Example 10 - INVALID (missing first name):
+Input: "Smith, Jr."
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "Smith", "middle_name": "", "suffix": "Jr."}}
+
+Example 11 - VALID (short common first name):
+Input: "Jim Renstrom"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Jim", "last_name": "Renstrom", "middle_name": "", "suffix": ""}}
+
+Example 12 - VALID (nickname first name):
+Input: "Nate Shannon"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Nate", "last_name": "Shannon", "middle_name": "", "suffix": ""}}
+
+Example 13 - VALID (Matt is a valid first name):
+Input: "Matt Alexander"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Matt", "last_name": "Alexander", "middle_name": "", "suffix": ""}}
+
+Example 14 - VALID (Ed is a valid first name):
+Input: "Ed Conover"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Ed", "last_name": "Conover", "middle_name": "", "suffix": ""}}
+
+Example 15 - VALID (hyphenated last name):
+Input: "Van Leeuwen"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "Van Leeuwen", "middle_name": "", "suffix": ""}}
+
+Example 16 - VALID (Doug is a valid first name):
+Input: "Douglas Haynes"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Douglas", "last_name": "Haynes", "middle_name": "", "suffix": ""}}
+
+Example 17 - VALID (Phil is a valid first name):
+Input: "Phil Vargas"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Phil", "last_name": "Vargas", "middle_name": "", "suffix": ""}}
+
+Example 18 - VALID (Nick is a valid first name):
+Input: "Nick Borges"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Nick", "last_name": "Borges", "middle_name": "", "suffix": ""}}
+
+Example 19 - VALID (Ted is a valid first name):
+Input: "Ted Garcia"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Ted", "last_name": "Garcia", "middle_name": "", "suffix": ""}}
+
+Example 20 - VALID (Sal is a valid first name):
+Input: "Sal Heredia"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Sal", "last_name": "Heredia", "middle_name": "", "suffix": ""}}
+
+Example 21 - INVALID (single last name only):
+Input: "Fountain"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "Fountain", "middle_name": "", "suffix": ""}}
+
+Example 22 - INVALID (redacted placeholder):
+Input: "[Name Redacted]"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "", "middle_name": "", "suffix": ""}}
+
+Example 23 - INVALID (generic reference):
+Input: "officers"
+Output: {"is_valid_name": false, "extracted_parts": {"first_name": "", "last_name": "", "middle_name": "", "suffix": ""}}
+
+Example 24 - VALID (Al is a valid first name):
+Input: "Al Smith"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Al", "last_name": "Smith", "middle_name": "", "suffix": ""}}
+
+Example 25 - VALID (Doug is a valid first name):
+Input: "Doug Haynes"
+Output: {"is_valid_name": true, "extracted_parts": {"first_name": "Doug", "last_name": "Haynes", "middle_name": "", "suffix": ""}}
+
+</few_shot_examples>
+
+<analysis_steps>
+1. Check if string contains at least two distinct name parts
+2. Verify the first part is a FULL given name (not just an initial like J., A., G.)
+3. Identify if there is a clear last name
+4. Check for optional middle name or suffix
+5. Reject placeholders, titles without names, single words, initials-only, or ambiguous strings
+</analysis_steps>
+
+<output_instructions>
+Return ONLY a simple JSON object with actual values. Do NOT include schema definitions, descriptions, or type information.
+
+CORRECT format example:
+{"is_valid_name": true, "extracted_parts": {"first_name": "John", "last_name": "Smith", "middle_name": "", "suffix": ""}}
+
+Do NOT return anything like this:
+{"properties": {...}, "type": "object", ...}
+</output_instructions>

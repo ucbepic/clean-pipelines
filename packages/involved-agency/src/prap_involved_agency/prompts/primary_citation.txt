@@ -1,0 +1,315 @@
+
+<objective>
+Analyze this page of text to determine if it contains a citation supporting {{agency_name}} as a {{agency_type}} agency.
+The agency name and action must both appear on THIS page. Do not infer from context.
+</objective>
+
+<agency_extraction_context>
+AGENCY NAME: {{agency_name}}
+AGENCY TYPE: {{agency_type}}
+{{extraction_context}}
+</agency_extraction_context>
+
+<definitions>
+{% if agency_type == "INVESTIGATING" %}
+INVESTIGATING AGENCY = an agency that investigates the USE OF FORCE or OFFICER MISCONDUCT, NOT the underlying crime.
+
+This is about inter-law-enforcement accountability. We are looking for agencies that reviewed, investigated, or made decisions about WHETHER AN OFFICER'S ACTIONS WERE JUSTIFIED — not agencies that investigated the burglary, robbery, homicide, or other criminal incident that led to the use of force.
+
+VALID investigating citations (investigating the USE OF FORCE or MISCONDUCT):
+- Agency investigated the officer-involved shooting
+- Agency reviewed whether the use of force was justified
+- Agency determined the shooting was lawful
+- Agency declined to file charges against the officer
+- Agency made a charging decision regarding the officer's conduct
+- Coroner determined cause of death (inherently about the force outcome)
+- Internal Affairs investigated the officer's use of force
+- Agency investigated the deputy-involved incident
+- Agency reviewed the officers conduct and found it within policy
+- Oversight board reviewed the use of force
+
+INVALID investigating citations (investigating the UNDERLYING CRIME, not the force):
+- Agency investigated the burglary
+- Agency investigated the robbery
+- Detectives interviewed witnesses to the crime
+- Agency responded to and investigated a call for service
+- Agency investigated the homicide of the victim (when victim is NOT the person force was used on)
+- Agency collected evidence at the crime scene (routine police work)
+- Agency arrested the suspect
+
+CRITICAL DISTINCTION: If an agency investigated a burglary and during that burglary an officer shot someone, the agency that investigated the burglary is a RESPONDING agency (their officers were involved in the incident). The agency that then investigated WHETHER THE SHOOTING WAS JUSTIFIED is the INVESTIGATING agency.
+{% else %}
+RESPONDING AGENCY = an agency whose officers participated in or were present at the incident.
+
+VALID responding citations:
+- Officer Name of Agency responded to scene
+- Agency officers were present at the scene
+- Officer Name of Agency used force (fired weapon, taser, pepper spray, baton, K9, control hold)
+- Agency initiated or joined pursuit
+- Agency officers secured the scene
+- Agency officers collected evidence at scene
+- Agency officers transported suspect
+- For misconduct: Officer Name of Agency violated policy, witnessed misconduct, reported misconduct
+
+INVALID responding citations:
+- Officer employed by Agency (without incident involvement)
+- Agency was notified (passive administrative)
+- Agency mentioned without incident context
+{% endif %}
+</definitions>
+
+<critical_agency_identity_verification>
+BEFORE confirming any citation, verify the PAGE TEXT itself links the actions to {{agency_name}}.
+
+RULES:
+- The agency name (or clear abbreviation) must appear ON THIS PAGE connected to the action
+- Do NOT assume an officer belongs to {{agency_name}} because the extraction context says so
+- If the page says "Officer X from Agency B" but you are searching for Agency A, that is a CONTRADICTION — return has_citation false
+- If the page describes officer actions but does not name any agency, has_citation is false
+- The page text is the ground truth, not the extraction context
+</critical_agency_identity_verification>
+
+<few_shot_examples>
+{% if agency_type == "INVESTIGATING" %}
+EXAMPLE 1 — YES: DA investigated the shooting (use of force review):
+Agency: San Diego County District Attorney's Office (INVESTIGATING)
+Page Text: The San Diego County District Attorney's Office investigated the officer-involved shooting and determined it was justified.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "DA Office investigated the officer-involved shooting which is a use of force investigation and determined justification. Agency name appears on page with investigation verbs.",
+  "quote": "San Diego County District Attorney Office investigated the officer-involved shooting and determined it was justified",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 2 — YES: IA investigated officer conduct:
+Agency: Los Angeles Police Department (INVESTIGATING)
+Page Text: The LAPD Internal Affairs Division conducted a thorough investigation into whether Officer Martinez's use of the taser was within department policy.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "LAPD Internal Affairs investigated whether use of force was within policy which is a use of force investigation. Agency name LAPD appears on page.",
+  "quote": "LAPD Internal Affairs Division conducted investigation into whether Officer Martinez use of taser was within department policy",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 3 — YES: Coroner determined cause of death:
+Agency: Riverside County Coroner (INVESTIGATING)
+Page Text: The Riverside County Coroner performed the autopsy and determined the cause of death to be multiple gunshot wounds.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "Coroner performed autopsy and determined cause of death which is inherently about the use of force outcome. Agency name Riverside County Coroner appears on page.",
+  "quote": "Riverside County Coroner performed autopsy and determined cause of death to be multiple gunshot wounds",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 4 — YES: Agency declined charges against officer:
+Agency: Orange County District Attorney's Office (INVESTIGATING)
+Page Text: After reviewing the evidence, the Orange County District Attorney's Office concluded that criminal charges against Deputy Williams were not warranted.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "DA Office made charging decision about the officer which is a use of force accountability action. Agency name appears on page with review and charging decision verbs.",
+  "quote": "Orange County District Attorney Office concluded that criminal charges against Deputy Williams were not warranted",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 5 — NO: Agency investigated the underlying crime, not the force:
+Agency: Glendale Police Department (INVESTIGATING)
+Page Text: Glendale Police Department detectives investigated the attempted burglary. Detective Francis interviewed the homeowner and collected fingerprints from the scene.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "Glendale PD investigated the burglary which is the underlying crime not the use of force. Investigating a crime scene and interviewing crime witnesses is responding agency activity not use of force investigation.",
+  "quote": "Glendale Police Department detectives investigated the attempted burglary and Detective Francis interviewed homeowner",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 6 — NO: Officers investigated a call for service:
+Agency: Sacramento Police Department (INVESTIGATING)
+Page Text: Sacramento Police Department officers responded to and investigated a report of a domestic disturbance at the residence.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "SPD investigated a domestic disturbance call which is investigating the underlying crime not investigating any use of force. This is responding agency activity.",
+  "quote": "Sacramento Police Department officers responded to and investigated report of domestic disturbance",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 7 — NO: Passive notification only:
+Agency: District Attorney's Office (INVESTIGATING)
+Page Text: The District Attorney's Office was notified of the incident on March 15, 2023.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "Was notified is passive administrative action not an investigation of use of force.",
+  "quote": "District Attorney Office was notified of the incident",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 8 — NO: CONTRADICTION — different agency:
+Agency: Los Angeles County Sheriff's Department (INVESTIGATING)
+Page Text: Detective Martinez from the Orange County District Attorney's Office reviewed all body camera footage and conducted follow-up interviews regarding the shooting.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "CONTRADICTION: Page text identifies Detective Martinez as from Orange County DA Office not Los Angeles County Sheriff's Department. The use of force investigation actions belong to a different agency.",
+  "quote": "Detective Martinez from Orange County District Attorney Office reviewed body camera footage regarding the shooting",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 9 — NO: Agency name not on page:
+Agency: Glendale Police Department (INVESTIGATING)
+Page Text: Officer Jones exited his vehicle and discharged his weapon striking the suspect who was then taken into custody.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "No agency name appears on this page. Officer actions are present but cannot be attributed to any specific agency from the page text alone.",
+  "quote": "Officer Jones exited vehicle and discharged weapon striking suspect",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 10 — YES: Oversight board reviewed use of force:
+Agency: San Francisco Office of Citizen Complaints (INVESTIGATING)
+Page Text: The San Francisco Office of Citizen Complaints opened an investigation into the officers use of deadly force and interviewed all involved officers.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "OCC investigated officers use of deadly force which is a use of force investigation. Agency name appears on page with investigation verbs opened investigation and interviewed.",
+  "quote": "San Francisco Office of Citizen Complaints opened investigation into officers use of deadly force and interviewed involved officers",
+  "confidence": "HIGH"
+}
+
+{% else %}
+EXAMPLE 1 — YES: Officer used force with agency named:
+Agency: San Diego Police Department (RESPONDING)
+Page Text: Officer Butera of the San Diego Police Department fired three shots at the suspect who was fleeing the scene.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "Officer Butera fired weapon which is use of force and agency name San Diego Police Department appears on page connected to the officer.",
+  "quote": "Officer Butera of San Diego Police Department fired three shots at suspect who was fleeing",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 2 — YES: Agency officers present at scene:
+Agency: California Highway Patrol (RESPONDING)
+Page Text: CHP officers were on scene when the vehicle crashed. Officer Martinez and Officer Lopez secured the perimeter.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "CHP officers present at scene and secured perimeter. CHP is clear abbreviation of California Highway Patrol appearing on page.",
+  "quote": "CHP officers were on scene when vehicle crashed and Officer Martinez and Lopez secured perimeter",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 3 — YES: Officers investigated the crime (this is RESPONDING not investigating):
+Agency: Glendale Police Department (RESPONDING)
+Page Text: Glendale Police Department officers responded to the burglary in progress call. Officer Francis pursued the suspect on foot and Officer Jones confronted the suspect in the driveway.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "GPD officers responded to crime scene pursued suspect and confronted suspect which are incident involvement actions. Agency name Glendale Police Department appears on page. Investigating the underlying crime is responding activity.",
+  "quote": "Glendale Police Department officers responded to burglary call and Officer Francis pursued suspect and Officer Jones confronted suspect",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 4 — YES: Misconduct case:
+Agency: Miami-Dade Police Department (RESPONDING)
+Page Text: Officer Garcia of the Miami-Dade Police Department allegedly falsified the arrest report. Officer Ramirez also of Miami-Dade PD reported the misconduct to his supervisor.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "Officer Garcia falsified report and Officer Ramirez reported misconduct with agency name Miami-Dade Police Department on page connected to both officers.",
+  "quote": "Officer Garcia of Miami-Dade Police Department allegedly falsified arrest report and Officer Ramirez of Miami-Dade PD reported misconduct",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 5 — YES: Officers joined pursuit:
+Agency: Sacramento Police Department (RESPONDING)
+Page Text: Sacramento Police Department officers joined the pursuit as it entered city limits and assisted in the eventual apprehension.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "SPD officers joined pursuit and assisted apprehension which is incident involvement. Agency name Sacramento Police Department appears on page.",
+  "quote": "Sacramento Police Department officers joined pursuit as it entered city limits and assisted in apprehension",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 6 — NO: Employment only without incident:
+Agency: Riverside Police Department (RESPONDING)
+Page Text: Officer Davis has been employed by the Riverside Police Department for five years and has received several commendations.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "Employed by alone without any incident involvement is insufficient.",
+  "quote": "Officer Davis employed by Riverside Police Department for five years",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 7 — NO: CONTRADICTION — officer from different agency:
+Agency: Los Angeles Police Department (RESPONDING)
+Page Text: Officer Chen of the Pasadena Police Department responded to the call for service. Officer Chen arrived at the location drew his firearm and ordered the suspect to the ground.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "CONTRADICTION: Page text identifies Officer Chen as Pasadena Police Department not Los Angeles Police Department. All actions attributed to Pasadena PD on this page.",
+  "quote": "Officer Chen of Pasadena Police Department responded to call drew firearm and ordered suspect to ground",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 8 — NO: Actions present but no agency named on page:
+Agency: La Habra Police Department (RESPONDING)
+Page Text: K-9 Officer Martinez had his rifle on the suspect and gave commands. Officer Navarro and K-9 Officer Martinez were identified as those who shot the suspect.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "Officers performed clear responding actions including aiming rifle giving commands and shooting but no agency name appears on this page. Cannot attribute these actions to La Habra Police Department without the agency name appearing on the page.",
+  "quote": "K-9 Officer Martinez had rifle on suspect and Officer Navarro and Martinez were identified as those who shot but no agency named on page",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 9 — NO: Passive notification:
+Agency: Fullerton Police Department (RESPONDING)
+Page Text: The Fullerton Police Department was notified of the incident.
+Response:
+{
+  "has_citation": false,
+  "reasoning": "Was notified is passive administrative action without incident involvement.",
+  "quote": "Fullerton Police Department was notified of the incident",
+  "confidence": "HIGH"
+}
+
+EXAMPLE 10 — YES: Agency confirmed on page with force used:
+Agency: San Bernardino County Sheriff's Department (RESPONDING)
+Page Text: Deputy Pulido from the San Bernardino County Sheriff's Department arrived at the scene deployed pepper spray and fired his duty weapon.
+Response:
+{
+  "has_citation": true,
+  "reasoning": "Deputy Pulido performed responding actions arrived deployed pepper spray and fired weapon. Agency name San Bernardino County Sheriff's Department appears on page connected to the officer.",
+  "quote": "Deputy Pulido from San Bernardino County Sheriff's Department arrived at scene deployed pepper spray and fired duty weapon",
+  "confidence": "HIGH"
+}
+{% endif %}
+</few_shot_examples>
+
+<page_text>
+{{page_text}}
+</page_text>
+
+<output_instructions>
+Complete this checklist before responding:
+1. Does the page text name {{agency_name}} or a clear abbreviation? If NO → has_citation is false.
+2. {% if agency_type == "INVESTIGATING" %}Does the page show investigation of USE OF FORCE or MISCONDUCT (not the underlying crime)?{% else %}Does the page show incident involvement with action verbs?{% endif %} If NO → has_citation is false.
+3. Are the actions connected to {{agency_name}} ON THIS PAGE? If NO → has_citation is false.
+4. Does the page attribute the same actions to a DIFFERENT agency? If YES → has_citation is false.
+
+Return JSON matching PrimaryCitationAnalysis:
+{
+  "has_citation": true or false,
+  "reasoning": "explanation including which checklist items passed or failed",
+  "quote": "text from page WITHOUT quotation marks max 300 chars",
+  "confidence": "HIGH or MEDIUM or LOW"
+}
+</output_instructions>

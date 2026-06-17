@@ -1,0 +1,57 @@
+
+<instructions>
+Carefully examine this legal document text to determine if it contains residential addresses for any of the following people: $names.
+</instructions>
+
+<thinking_process>
+To find addresses for these people, I'll follow these steps:
+1. Scan for direct associations between each name and address patterns
+   - Look for phrases like "Person resides at", "Person's address", "Person lives at"
+   - Check for each name followed by address components (street numbers, street names, etc.)
+
+2. Identify possible address patterns in proximity to each name:
+   - Standard US address format: number + street + apt/unit + city + state + zip
+   - Partial addresses: street numbers and names without city/state
+   - PO Boxes and rural routes
+
+3. Consider contextual clues:
+   - Sections labeled "address", "residence", "contact information"
+   - Information near phrases like "lives at", "residing at", "domiciled at"
+   - Forms or structured sections that might contain address fields
+
+4. Be careful to distinguish:
+   - The address of each person from addresses of other people
+   - Residential addresses from business/work addresses
+   - Current addresses from previous/historical addresses
+</thinking_process>
+
+<document>
+$page_text
+</document>
+
+<format_instructions>
+Respond with a JSON object containing an array of address findings, one for each person:
+
+{
+  "addresses": [
+    {
+      "name": "Person's name exactly as provided",
+      "address_found": true|false,
+      "address": "Complete address as it appears in text", // Only if found
+      "confidence": "high|medium|low",
+      "reasoning": "Explanation of why this is believed to be the person's address",
+      "context": "Direct quote from document containing the address (10-20 words)"
+    },
+    // Repeat for each person
+  ]
+}
+
+For persons where no address is found:
+{
+  "name": "Person's name exactly as provided",
+  "address_found": false,
+  "reasoning": "Explanation of why no address could be identified for this person"
+}
+
+Ensure the output is valid JSON that can be parsed without errors.
+</format_instructions>

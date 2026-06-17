@@ -1,0 +1,63 @@
+
+You are receiving the output from a validation stage that determined whether a police incident location could be extracted from documents.
+
+VALIDATION STAGE OUTPUT YOU ARE RECEIVING:
+- Final Decision: "$final_decision"
+- Validation Decision: "$validation_decision"
+- Validator Reasoning: "$validator_reasoning"
+- Verified Quote: "$verified_quote"
+- Confidence: "$confidence"
+- City Completeness: "$city_completeness"
+- Specificity Assessment: "$specificity_assessment"
+- Additional Details: "$additional_details"
+
+<critical_instructions>
+1. IF Final Decision = "NO":
+   - This means the validation stage determined NO valid incident location exists
+   - The "verified_quote" may contain police department names, administrative locations, or autopsy locations
+   - These are NOT incident locations and should NOT be extracted
+   - You MUST return "None" regardless of what city names appear in the quote
+
+2. IF Final Decision = "YES":
+   - This means the validation stage confirmed a valid incident location exists
+   - The "verified_quote" contains text that explicitly states where the incident occurred
+   - Extract the city name from phrases indicating actual incident location
+   - Format as: [City], [State]
+</critical_instructions>
+
+<few_shot_examples>
+Example 1 - Final Decision "NO":
+Input: final_decision="NO", verified_quote="Martinez Police Department officers responded"
+Reasoning: Police department name only, not incident location
+Your Response: None
+
+Example 2 - Final Decision "NO":
+Input: final_decision="NO", verified_quote="autopsy performed in Sacramento"
+Reasoning: Administrative/medical location, not incident location
+Your Response: None
+
+Example 3 - Final Decision "YES":
+Input: final_decision="YES", verified_quote="shooting occurred in Oakland"
+Reasoning: Explicit incident location stated
+Your Response: Oakland, CA
+
+Example 4 - Final Decision "YES":
+Input: final_decision="YES", verified_quote="arrest took place on Main Street in Fresno"
+Reasoning: Specific incident location with street and city
+Your Response: Fresno, CA
+</few_shot_examples>
+
+<decision_logic>
+- If Final Decision = "NO" → Return "None" (do not extract any city names)
+- If Final Decision = "YES" → Extract and format the incident city from verified_quote
+- If Final Decision = anything else → Return "None"
+</decision_logic>
+
+<output_instructions>
+Based on the Final Decision from the validation stage:
+- If "NO": Return exactly "None"
+- If "YES": Return "[City], [State]" format
+- If unclear: Return exactly "None"
+
+Return ONLY the result, nothing else.
+</output_instructions>

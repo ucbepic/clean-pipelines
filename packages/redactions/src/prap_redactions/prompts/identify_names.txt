@@ -1,0 +1,232 @@
+
+
+<objective>
+Extract names of individuals who are:
+1. Victims - Individuals who have suffered harm from a criminal act. The specific criminal act must be named within the document. Criminal acts include domestic violence, sexual assault, assault, etc.
+2. Witnesses - Individuals who observed or have knowledge about an incident (EXCLUDING police officers)
+3. Children - Minors who are victims or witnesses in the case
+
+Extract ANY identifiable name or reference, including:
+- Full proper names (e.g., "Jonathan Brown", "Sarah J. Miller")
+- Partial names with titles (e.g., "Mrs. Johnson", "Mr. Thompson")
+- First names only if they clearly refer to a victim or witness (e.g., "Jane said she was assaulted")
+- Last names only if they clearly refer to a victim or witness (e.g., "Smith witnessed the incident")
+</objective>
+
+<good_names>
+- Full proper names with first and last name (e.g., "Jonathan Brown")
+- Names with middle initials (e.g., "Sarah J. Miller")
+- Partial names with titles (e.g., "Mrs. Johnson", "Mr. Thompson", "Ms. Garcia")
+- First names only when clearly referring to victims/witnesses (e.g., "Jane reported the assault")
+- Last names only when clearly referring to victims/witnesses (e.g., "Wilson testified")
+- Names must have clear textual evidence linking them to victim/witness status
+</good_names>
+
+<names_to_avoid>
+## DO NOT EXTRACT
+- Names of defendants, suspects, or perpetrators
+- Names of law enforcement personnel (officers, detectives, etc.) EVEN IF they are witnesses
+- Names of legal professionals (attorneys, judges, court staff)
+- Names of government officials unrelated to victim/witness roles
+- Descriptive identifiers that aren't names (e.g., "female subject," "unknown witness")
+- Coded references (e.g., "CV," "W," "(V)")
+- Relationship descriptors WITHOUT names (e.g., just "wife" or "mother" without any name)
+- Age-based identifiers WITHOUT names (e.g., "elderly woman" with no name given)
+- Role-based references WITHOUT names (e.g., just "hostage" or "victim" with no name)
+</names_to_avoid>
+
+<thinking_process_for_names>
+1. Is there ANY name or identifiable reference to this person (full name, partial name, title + surname, etc.)? If not, DO NOT extract.
+2. Is there clear evidence this person is a victim or witness? If not, DO NOT extract.
+3. Is this person definitely NOT in any of the excluded categories (law enforcement, defendant, legal professional)? If they are excluded, DO NOT extract.
+4. Does surrounding context confirm their role as victim or witness? If uncertain, DO NOT extract.
+5. Is there ANY indication this person is a police officer or law enforcement? If yes, DO NOT extract even if they are also a witness.
+</thinking_process_for_names>
+
+
+<thinking_process>
+Follow this systematic approach:
+1. First, scan the document for clear indicators of victim/witness status:
+   - Direct references: "victim," "witness," "complainant," "survivor," "minor"
+   - Contextual clues: "testified that," "was assaulted," "reported that," "suffered injuries"
+
+2. For each potential name you find (including partial names):
+   - Check if there is ANY identifiable name or reference (full, partial, title + surname, etc.)
+   - Check if there are ANY indicators of law enforcement role:
+     * Titles like "Officer," "Detective," "Deputy," "Sergeant," "Sheriff," etc.
+     * References to "badge," "precinct," "department," etc.
+     * Context about taking reports, responding to calls, or other police functions
+     * If ANY law enforcement indicators exist, mark for exclusion EVEN IF they are witnesses
+   - Determine their likely role based on surrounding context
+   - Assess confidence level in this determination
+   - Collect the exact text that supports your classification
+
+3. For ambiguous cases:
+   - Look for additional mentions of the same name elsewhere in the document
+   - Analyze the broader narrative to infer their role
+   - If still uncertain after thorough analysis, DO NOT extract the name
+   - If there's ANY possibility they are law enforcement, DO NOT extract the name
+
+4. Be particularly attentive to privacy-sensitive individuals:
+   - Children are often referenced with initials or partial names
+   - Sexual assault victims may be referred to as "Jane Doe" or by initials
+   - Domestic violence victims may be referenced by relationship ("defendant's wife") or partial names
+
+5. Apply the verification steps to each potential name:
+   - First test: Is there ANY identifiable name or reference?
+   - Second test: Is there clear evidence of victim/witness role?
+   - Third test: Is this person NOT in any excluded category (especially law enforcement)?
+   - Fourth test: Does context confirm their classification?
+   - Fifth test: Is there ANY indication they might be law enforcement? If yes, EXCLUDE.
+
+   Only extract names that pass ALL verification steps.
+</thinking_process>
+
+<document>
+$source_text
+</document>
+
+<example_extractions>
+Expanded Name Extraction Examples
+
+CORRECT Extractions
+
+1. "Jennifer Wilson stated she was assaulted by the defendant in her apartment."
+   EXTRACT: "Jennifer Wilson" - Full proper name (first + last), clear victim role, not law enforcement
+
+2. "According to Michael Johnson, who witnessed the incident from his balcony, the altercation began at approximately 10:30 PM."
+   EXTRACT: "Michael Johnson" - Full proper name (first + last), clear witness role, not law enforcement
+
+3. "Amanda R. Thompson, the victim of domestic violence, sustained bruises to her arms and face."
+   EXTRACT: "Amanda R. Thompson" - Full proper name with middle initial, clear domestic violence victim, not law enforcement
+
+4. "The child, Robert Sanchez (age 12), testified that he observed the suspect entering the building."
+   EXTRACT: "Robert Sanchez" - Full proper name (first + last), identified as child witness, not law enforcement
+
+5. "Margaret Chen was sexually assaulted in the park according to the forensic examination."
+   EXTRACT: "Margaret Chen" - Full proper name (first + last), clear sexual assault victim, not law enforcement
+
+6. "When interviewed, Elizabeth Powell confirmed witnessing the robbery from across the street."
+   EXTRACT: "Elizabeth Powell" - Full proper name (first + last), clear witness role, not law enforcement
+
+7. "Thomas J. Richardson, the 10-year-old victim, suffered minor injuries during the home invasion."
+   EXTRACT: "Thomas J. Richardson" - Full proper name with middle initial, identified as both child and victim, not law enforcement
+
+8. "Stephanie Alvarez described the assault on her person while testifying in court."
+   EXTRACT: "Stephanie Alvarez" - Full proper name (first + last), clear victim role from context, not law enforcement
+
+9. "William Robert Garcia, who resides at the property adjacent to the crime scene, provided a statement describing what he observed."
+   EXTRACT: "William Robert Garcia" - Full proper name with middle name, clear witness role, not law enforcement
+
+10. "The domestic violence victim, Catherine Murphy, had a protective order against the defendant."
+    EXTRACT: "Catherine Murphy" - Full proper name (first + last), clear domestic violence victim, not law enforcement
+
+11. "The victim's mother, Mrs. Johnson, provided additional information."
+    EXTRACT: "Mrs. Johnson" - Partial name with title, relationship to victim makes her a relevant person, witness role
+
+12. "Mr. Thompson, the defendant's neighbor, claimed to have heard the altercation."
+    EXTRACT: "Mr. Thompson" - Partial name with title, witness to the incident
+
+13. "Jane told police she was assaulted by her ex-boyfriend."
+    EXTRACT: "Jane" - First name only, clearly identified as assault victim
+
+14. "Wilson testified that she saw the suspect fleeing the scene."
+    EXTRACT: "Wilson" - Last name only, clearly identified as witness
+
+15. "Ms. Garcia stated she witnessed the robbery from across the street."
+    EXTRACT: "Ms. Garcia" - Partial name with title, clear witness role
+
+INCORRECT Extractions
+
+1. "Officer Richard Martinez witnessed the assault while responding to the call."
+   DO NOT EXTRACT - Law enforcement personnel, excluded even though a witness
+
+2. "Detective Sarah Williams interviewed several witnesses at the scene."
+   DO NOT EXTRACT - Law enforcement personnel, excluded category
+
+3. "The child victim is referred to in the report."
+   DO NOT EXTRACT - No name provided, just descriptor
+
+4. "Deputy Chief Carlos Mendez testified about arriving first at the crime scene."
+   DO NOT EXTRACT - Law enforcement personnel, excluded even if witnessing the aftermath
+
+5. "Attorney Jennifer Lopez represented the victim during the proceedings."
+   DO NOT EXTRACT - Legal professional, excluded category
+
+6. "Judge William Stevens presided over the hearing where the witness testimony was presented."
+   DO NOT EXTRACT - Legal professional, excluded category
+
+7. "The elderly woman reported being the victim of fraud."
+   DO NOT EXTRACT - No name provided, just descriptor
+
+8. "According to Sergeant Wilson, the child witness seemed credible."
+   DO NOT EXTRACT - Law enforcement personnel, excluded category
+
+9. "The perpetrator, James Smith, denied all allegations."
+   DO NOT EXTRACT - Name of defendant/suspect/perpetrator, excluded category
+
+10. "The victim, who wishes to remain anonymous, will be referred to in the report."
+    DO NOT EXTRACT - No name provided, anonymized
+
+11. "Prosecutor Alexandra Bennett argued that the victim's testimony was consistent."
+    DO NOT EXTRACT - Legal professional, excluded category
+
+12. "The defendant's wife confirmed the account."
+    DO NOT EXTRACT - No name provided, just relationship descriptor
+
+13. "A small child witnessed the incident."
+    DO NOT EXTRACT - No name provided, just descriptor
+
+Ambiguous Cases (SHOULD NOT BE EXTRACTED)
+
+1. "The witness, Dr. Thompson, provided medical expertise."
+   DO NOT EXTRACT - Ambiguous role (could be an expert witness/medical professional rather than direct witness)
+
+2. "Jones family members were present during the altercation."
+   DO NOT EXTRACT - Collective reference, not specific individuals
+
+3. "The juvenile will be referred to as A.B. to protect their identity."
+   DO NOT EXTRACT - Initials used for anonymization, not actual names
+
+4. "Martinez, who works security at the building, reported unusual activity."
+   EXTRACT with CAUTION: "Martinez" - Could be job-related witness (similar to law enforcement) but if clearly a civilian security guard and witnessed a crime, may extract
+
+Examples with Multiple Classifications
+
+1. "Emily Johnson, a 16-year-old sexual assault victim, provided testimony via closed-circuit television."
+   EXTRACT: "Emily Johnson" - Full proper name (first + last), multiple classifications: child + sexual assault victim
+
+2. "Alexander Wong, who both witnessed the domestic violence incident and suffered injuries while attempting to intervene."
+   EXTRACT: "Alexander Wong" - Full proper name (first + last), multiple classifications: witness + victim
+
+3. "The minor child, Sophia Martinez, witnessed the domestic violence against her mother."
+   EXTRACT: "Sophia Martinez" - Full proper name (first + last), multiple classifications: child + witness
+
+4. "Officer Emily Chen's 12-year-old daughter, Lily Chen, witnessed the incident."
+   EXTRACT: "Lily Chen" - Full proper name (first + last), classifications: child + witness (not excluded despite parent being law enforcement)
+
+5. "Detective Wilson's wife, Sandra Wilson, was the victim of domestic violence."
+   EXTRACT: "Sandra Wilson" - Full proper name (first + last), domestic violence victim (not excluded despite relationship to law enforcement)
+
+6. "Mrs. Davis, the victim's neighbor, heard screaming and called 911."
+   EXTRACT: "Mrs. Davis" - Partial name with title, witness to the incident
+</example_extractions>
+
+<output_instructions>
+IMPORTANT:
+- Do NOT extract names of police officers, attorneys, judges, court staff, or suspects/perpetrators.
+- NEVER extract police officer names, even if they are witnesses or have other roles.
+- DO extract ANY identifiable name or reference to victims and witnesses, including partial names (Mr./Mrs./Ms. + surname, first names only, last names only)
+- Only extract if there is SOME name or identifiable reference AND clear evidence of victim/witness status.
+- Do NOT extract pure descriptive terms with no name attached (e.g., "the victim" or "a witness" with no name).
+- Do NOT extract the names of potential victims or potential witnesses. You must provide clear evidence that the person you are extracting is a proven victim or witness.
+
+Return structured JSON with extracted_persons array. For each person include:
+- name: Any identifiable name (full, partial, title + surname, first name only, last name only)
+- person_type: One of: victim|witness|domestic_violence_victim|sexual_assault_victim|child
+- reasoning: Specific textual evidence for classification
+- confidence: high|medium|low
+- context: Direct quote from document (10-20 words)
+
+If NO persons meeting criteria are found, return: {"extracted_persons": []}
+</output_instructions>

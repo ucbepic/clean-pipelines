@@ -1,0 +1,92 @@
+
+        <task>
+        You are analyzing a collection of document summaries related to a police case. Your task is to identify the {count} most important document summaries that contain the most relevant information for extracting investigating agencies and responding agencies.
+        </task>
+
+        <definitions>
+        INVESTIGATING AGENCY: An agency that conducted investigations into use of force or misconduct.
+        - Look for: "investigated," "reviewed the case," "conducted investigation," "interviewed witnesses," "made charging decision"
+        - Examples: District Attorney, Internal Affairs, Coroner, State DOJ, Sheriff's Department (when investigating)
+        
+        RESPONDING AGENCY: An agency whose officers were involved in or present at the incident.
+        - Look for: "responded to scene," "were present," "used force," "fired weapon," "participated in pursuit"
+        - For misconduct: "violated policy," "witnessed," "reported misconduct"
+        - Examples: Police departments, Sheriff's departments (when responding), Highway Patrol
+        </definitions>
+
+        <documents>
+        Below are {num_summaries} document summaries. Each document is clearly marked with its index number:
+        ===== DOCUMENT [INDEX] START =====
+        [Document content]
+        ===== DOCUMENT [INDEX] END =====
+
+        {formatted_text}
+        </documents>
+
+        <evaluation_criteria>
+        For each document summary, determine its importance for agency extraction based on these criteria:
+        
+        HIGH IMPORTANCE - Document mentions agencies with action verbs:
+        - Names specific investigating agencies with investigation verbs ("DA investigated," "Internal Affairs reviewed")
+        - Names specific responding agencies with incident involvement ("Officer Smith of LAPD fired weapon," "CHP officers on scene")
+        - Contains clear evidence of agency roles with action verbs
+        - Provides names of officers and their agencies
+        
+        MEDIUM IMPORTANCE - Document has some agency information:
+        - Mentions agencies but with weaker context
+        - References "officers" or "investigators" without naming agencies
+        - Has partial agency information
+        
+        LOW IMPORTANCE - Document lacks agency information:
+        - Administrative documents with no agency names
+        - Documents focused on other topics (evidence, timelines, witness statements without agency context)
+        - No clear investigating or responding agency mentions
+        </evaluation_criteria>
+
+        <thinking_process>
+        1. Read each document summary carefully
+        2. For each summary, identify if it mentions:
+        - Investigating agencies with investigation action verbs
+        - Responding agencies with incident involvement verbs
+        - Specific agency names (not just generic "police" or "officers")
+        3. Prioritize summaries that:
+        - Name multiple agencies
+        - Have clear evidence with action verbs
+        - Distinguish between investigating and responding roles
+        4. Rank summaries based on density and clarity of agency information
+        5. Select the {count} summaries most likely to contain agency names with strong evidence
+        </thinking_process>
+
+        <examples>
+        HIGH IMPORTANCE summary excerpt:
+        "Officer Butera of the San Diego Police Department fired at the suspect. The San Diego County District Attorney's Office investigated the shooting."
+        → Contains: SDPD (responding with action verb), DA's Office (investigating with action verb)
+        
+        HIGH IMPORTANCE summary excerpt:
+        "LAPD Internal Affairs Division opened an investigation. Officer Martinez of LAPD used force during the arrest."
+        → Contains: LAPD IA (investigating), LAPD (responding), clear action verbs
+        
+        MEDIUM IMPORTANCE summary excerpt:
+        "The investigation was conducted by county authorities. Officers responded to the scene."
+        → Mentions investigation and response but lacks specific agency names
+        
+        LOW IMPORTANCE summary excerpt:
+        "The witness stated they saw the altercation from across the street. Evidence was collected at the scene."
+        → No agency information, focused on evidence/witnesses
+        </examples>
+
+        <output_format_instructions>
+        CRITICAL: You must return ONLY the index numbers in the exact format shown below.
+        Do not include any explanation, reasoning, or other text in your response.
+        
+        Return the indices of the {count} most important document summaries in this exact format:
+        IMPORTANT_SUMMARY_INDICES: [index1, index2, ...]
+        
+        For example:
+        IMPORTANT_SUMMARY_INDICES: [0, 3]
+        IMPORTANT_SUMMARY_INDICES: [0, 1]
+        IMPORTANT_SUMMARY_INDICES: [2, 5]
+        IMPORTANT_SUMMARY_INDICES: [1, 6]
+        IMPORTANT_SUMMARY_INDICES: [0, 2]
+        </output_format_instructions>
+        

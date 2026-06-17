@@ -1,0 +1,182 @@
+
+{% if use_domain %}
+<background>
+
+    California law (SB-1421 and SB-16) requires law enforcement agencies to disclose records related to certain categories of cases involving peace officers:
+    - Sustained findings of misconduct (dishonesty, sexual misconduct, racial bias, excessive force, etc.)
+    - Use of force resulting in death or great bodily injury
+    - Officer-involved shootings
+
+    These disclosures generate large collections of documents. In order for investigators, attorneys, and oversight bodies to review how incidents were handled, it is important to be able to navigate these documents in a structured way, using document dates, types, purposes, authors/recipients, and other metadata. But when documents are obtained through public records requests or litigation, they are provided without any of the relevant metadata or structure, sometimes in a single large PDF file with many documents concatenated together.
+
+    We seek to recover the relevant structure and metadata by reviewing each page and tracking only the metadata and type/purpose of documents, rather than the substantive content of the documents.
+
+</background>
+
+<investigations and documents>
+
+    The following background information describes the types of documents that may appear in disclosed case files. A single case file may contain documents related to misconduct investigations, use-of-force reviews, officer-involved shooting investigations, or a combination of these.
+
+    MISCONDUCT INVESTIGATIONS:
+    An investigation of police misconduct may be conducted by an internal affairs division, a civilian review board, or an independent monitor. The investigation can be initiated by a citizen complaint, an internal complaint, or litigation. The investigating body reviews the allegation and determines whether to open a formal investigation. If they open an investigation, they are required to notify the subject officer(s). The investigation is memorialized in an investigative report, which concludes with findings and possibly disciplinary recommendations. A sustained finding and decision to discipline necessitates additional notifications to the subject officer(s). Similarly, termination of employment requires formal communication to the subject officer(s). Officers can appeal disciplinary actions, generating appeal requests and hearing transcripts. In California, the last level of appeal within a police agency is the "Skelly hearing" or "Skelly conference".
+
+    USE-OF-FORCE CASES:
+    When an officer uses force resulting in death or great bodily injury, the incident is documented through police incident reports and supplemental reports by involved and witness officers. The agency typically conducts an internal use-of-force review, which may generate a use-of-force report, response-to-resistance report, or critical incident report. If the subject is injured or killed, the file may include medical records, injury documentation, autopsy or coroner reports, and toxicology reports from the medical examiner's office. Body-worn camera logs and evidence inventories may also be included.
+
+    OFFICER-INVOLVED SHOOTINGS:
+    Officer-involved shootings are typically investigated both internally and by the District Attorney's office (or occasionally the Attorney General). The DA's Bureau of Investigation generates investigation reports covering the initial response, walk-through, witness interviews, and officer interviews. The DA issues a review letter or declination memo with findings on whether the shooting was justified. Forensic evidence examination reports (ballistics, firearms testing) may come from the Department of Justice Bureau of Forensic Services. Crime scene investigation reports are prepared by sheriff's or police scientific investigation units. Evidence disposition requests handle the return of firearms and other evidence after the investigation concludes.
+
+    OVERSIGHT AND REVIEW:
+    Cases may also be reviewed by the Inspector General, civilian oversight boards, or other external bodies, generating monitoring reports, review board findings, and related correspondence. District Attorney offices may review both shootings and misconduct cases.
+
+    COMMON ACROSS ALL CASE TYPES:
+    Investigations often involve interviews with witnesses and involved officers, which generate transcripts. A variety of miscellaneous documents may appear, including correspondence, legal citations or policy references, admonishments, training records, or other personnel documents. Some documents are legally required to be produced during investigations and may be named after the law or precedent that requires their production (examples: "Skelly", "Lybarger", "Miranda"). Police incident reports and supplemental reports documenting the underlying incident are common across all case types.
+
+</investigations and documents>
+{% endif %}
+
+<task description>
+    We have received a large PDF file with possibly many reports and documents concatenated together, related to a law enforcement case (which may involve misconduct, use of force, an officer-involved shooting, or a combination of these). Your job is to classify each page of the document in terms of the type/purpose of the document, and extract any relevant metadata that will help downstream users filter and find specific documents.
+
+    We are interested in METADATA, and NOT substantive content. When extracting dates, we are ONLY interested in the date a document was created, sent, or received, but NOT any dates described in the substantive content of the document. When extracting names, we are ONLY interested in the names of senders, recipients, authors, or subjects of the document, but NOT names mentioned in the substantive content of the document. In the case of interview transcripts, we are interested in the names of the participants in the interview, but NOT names that are mentioned by participants in the interview. When extracting case numbers, we are ONLY interested in identifiers associated with the document itself, such as complaint numbers or case numbers contained in page or document headers, but NOT any case numbers referred to within the substantive content of the document. When extracting agencies or divisions, we are ONLY interested in the agency or division responsible for generating the document (on the letterhead), but NOT agencies or divisions mentioned in the substantive content of the document.
+
+    If the page appears to be a continuation of a document from the previous page, only describe the page as "CONTINUATION", and only provide new metadata if there is new metadata on the page that was not present on previous pages of the same document. Most of the time key metadata only appears on the first page of a document, but occasionally signatures and dates can appear at the end, and these are considered key metadata.
+
+    Respond with a document classification, a list of relevant metadata extracted from the page, followed by your REASONING steps for making this determination. For continuation pages, the classification should be "CONTINUATION" only, and the metadata list should only include new metadata not present on previous pages of the same document. Preface the reasoning with a new line and the word "REASONING:" in all caps on its own line.
+
+    Here are examples of acceptable output:
+    <example>
+        - Document type: INVESTIGATIVE REPORT
+        - Author: Sergeant John Smith (#12345)
+        - Report date: March 15, 2022
+        - Report received date: March 20, 2022
+        - Agency: Springfield Police Internal Affairs Division
+        - Case Number: IA-2022-0456
+        - Subject Officer: Officer Jane Doe (#67890)
+
+        REASONING:
+        - The header of the document indicates it is an INVESTIGATIVE REPORT, with the author's name and date clearly listed.
+        - The agency responsible for the report is mentioned in the letterhead.
+        - The dates and case number all appear at the top of the page as colon-separated key-value pairs. This is a common format for metadata on the first page of a report.
+        - The frontmatter includes a label for "Accused Officer" with the name and badge number of the subject officer.
+    </example>
+
+    <example>
+        - Document type: INVESTIGATIVE REPORT - CONTINUATION
+
+        REASONING:
+        - The page header indicates this is page 3 of a longer document
+        - The previous page was labeled INVESTIGATIVE REPORT - CONTINUATION, strengthening the case that this page is also part of the INVESTIGATIVE REPORT and is a CONTINUATION from the previous page.
+        - The date in the page footer matches the date already extracted from the previous page, so there is no new metadata to extract.
+    </example>
+
+    <example>
+        - Document type: NOTICE OF INTENT TO DISCIPLINE
+        - Sender: Chief of Police Robert Brown
+        - Recipient: Officer Jane Doe (#67890)
+        - Date: April 10, 2022
+        - Letterhead agency: Fairfax Police Department
+        - Subject line: Notice of Intent to Discipline IA-2022-0456
+        - Case Number: IA-2022-0456
+
+        REASONING:
+        - This has the format of a formal letter, with sender name/date and address in the header, indicating it is a communication rather than a report.
+        - The subject line for the communication says it is a "Notice of Intent to Discipline", indicating the document type.
+        - The letterhead includes the agency name, which is relevant metadata.
+        - The recipient is named in the address block, along with their badge number.
+    </example>
+
+    <example>
+        - Document type: INTERVIEW TRANSCRIPT
+        - Interviewer: Detective Alice Johnson (#54321)
+        - Interviewees: Witness Tom White, Officer Jane Doe (#67890)
+        - Interview date: May 5, 2022
+        - Agency: Springfield Police Department
+
+        REASONING:
+        - The document is formatted as a transcript, with speaker labels and timestamps, indicating it is an INTERVIEW TRANSCRIPT.
+        - The interviewer and interviewees are named at the start of the transcript.
+        - The interview date is mentioned in the introductory section of the transcript.
+        - The agency is indicated in the letterhead at the top of the page.
+    </example>
+
+    <example>
+        - Document type: DISTRICT ATTORNEY REVIEW LETTER
+        - Sender: District Attorney George Marquez
+        - Recipient: Chief of Police Armando Orozco
+        - Date: July 8, 2024
+        - Letterhead agency: Imperial County District Attorney's Office
+        - Subject: Officer Involved Shooting Review for Officer Alexander Hernandez #547
+        - Case Number: ICDA BOI 24-01548
+
+        REASONING:
+        - The letterhead identifies this as coming from the District Attorney's Office.
+        - The subject line references an "Officer Involved Shooting Review", indicating this is a DA review letter regarding an OIS.
+        - The sender and recipient are identified in the letter header.
+        - The case number appears in the subject line.
+    </example>
+
+    <example>
+        - Document type: POLICE INCIDENT REPORT
+        - Report Number: 24-001058
+        - Incident Date: 02/21/2024
+        - Offense: Assault with Deadly Weapon (245(A)(1) PC)
+        - Agency: Calexico Police Department
+        - Reporting Officer: (not identified on this page)
+
+        REASONING:
+        - The page header identifies this as an "Incident Report" from the Calexico Police Department.
+        - The structured format with offense codes, incident number, and date fields is characteristic of a police incident report.
+        - The report number and incident date appear in the header fields.
+    </example>
+
+    <example>
+        - Document type: FORENSIC EVIDENCE EXAMINATION REPORT
+        - Report Date: March 7, 2024
+        - Agency: State of California Department of Justice, Bureau of Forensic Services
+        - Agency Case Number: BOI2401548
+        - BFS Case Number: RI-24-000565-0001
+
+        REASONING:
+        - The header identifies this as a "Physical Evidence Examination Report" from the Bureau of Forensic Services.
+        - The report contains forensic analysis results (firearms/ballistics testing).
+        - Multiple case numbers are present linking this to the originating investigation.
+    </example>
+</task description>
+
+<classification tips>
+    - Look for keywords and phrases that, in the context of the given background about how investigations and documents work, indicate the purpose of the document (for example, the word "Skelly" is a hint that this document is related to a Skelly hearing; "Bureau of Investigation" suggests a DA investigation report; "Physical Evidence Examination" indicates a forensic report).
+    - Pay special attention to headers, footers, and any formal language that may indicate the document type.
+    - Headers and footers often include page numbers, which can help tell if this is the first page of a document or a continuation.
+    - Pay attention to contiguity across pages -- a single multi-page document should be labeled with the full classification on the first page, and "CONTINUATION" on subsequent pages, and will not be broken up with different document types in between.
+    - Use the "previous page context" provided to help determine if this page is a continuation of the previous page's document. Pages that end mid-sentence are likely to be continued on the next page. Signature blocks or formal closings can indicate the end of a document. The contiguity from the end of the previous page to the start of the current page (accounting for page footers/headers) can help determine if this is a continuation.
+    - Just because a page type matches the page type of the previous page does NOT mean it is a continuation. Use context clues to determine if a page is a continuation from the previous page, or the start of a new document of the same type. For example, if the current page and the previous page both appear to be transcripts, but the current page has a different interview date or interview participant names, then it is likely a new document rather than a continuation. Page headings often provide helpful context clues. A page beginning mid-sentence is likely a continuation.
+    - Documents can come from many different agencies and entities: police departments, sheriff's offices, district attorney offices, the Department of Justice, medical examiner/coroner offices, the Inspector General, civilian oversight boards, and others. The letterhead or header typically identifies the source agency.
+    - REMEMBER: We are only interested in METADATA, and NOT substantive content.
+</classification tips>
+
+{% if history %}
+<running history>
+Here is a running history of classifications from previous pages in the document:
+{{ history }}
+If the current page is a continuation of the document on the previous page, rather than the start of a new document, then add the word "Continuation" to your classification. For example: "Investigative report - Continuation"
+{% else %}
+This is the first page being classified, so there is no running history.
+</running history>
+{% endif %}
+
+{% if previous_page_context %}
+Here is the bottom of the previous page for context:
+<previous page context>
+-------------------------------
+{{ previous_page_context }}
+</previous page context>
+{% endif %}
+
+Here is the text of the current page to classify:
+<text to classify>
+-------------------------------
+{{ page_text }}
+</text to classify>
+
+Provide your classification in the required format. Only provide the classification, metadata list, and reasoning for the current page. For continuation pages, only output NEW metadata not present on previous pages.

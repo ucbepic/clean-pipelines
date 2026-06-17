@@ -1,0 +1,88 @@
+
+<objective>
+Determine if these two agency names refer to the same law enforcement or investigative agency.
+Consider abbreviations, variations in official naming, and common alternate names.
+</objective>
+
+<agency_names>
+Agency Name 1: {{name1}}
+Agency Name 2: {{name2}}
+</agency_names>
+
+<matching_criteria>
+These should be considered MATCHES:
+- Exact matches (case insensitive)
+- Official name vs common abbreviation (e.g., "LAPD" = "Los Angeles Police Department")
+- Variations in department/office/bureau (e.g., "Sheriff's Department" = "Sheriff's Office")
+- With/without county/city prefix (e.g., "San Diego Sheriff" = "San Diego County Sheriff's Department")
+- Different ordering of components (e.g., "County of Los Angeles District Attorney" = "Los Angeles County District Attorney's Office")
+- Internal divisions of same agency (e.g., "LAPD - Internal Affairs" = "Los Angeles Police Department Internal Affairs Division")
+- Sheriff's Office/Department and Medical Examiner/Coroner from same jurisdiction (e.g., "Los Angeles County Sheriff's Office" = "Los Angeles County Medical Examiner" - medical examiners are often administratively part of sheriff's offices)
+
+These should be considered NON-MATCHES:
+- Different agencies in same jurisdiction (e.g., "Los Angeles Police" ≠ "Los Angeles Sheriff") - EXCEPT for Sheriff + Medical Examiner/Coroner combinations
+- Different jurisdictions (e.g., "San Diego PD" ≠ "San Francisco PD")
+- Different levels of government (e.g., "California DOJ" ≠ "Federal DOJ")
+- Completely different agency types (e.g., "Police Department" ≠ "District Attorney") - EXCEPT for Sheriff + Medical Examiner/Coroner combinations
+</matching_criteria>
+
+<few_shot_examples>
+EXAMPLE 1 - Match (Abbreviation):
+Name 1: LAPD
+Name 2: Los Angeles Police Department
+Result: {"is_match": true, "reasoning": "LAPD is standard abbreviation for Los Angeles Police Department", "confidence": "HIGH"}
+
+EXAMPLE 2 - Match (Department vs Office):
+Name 1: San Diego County Sheriff's Department
+Name 2: San Diego County Sheriff's Office
+Result: {"is_match": true, "reasoning": "Department and Office are interchangeable terms for same agency", "confidence": "HIGH"}
+
+EXAMPLE 3 - Non-Match (Different Agencies):
+Name 1: Los Angeles Police Department
+Name 2: Los Angeles County Sheriff's Department
+Result: {"is_match": false, "reasoning": "These are two distinct agencies in Los Angeles County with different jurisdictions", "confidence": "HIGH"}
+
+EXAMPLE 4 - Match (Prefix Variation):
+Name 1: Orange County District Attorney's Office
+Name 2: District Attorney's Office for Orange County
+Result: {"is_match": true, "reasoning": "Same DA office with different word ordering", "confidence": "HIGH"}
+
+EXAMPLE 5 - Match (Internal Division):
+Name 1: California Highway Patrol
+Name 2: California Highway Patrol - Northern Division
+Result: {"is_match": true, "reasoning": "Northern Division is part of same parent agency CHP", "confidence": "MEDIUM"}
+
+EXAMPLE 6 - Non-Match (Different Jurisdictions):
+Name 1: San Diego Police Department
+Name 2: San Francisco Police Department
+Result: {"is_match": false, "reasoning": "Different cities with separate police departments", "confidence": "HIGH"}
+
+EXAMPLE 7 - Non-Match (Different Agency Types):
+Name 1: Riverside Police Department
+Name 2: Riverside District Attorney
+Result: {"is_match": false, "reasoning": "Police and DA are different agency types even in same jurisdiction", "confidence": "HIGH"}
+
+EXAMPLE 8 - Match (With/Without County):
+Name 1: Fresno Sheriff
+Name 2: Fresno County Sheriff's Office
+Result: {"is_match": true, "reasoning": "Same sheriff agency with/without county designation", "confidence": "HIGH"}
+
+EXAMPLE 9 - Match (Sheriff + Medical Examiner):
+Name 1: Los Angeles County Sheriff's Office
+Name 2: Los Angeles County Medical Examiner
+Result: {"is_match": true, "reasoning": "Medical examiners are often administratively part of sheriff's offices in the same jurisdiction", "confidence": "HIGH"}
+
+EXAMPLE 10 - Match (Sheriff + Coroner):
+Name 1: San Diego County Sheriff's Department
+Name 2: San Diego County Coroner
+Result: {"is_match": true, "reasoning": "Coroner offices are typically part of the sheriff's department in California counties", "confidence": "HIGH"}
+</few_shot_examples>
+
+<output_instructions>
+Return a JSON object matching the AgencyNameMatch schema:
+{
+  "is_match": true or false,
+  "reasoning": "Detailed explanation of your decision",
+  "confidence": "HIGH or MEDIUM or LOW"
+}
+</output_instructions>

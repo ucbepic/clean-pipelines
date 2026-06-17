@@ -1,0 +1,47 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+.env
+.env.local
+.env.*.local
+
+dist/
+build/
+*.egg-info/
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# logs (runtime artifacts)
+*.log
+logs/
+
+# data files
+*.csv
+*.parquet
+*.pkl
+*.joblib
+
+# response cache (see prap_core.llm)
+.prap_cache/
+
+# never ship local data
+data/

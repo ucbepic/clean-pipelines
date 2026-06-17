@@ -1,0 +1,182 @@
+
+<instructions>
+Format the verified list of individuals into a structured JSON response. Include only individuals that have been verified as victims, witnesses, domestic violence victims, sexual assault victims, or children where should_be_included is true.
+
+CRITICAL: Ensure NO law enforcement personnel are included in the final output.
+</instructions>
+
+<verified_names>
+$verified_names
+</verified_names>
+
+<few_shot_examples>
+Example 1: Valid victims/witnesses found
+Input:
+[
+  {
+    "name": "Jane Smith",
+    "should_be_included": true,
+    "reasoning": "Clearly identified as victim of assault",
+    "evidence_from_text": "Jane Smith reported that she was assaulted by the suspect"
+  },
+  {
+    "name": "Officer Brown",
+    "should_be_included": false,
+    "reasoning": "Law enforcement personnel",
+    "evidence_from_text": "Officer Brown responded to the scene",
+    "exclusion_category": "law_enforcement"
+  }
+]
+
+Output:
+{
+  "extracted_persons": [
+    {
+      "name": "Jane Smith",
+      "person_type": ["victim"],
+      "confidence": "high",
+      "reasoning": "Clearly identified as victim of assault"
+    }
+  ]
+}
+
+Example 2: No valid victims/witnesses (only excluded persons)
+Input:
+[
+  {
+    "name": "Detective Wilson",
+    "should_be_included": false,
+    "reasoning": "Law enforcement personnel",
+    "evidence_from_text": "Detective Wilson interviewed the suspect",
+    "exclusion_category": "law_enforcement"
+  },
+  {
+    "name": "John Doe",
+    "should_be_included": false,
+    "reasoning": "Identified as the suspect",
+    "evidence_from_text": "John Doe was arrested at the scene",
+    "exclusion_category": "defendant"
+  }
+]
+
+Output:
+{
+  "extracted_persons": []
+}
+
+Example 3: Mixed law enforcement witnesses and civilian witnesses
+Input:
+[
+  {
+    "name": "Mary Johnson",
+    "should_be_included": true,
+    "reasoning": "Civilian witness to the incident",
+    "evidence_from_text": "Mary Johnson stated she saw the entire incident from her window"
+  },
+  {
+    "name": "Officer Davis",
+    "should_be_included": false,
+    "reasoning": "Police officer who witnessed the incident",
+    "evidence_from_text": "Officer Davis witnessed the altercation while on patrol",
+    "exclusion_category": "law_enforcement"
+  }
+]
+
+Output:
+{
+  "extracted_persons": [
+    {
+      "name": "Mary Johnson",
+      "person_type": ["witness"],
+      "confidence": "high",
+      "reasoning": "Civilian witness to the incident"
+    }
+  ]
+}
+
+Example 4: Only Police Officer Witnesses
+Input:
+[
+  {
+    "name": "Officer Smith",
+    "should_be_included": false,
+    "reasoning": "Police officer who witnessed the incident",
+    "evidence_from_text": "Officer Smith witnessed the theft while on patrol",
+    "exclusion_category": "law_enforcement"
+  },
+  {
+    "name": "Deputy Johnson",
+    "should_be_included": false,
+    "reasoning": "Law enforcement personnel who witnessed the incident",
+    "evidence_from_text": "Deputy Johnson was the first responder and witnessed the aftermath",
+    "exclusion_category": "law_enforcement"
+  }
+]
+
+Output:
+{
+  "extracted_persons": []
+}
+
+Example 5: Partial names included
+Input:
+[
+  {
+    "name": "Mrs. Johnson",
+    "should_be_included": true,
+    "reasoning": "Victim's mother who provided witness testimony",
+    "evidence_from_text": "The victim's mother, Mrs. Johnson, provided additional information"
+  },
+  {
+    "name": "Mr. Thompson",
+    "should_be_included": true,
+    "reasoning": "Neighbor who witnessed the altercation",
+    "evidence_from_text": "Mr. Thompson, the defendant's neighbor, claimed to have heard the altercation"
+  }
+]
+
+Output:
+{
+  "extracted_persons": [
+    {
+      "name": "Mrs. Johnson",
+      "person_type": ["witness"],
+      "confidence": "high",
+      "reasoning": "Victim's mother who provided witness testimony"
+    },
+    {
+      "name": "Mr. Thompson",
+      "person_type": ["witness"],
+      "confidence": "high",
+      "reasoning": "Neighbor who witnessed the altercation"
+    }
+  ]
+}
+</few_shot_examples>
+
+<format_instructions>
+Create a properly formatted JSON object containing only the verified individuals:
+
+{
+  "extracted_persons": [
+    {
+      "name": "Full Name of Person (or partial name as provided)",
+      "person_type": ["victim", "child"],  // Array of all applicable types
+      "confidence": "high|medium|low",
+      "reasoning": "Concise explanation of why this person was included"
+    }
+  ]
+}
+
+Rules:
+1. Only include individuals where "should_be_included" is true
+2. EXCLUDE anyone with ANY indication of being law enforcement, even if they are witnesses
+3. Convert single person_type values into arrays if needed (e.g., "victim" becomes ["victim"])
+4. If a person has multiple types, include all in the person_type array
+5. If no individuals were verified (or all were excluded), return:
+{
+  "extracted_persons": []
+}
+
+Ensure the output is valid JSON that can be parsed without errors. Follow the few-shot examples closely.
+</format_instructions>

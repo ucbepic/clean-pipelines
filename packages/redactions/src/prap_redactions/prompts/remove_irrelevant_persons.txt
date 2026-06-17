@@ -1,0 +1,76 @@
+
+<instructions>
+Review the list of verified persons and filter out individuals who are not relevant to victim/witness tracking.
+Your task is to identify and remove:
+
+1. ALL law enforcement personnel (police officers, sheriff deputies, detectives, etc.) - HIGHEST PRIORITY
+2. Defendants/suspects/perpetrators
+3. Attorneys/legal representatives
+4. Judges or court staff
+5. Government officials unrelated to victim/witness roles
+
+This filtering is essential to ensure we only track individuals who are victims, witnesses, or other protected persons.
+</instructions>
+
+<thinking_process>
+For each person in the verified list:
+
+1. FIRST PRIORITY CHECK - Law enforcement indicators:
+   - Is there ANY indication this person is law enforcement?
+   - Look for titles: Officer, Detective, Deputy, Sergeant, Lieutenant, crime technician, forensic scientist, coroner, doctor etc.
+   - Look for descriptions of actions typical of law enforcement: responding to scene, taking report, etc.
+   - Check for mentions of uniform, badge, department, etc.
+   - If ANY law enforcement indicators exist, mark for REMOVAL immediately, even if they are also witnesses
+
+2. Analyze the context and information:
+   - Does the name appear in a context indicating they are a defendant, suspect, or perpetrator?
+   - Do they have legal professional designations (Attorney, Lawyer, Public Defender, Doctor, Coroner)?
+   - Are they identified as court staff (Judge, Clerk, Bailiff)?
+   - Are they government officials not directly involved as victims/witnesses?
+
+3. Check for role indicators:
+   - Look for titles or descriptions that reveal their role
+   - Examine how they're referenced throughout the document
+   - Note patterns of behavior or actions typical of these excluded roles
+
+4. Consider contextual clues:
+   - How do others interact with this person?
+   - Are they described as taking actions consistent with excluded roles?
+   - Do they have authority or power in the described situations?
+
+5. Make careful decisions:
+   - If ANY evidence of law enforcement role: REMOVE (highest priority)
+   - If clear evidence shows they belong to another excluded category: REMOVE
+   - If ambiguous but strong indicators of an excluded role exist: REMOVE
+   - If ambiguous with possible law enforcement connection: REMOVE (be conservative)
+   - If primarily a victim/witness with no excluded roles: KEEP
+</thinking_process>
+
+<verified_persons>
+$verified_names
+</verified_persons>
+
+<original_document>
+$source_text
+</original_document>
+
+<output_instructions>
+For each person in the verified list, analyze whether they should be included or excluded.
+
+Return structured JSON with verified_persons array. For each person include:
+- name: Full name of person (as provided)
+- should_be_included: true or false
+- reasoning: Clear explanation of why this person should be included or excluded
+- evidence_from_text: Direct quote from the document that supports your decision. If multiple quotes, concatenate them into a SINGLE string separated by semicolons. DO NOT create multiple separate string values.
+- exclusion_category: Only include this field if should_be_included is false. Value must be one of: law_enforcement|defendant|legal_professional|court_staff|government_official|other
+
+CRITICAL FORMATTING RULES:
+1. evidence_from_text must be a SINGLE string value, not multiple strings
+2. If you have multiple quotes, combine them like: "Quote 1; Quote 2; Quote 3"
+3. exclusion_category should ONLY be present when should_be_included is false
+4. When should_be_included is true, do NOT include the exclusion_category field
+
+CRITICAL REMINDER: ALL law enforcement personnel MUST be excluded, even if they are also witnesses. This is your highest priority.
+
+IMPORTANT: Review the entire document to ensure no law enforcement personnel are missed. Be especially thorough in checking for indirect indicators of law enforcement roles.
+</output_instructions>

@@ -1,0 +1,23 @@
+If an incident date is stated, return the date in ISO-8601 format.
+If there are multiple incident dates, list them all separated by commas.
+If the incident date is not stated, return None. Include nothing else in your response.
+
+Valid responses include:
+2024-07-18
+2022-05-23
+None
+2021-01-02
+None
+None
+1999-04-11, 2001-05-23
+None
+1999-04-11, 1999-04-12, 1999-04-13
+1999-04-11, 1999-04-12, 1999-04-13, 2022-05-23, 2022-05-23
+
+Below is the document that you are tasked with reviewing:
+
+--------------------
+
+$source_text
+
+--------------------

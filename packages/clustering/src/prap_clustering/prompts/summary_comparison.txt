@@ -1,0 +1,91 @@
+<task>
+Your task is to compare two document summaries and determine if they describe the SAME SPECIFIC INCIDENT.
+
+CRITICAL: Only score 1.0 if BOTH summaries contain SPECIFIC IDENTIFYING DETAILS that clearly indicate the same incident. Generic codes or vague references are NOT sufficient.
+</task>
+
+<what_counts_as_same_incident>
+Score 1.0 (SAME INCIDENT) ONLY if you find MULTIPLE SPECIFIC matching details:
+
+STRONG IDENTIFIERS (at least 2 required):
+- Specific incident date (e.g., "2018-04-05", "April 5, 2018")
+- Specific person names (full names like "Michael Butler", NOT redacted like "B 6 B" or "witness 1")
+- Specific unique case/incident numbers (e.g., "IA2018-0167", "LOP170405000550")
+- Specific location (e.g., "1234 Oak Street", "Corner of 5th and Main")
+- Specific event description (e.g., "officer-involved shooting", "traffic stop on I-880")
+
+WEAK/INSUFFICIENT IDENTIFIERS (DO NOT match on these alone):
+- Generic legal statute codes (832.7, PC 148, 832.7(b)(6)(B), etc.) ← MANY DIFFERENT INCIDENTS reference these
+- Generic form codes (TF-967, F-313, COM, RAVA, etc.) ← These are document types, not unique IDs
+- Redacted/generic names ("B 6 B", "subject", "victim", "witness 1", "unnamed suspect")
+- Generic dates without other context ("2024-10-19" mentioned in metadata/filing)
+- Department abbreviations (OPD, IAD, OISLL, etc.)
+</what_counts_as_same_incident>
+
+<critical_rules>
+1. If BOTH summaries only contain generic codes (statute codes, form codes) with NO specific names/dates/events:
+   → Score 0.0 (these could be ANY two incidents)
+
+2. If summaries share a statute code (like 832.7) but have DIFFERENT specific details:
+   → Score 0.0 (different incidents that reference same law)
+
+3. If summaries are vague/short with minimal information:
+   → Score 0.0 (insufficient evidence to cluster)
+
+4. Generic codes appearing in BOTH summaries does NOT mean same incident
+   → Ask: "Could these be DIFFERENT incidents that happen to reference the same statute/form?"
+   → If yes → Score 0.0
+</critical_rules>
+
+<scoring_guidelines>
+Score 1.0 (SAME INCIDENT):
+- BOTH summaries have 2+ specific matching identifiers (dates, names, unique case numbers)
+- Clear evidence this is the same event described from different documents
+- Example: Both mention "Michael Butler" + "April 5, 2018" + "LOP170405000550"
+
+Score 0.5 (UNCERTAIN):
+- ONE specific identifier matches but not enough evidence
+- Possible same incident but missing confirmation
+- Example: Same date mentioned but different/missing names
+
+Score 0.0 (DIFFERENT INCIDENTS):
+- No specific matching identifiers
+- Only generic codes match (statute codes, form codes)
+- Different specific details (different dates, different names, different events)
+- Summaries too vague to determine
+- Example: Both mention "832.7(b)(6)(B)" but nothing else matches
+</scoring_guidelines>
+
+<output_format>
+Respond with ONLY a JSON object:
+{
+  "similarity": <0.0 | 0.5 | 1.0>,
+  "reasoning": "<brief explanation of why you chose this score>"
+}
+
+Valid similarity values:
+- 1.0: Same incident (strong evidence with specific details)
+- 0.5: Uncertain/possibly related
+- 0.0: Different incidents or insufficient evidence
+</output_format>
+
+<warnings>
+- Generic statute codes (832.7, PC 148, etc.) appear in THOUSANDS of different police documents
+- Matching on ONLY generic codes will create false positives
+- When in doubt, score 0.0 (better to under-cluster than over-cluster)
+- Redacted names like "B 6 B" are NOT identifying - they could be ANYONE
+</warnings>
+
+Below are the two document summaries to compare:
+
+Summary 1:
+--------------------
+{{ summary_1 }}
+--------------------
+
+Summary 2:
+--------------------
+{{ summary_2 }}
+--------------------
+
+Respond with ONLY the JSON object as specified above.

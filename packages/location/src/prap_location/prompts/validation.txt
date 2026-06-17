@@ -1,0 +1,174 @@
+
+You are double-checking the initial city extraction. Your job is to verify, correct, or override the previous analysis.
+You must be certain that the listed location is a City and not a County. For example, "the incident took place at the Department of State Hospitals - Coalinga State Hospital (CSH)" does not list a city and "Fresno County Probation Department's Juvenile Justice Campus" does not list a city.
+
+Check if the documents actually contain evidence of WHERE the incident occurred:
+
+If PREVIOUS ANALYSIS was WRONG:
+- Said "None" but documents clearly show incident location → Override to "YES"
+- Said a city but it's only the police department name → Override to "NO"
+- Said a city but it's only autopsy/medical location → Override to "NO"
+
+If PREVIOUS ANALYSIS was CORRECT:
+- Confirm the decision
+
+Look for actual incident location phrases like:
+- "shooting occurred in [city]"
+- "arrest took place in [city]"
+- "incident happened in [city]"
+- "on [street] in [city]"
+
+NOT just department names or administrative locations.
+
+
+<few_shot_examples>
+Example 1 - CLASSIFY AS "None" (Police department review, no incident location)
+Text: "The Justice System Integrity Division of the Los Angeles County District Attorney's Office has completed its review of the July 12, 2017, non-fatal shooting of Jose Jimenez by San Fernando Police Department (SFPD) Officer Benny Simonzad."
+Analysis: Only mentions the police department name (San Fernando PD) but does not specify where the actual shooting incident occurred. Officers can respond outside their jurisdiction.
+Output: None
+
+Example 2 - CLASSIFY AS "None" (Department name only, no incident city)
+Text: "Officer Martinez from Richmond Police Department discharged his weapon during the encounter with the suspect."
+Analysis: Richmond Police Department is mentioned but no city location is provided for where the incident actually occurred.
+Output: None
+
+Example 3 - CLASSIFY AS "None" (Multiple departments, no incident locations)
+Text: "The investigation involved cooperation between Hayward Police Department and Alameda County Sheriff's Office following the use of force incident."
+Analysis: Multiple law enforcement agencies mentioned but no specific city where the incident took place is provided.
+Output: None
+
+Example 4 - CLASSIFY AS "None" (Department mentioned in administrative context)
+Text: "Vallejo Police Department Internal Affairs Division is conducting a review of the officer-involved shooting that occurred last month."
+Analysis: Department name provided in administrative context but no indication where the actual shooting incident happened.
+Output: None
+
+Example 5 - CLASSIFY AS "None" (Officer affiliation only)
+Text: "Detective Johnson, employed by Concord Police Department, was involved in the misconduct allegations under investigation."
+Analysis: Officer's department affiliation mentioned but no city location provided for where the misconduct incident occurred.
+Output: None
+
+Example 6 - CLASSIFY AS "None" (Department response, no incident location)
+Text: "Fremont Police Department officers responded to reports of excessive force during an arrest."
+Analysis: Department name mentioned as responders but no specific city location given for where the arrest/force incident took place.
+Output: None
+
+Example 7 - CLASSIFY AS "None" (Administrative notification)
+Text: "Union City Police Department was notified of the officer-involved shooting for jurisdictional review."
+Analysis: Department mentioned for notification purposes but no indication that the shooting occurred in Union City.
+Output: None
+
+Example 8 - CLASSIFY AS "None" (Training context)
+Text: "The use of force training conducted by Newark Police Department covers scenarios similar to this incident."
+Analysis: Department mentioned in training context but no specific incident location provided.
+Output: None
+
+Key Principle
+- Police department name alone ≠ Incident location
+- Officers can: Respond outside their jurisdiction, be involved in mutual aid responses, have incidents reviewed by other agencies, work in administrative capacities
+</few_shot_examples_negative>
+
+<few_shot_examples_positive>
+Example 1 - CLASSIFY AS Primary Incident City
+Text: "The officer-involved shooting occurred on Highway 101 in San Jose when California Highway Patrol officers attempted to stop the suspect's vehicle."
+Analysis: Specific incident location provided ("on Highway 101 in San Jose") with clear indication where the shooting took place.
+Output: San Jose, CA
+
+Example 2 - CLASSIFY AS Primary Incident City
+Text: "Officers used force during the arrest at the intersection of Broadway and 14th Street in Oakland following a pursuit that began downtown."
+Analysis: Specific street intersection and city provided ("Broadway and 14th Street in Oakland") showing where the force was used.
+Output: Oakland, CA
+
+Example 3 - CLASSIFY AS Primary Incident City
+Text: "The misconduct incident took place within Sacramento city limits near the Capitol building when the officer detained the suspect without cause."
+Analysis: Clear jurisdictional reference ("within Sacramento city limits") and specific area reference establishing incident location.
+Output: Sacramento, CA
+
+Example 4 - CLASSIFY AS Primary Incident City
+Text: "Fresno Police Department officers discharged their weapons during a confrontation in downtown Fresno outside the courthouse on Van Ness Avenue."
+Analysis: Both department name AND specific city location ("in downtown Fresno") with street reference confirming incident location.
+Output: Fresno, CA
+
+Example 5 - CLASSIFY AS Primary Incident City
+Text: "The use of force occurred in Stockton's Miracle Mile district when San Joaquin County Sheriff's deputies attempted to subdue the armed suspect."
+Analysis: Specific city and district provided ("in Stockton's Miracle Mile district") establishing where the incident happened.
+Output: Stockton, CA
+
+Example 6 - CLASSIFY AS Primary Incident City
+Text: "Richmond Police officers were involved in a shooting incident that occurred within the city of Richmond near the BART station on Macdonald Avenue."
+Analysis: Explicit city reference ("within the city of Richmond") with specific landmark and street location.
+Output: Richmond, CA
+
+Example 7 - CLASSIFY AS Primary Incident City
+Text: "The excessive force complaint stems from an arrest that took place in Hayward's Castro Valley neighborhood during a domestic violence response."
+Analysis: City and neighborhood specified ("in Hayward's Castro Valley neighborhood") showing incident location.
+Output: Hayward, CA
+
+Example 8 - CLASSIFY AS Primary Incident City
+Text: "Vallejo officers used a taser on the suspect during a traffic stop on Tennessee Street in Vallejo, according to witness statements."
+Analysis: Street name and city provided ("on Tennessee Street in Vallejo") confirming where the taser was deployed.
+Output: Vallejo, CA
+
+Example 9 - CLASSIFY AS Primary Incident City
+Text: "The police shooting happened in the parking lot of a Walmart store located in Antioch when officers responded to reports of an armed individual."
+Analysis: Specific business location and city provided ("Walmart store located in Antioch") establishing incident scene.
+Output: Antioch, CA
+
+Example 10 - CLASSIFY AS Primary Incident City
+Text: "Union City Police Department officers were involved in a pursuit that ended with a crash and use of force incident on Alvarado Street within Union City municipal boundaries."
+Analysis: Street name and jurisdictional confirmation ("on Alvarado Street within Union City municipal boundaries") clearly establishing incident location.
+Output: Union City, CA
+
+Key Pattern Recognition
+Valid incident location indicators:
+
+"occurred in [city]"
+"took place in [city]"
+"within [city] city limits"
+"within [city] municipal boundaries"
+"in downtown [city]"
+"in [city's] [neighborhood] district"
+"on [street] in [city]"
+"at [address/landmark] in [city]"
+"near [landmark] in [city]"
+"within the city of [city]"
+</few_shot_examples_positive>
+
+
+<original_documents>
+$source_text
+</original_documents>
+
+<targeted_analysis_for_reference>
+$targeted_response
+</targeted_analysis_for_reference>
+
+You MUST respond with EXACTLY this JSON structure (no additional text before or after):
+
+{
+  "validation_decision": "confirm|update|override",
+  "final_decision": "YES|NO",
+  "validator_reasoning": "Explain your decision following the 4-step validation process. If targeted analysis was NO, autopsy/medical/administrative location, policy statement, multi-incident, or lacks specificity, explicitly state that and classify as NO.",
+  "verified_quote": "Exact quote from the documents that best supports your YES/NO decision without quotation marks.",
+  "confidence": "high|medium|low",
+  "city_completeness": "complete|partial|minimal",
+  "specificity_assessment": "sufficient|insufficient",
+  "additional_details": "Any additional city details found beyond the primary quote (state, county, jurisdiction, etc.)"
+}
+
+The verified quote must include strings like:
+
+"occurred in [city]"
+"took place in [city]"
+"within [city] city limits"
+"within [city] municipal boundaries"
+"in downtown [city]"
+"in [city's] [neighborhood] district"
+"on [street] in [city]"
+"at [address/landmark] in [city]"
+"near [landmark] in [city]"
+"within the city of [city]"
+
+A quote that does not include these language markers is an indication that the location you've identified is not the primary incident.
+
+
+</output_instructions>

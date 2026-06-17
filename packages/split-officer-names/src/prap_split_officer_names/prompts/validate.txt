@@ -1,0 +1,95 @@
+<objective>
+Verify whether this name classification is correct. The name must have a FULL first name and FULL last name to be valid.
+</objective>
+
+<name_string>
+$name_string
+</name_string>
+
+<initial_extraction>
+Initial Decision: $is_valid_name
+Extracted Parts:
+- First Name: $first_name
+- Last Name: $last_name
+- Middle Name: $middle_name
+- Suffix: $suffix
+</initial_extraction>
+
+<validation_criteria>
+For a name to be VALID:
+1. Must have a FULL first name (not just an initial like "J.")
+2. Must have a FULL last name
+3. The first name should be a recognizable given name (not a title or placeholder)
+4. Both parts should look like actual name components
+
+IMPORTANT - Short first names that ARE VALID:
+- Common nicknames: Jim, Ed, Al, Ted, Sal, Nick, Matt, Nate, Doug, Phil, Dave, Dan, Tom, Bob, Joe, Ben, Sam, Tim, Ricky, KC, TJ, RK
+- These are full given names, NOT initials, and should be accepted
+
+REJECT if:
+- First name is only an initial (J., M., etc.) - a single letter followed by a period
+- Contains placeholder text (Unknown, Redacted, TBD, N/A)
+- Is a title without a proper first name (Officer Smith)
+- Is inverted format with only initial (Smith, J.)
+- Contains only one word total
+- Looks like a role or description, not a name
+- Is a generic reference (officers, deputies, personnel)
+</validation_criteria>
+
+<few_shot_examples>
+VALID NAMES (have both full first name AND full last name):
+Example 1 - VALID: "Jim Renstrom" -> true (First: Jim, Last: Renstrom - both are full names)
+Example 2 - VALID: "Nate Shannon" -> true (First: Nate, Last: Shannon - both are full names)
+Example 3 - VALID: "Matt Alexander" -> true (First: Matt, Last: Alexander - both are full names)
+Example 4 - VALID: "Ed Conover" -> true (First: Ed, Last: Conover - both are full names)
+Example 5 - VALID: "Doug Haynes" -> true (First: Doug, Last: Haynes - both are full names)
+Example 6 - VALID: "Phil Vargas" -> true (First: Phil, Last: Vargas - both are full names)
+Example 7 - VALID: "Nick Borges" -> true (First: Nick, Last: Borges - both are full names)
+Example 8 - VALID: "Ted Garcia" -> true (First: Ted, Last: Garcia - both are full names)
+Example 9 - VALID: "Sal Heredia" -> true (First: Sal, Last: Heredia - both are full names)
+Example 10 - VALID: "Al Smith" -> true (First: Al, Last: Smith - both are full names)
+Example 11 - VALID: "Dave Kellogg" -> true (First: Dave, Last: Kellogg - both are full names)
+Example 12 - VALID: "Jim Musgrave" -> true (First: Jim, Last: Musgrave - both are full names)
+Example 13 - VALID: "Matt Costa" -> true (First: Matt, Last: Costa - both are full names)
+Example 14 - VALID: "Josh Coleman" -> true (First: Josh, Last: Coleman - both are full names)
+Example 15 - VALID: "Ricky Wright" -> true (First: Ricky, Last: Wright - both are full names)
+Example 16 - VALID: "KC Calder" -> true (First: KC, Last: Calder - KC is a valid nickname)
+Example 17 - VALID: "TJ DeSalvo" -> true (First: TJ, Last: DeSalvo - TJ is a valid nickname)
+Example 18 - VALID: "Jeff Tom" -> true (First: Jeff, Last: Tom - both are full names)
+Example 19 - VALID: "Jacob VasquezCoy" -> true (First: Jacob, Last: VasquezCoy - compound last name)
+Example 20 - VALID: "Ericandrew Avendano" -> true (First: Ericandrew, Last: Avendano - unusual but full names)
+
+INVALID NAMES (missing full first name OR full last name):
+Example 21 - INVALID: "J. Oubre" -> false (J. is an initial, not a full first name)
+Example 22 - INVALID: "G. McComb" -> false (G. is an initial, not a full first name)
+Example 23 - INVALID: "R. Compton" -> false (R. is an initial, not a full first name)
+Example 24 - INVALID: "L. Simms" -> false (L. is an initial, not a full first name)
+Example 25 - INVALID: "Wilkinson, J. I." -> false (only initials for first name)
+Example 26 - INVALID: "Fountain" -> false (single word - missing first name)
+Example 27 - INVALID: "Del Rosario" -> false (last name only - missing first name)
+Example 28 - INVALID: "Van Leeuwen" -> false (last name only - missing first name)
+Example 29 - INVALID: "Smith Jr" -> false (last name + suffix - missing first name)
+Example 30 - INVALID: "Reginald J." -> false (first name + initial - missing full last name)
+Example 31 - INVALID: "O Guzman" -> false (O is an initial, not a full first name)
+Example 32 - INVALID: "Dee" -> false (single word - could be first or last, incomplete)
+Example 33 - INVALID: "Ayub" -> false (single word - missing either first or last name)
+Example 34 - INVALID: "Dunn" -> false (single word - missing first name)
+Example 35 - INVALID: "Hudspeth" -> false (single word - missing first name)
+Example 36 - INVALID: "Abad" -> false (single word - missing first name)
+Example 37 - INVALID: "De Leon" -> false (last name only - missing first name)
+Example 38 - INVALID: "De La Cruz" -> false (last name only - missing first name)
+Example 39 - INVALID: "officers" -> false (generic reference, not a name)
+Example 40 - INVALID: "Members" -> false (generic reference, not a name)
+</few_shot_examples>
+
+<output_instructions>
+Return ONLY a simple JSON object with a single boolean field. Do NOT include schema definitions, descriptions, or type information.
+
+CORRECT format:
+{"final_decision": true}
+or
+{"final_decision": false}
+
+Do NOT return anything like this:
+{"properties": {...}, "type": "object", ...}
+</output_instructions>

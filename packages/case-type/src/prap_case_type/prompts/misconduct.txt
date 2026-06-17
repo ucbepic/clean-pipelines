@@ -1,0 +1,20 @@
+Based on the summary of the incident below, were there any sustained findings of misconduct?
+SUSTAINED MISCONDUCT means:
+   - Explicit sustained/upheld findings
+   - Confirmed disciplinary actions
+   - Final, not preliminary determinations
+   - Only if there was an investigation that had sustained findings of misconduct can there be misconduct
+   NOT misconduct:
+   - Mere allegations, no matter how much they might seem to imply misconduct
+   - Pending investigations do not matter unless they result in sustained misconduct
+   - Inferred misconduct without sustained findings
+   - Other sustained types, such as sustained injuries
+
+Please respond with either 'true', 'false', or 'unclear'
+Limit your response to 'true', 'false', or 'unclear'
+
+--------------------
+
+$source_text
+
+--------------------

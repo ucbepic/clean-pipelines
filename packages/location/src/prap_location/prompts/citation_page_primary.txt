@@ -1,0 +1,81 @@
+<objective>
+Analyze this page of text to determine if it contains citations that support the SPECIFIC location extraction identified in the initial analysis.
+</objective>
+
+<initial_classification_context>
+The initial analysis extracted a location from this case based on the following analysis:
+
+$initial_analysis_summary
+
+You should look for citations that relate to or support this SPECIFIC location finding and the details mentioned above.
+</initial_classification_context>
+
+<location_citation_definition>
+LOCATION CITATIONS must describe WHERE the incident actually occurred:
+- Specific street addresses or intersections
+- City names with clear incident context ("incident occurred in [city]")
+- Jurisdictional references ("within [city] city limits")
+- Geographic landmarks with incident context
+- Neighborhood or district references with incident context
+
+NOT location citations:
+- Police department names alone (e.g., "Oakland Police Department" ≠ incident in Oakland)
+- Administrative locations (police stations, courthouses, jails)
+- Medical examiner or autopsy locations
+- Where reports were filed or reviewed
+- Officer employment locations
+- Policy statements about jurisdictions
+</location_citation_definition>
+
+<targeted_search_guidance>
+Based on the initial analysis above, prioritize finding citations that:
+1. Mention the same city or location from the initial analysis
+2. Describe the specific incident location identified in the initial analysis
+3. Support or provide additional details about the geographic context
+4. Contain similar location language or context to the evidence from the initial analysis
+</targeted_search_guidance>
+
+<few_shot_examples>
+EXAMPLE 1 - YES (Targeted Match):
+Initial Analysis: "DECISION: PRIMARY INCIDENT CITY, City: Oakland, CA, Supporting Evidence: shooting occurred in downtown Oakland"
+Page Text: "The officer-involved shooting took place at the intersection of Broadway and 14th Street in Oakland during the evening hours."
+Response: YES: This page contains citations that support the specific Oakland location identified in the initial analysis.
+Quote: "shooting took place at the intersection of Broadway and 14th Street in Oakland"
+
+EXAMPLE 2 - YES (Specific Location Match):
+Initial Analysis: "DECISION: PRIMARY INCIDENT CITY, City: Fresno, CA, Supporting Evidence: arrest within Fresno city limits"
+Page Text: "The use of force incident occurred within the city limits of Fresno near the downtown courthouse on Van Ness Avenue."
+Response: YES: This page provides citations supporting the specific Fresno location from the initial analysis.
+Quote: "incident occurred within the city limits of Fresno near the downtown courthouse"
+
+EXAMPLE 3 - NO (Different Location):
+Initial Analysis: "DECISION: PRIMARY INCIDENT CITY, City: Sacramento, CA, Supporting Evidence: incident took place in Sacramento"
+Page Text: "Richmond Police Department officers responded to reports of suspicious activity in their jurisdiction."
+Response: NO: This describes Richmond PD activity, not the Sacramento incident identified in the initial analysis.
+Quote: "Richmond Police Department officers responded to reports of suspicious activity"
+
+EXAMPLE 4 - NO (Administrative Location Only):
+Initial Analysis: "DECISION: PRIMARY INCIDENT CITY, City: San Jose, CA, Supporting Evidence: shooting happened in San Jose"
+Page Text: "The autopsy was performed at the Santa Clara County Coroner's Office in San Jose."
+Response: NO: This is an administrative/medical location, not the incident location from the initial analysis.
+Quote: "autopsy was performed at the Santa Clara County Coroner's Office"
+
+EXAMPLE 5 - YES (Additional Context):
+Initial Analysis: "DECISION: PRIMARY INCIDENT CITY, City: Stockton, CA, Supporting Evidence: occurred in Stockton's downtown area"
+Page Text: "Witnesses reported seeing the altercation between police and the suspect in Stockton's Miracle Mile district before the arrest."
+Response: YES: This page provides witness accounts supporting the specific Stockton location from the initial analysis.
+Quote: "altercation between police and the suspect in Stockton's Miracle Mile district"
+</few_shot_examples>
+
+<page_text>
+$page_text
+</page_text>
+
+<output_instructions>
+Focus on finding citations that specifically support the initial LOCATION EXTRACTION finding described above.
+Respond with 'YES' or 'NO' followed by your reasoning and an exact quote.
+
+Format:
+[YES/NO]: [Your reasoning explaining whether this page contains citations supporting the SPECIFIC location from the initial analysis]
+Quote: "[Exact text from the page that supports your decision]"
+</output_instructions>

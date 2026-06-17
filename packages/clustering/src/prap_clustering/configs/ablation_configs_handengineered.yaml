@@ -1,0 +1,308 @@
+ablations:
+  # ============================================================================
+  # V2 IMPROVED BASELINE & ABLATIONS
+  # ============================================================================
+  # Goal: Show that improved cascade significantly outperforms individual tiers
+  #
+  # Key improvements applied to all v2 configs:
+  # - No tier1 name matching (was causing false positives from filepath names)
+  # - No officer extraction/matching (minimal signal, high cost)
+  # - No Tier 3 semantic comparison (expensive LLM calls, no F1 benefit)
+  # - 180-day case ID date validation (tightened from 365 days)
+  # ============================================================================
+
+
+  # # Core Architecture Ablations
+  # - name: "full_pipeline"                    # was: baseline_v2
+  # - name: "tier1_and_tier2"                  # was: tier1_and_tier2_only
+  # - name: "tier2_and_tier3"                  # was: tier2_and_tier3
+  # - name: "tier1_only"                       # was: tier1_only_v2
+  # - name: "tier2_only"                       # was: tier2_extraction_only_v2
+
+  # # Feature Ablations (on Tier 1+2)
+  # - name: "no_case_ids"                      # was: no_case_ids_v2
+  # - name: "no_subject_names"                 # was: no_subject_names_v2
+  # - name: "no_dates"                         # was: no_dates_v2
+  # - name: "no_all_names"                     # was: no_all_names_v2
+
+  # # Minimal Systems (on Tier 1+2)
+  # - name: "case_ids_and_dates_only"          # was: case_ids_dates_only_v2
+  # - name: "names_and_dates_only"             # was: names_dates_only_v2
+
+  # # Learned Rules Baselines
+  # - name: "learned_decision_tree"            # was: learned_rules_decision_tree
+  # - name: "learned_random_forest"            # was: learned_rules_random_forest
+
+
+  - name: "baseline_v2"
+    description: "V2: Improved baseline (no tier1 names, no officers, no Tier 3, 180d dates)"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]  
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false  
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false  
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true 
+
+  - name: "baseline_v2_no_validation"
+    description: "V2: baseline_v2 with cluster validation disabled (no connectivity threshold split)"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+    enable_validation: false 
+
+  - name: "tier1_and_tier2_only"
+    description: "V2: Tiers 1+2 combined (no Tier 3) - tests Tier 3 contribution"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+  
+  - name: "tier2_and_tier3"
+    description: "V2: Tiers 2+3 only (no regex/Tier 1) - tests if LLM can handle everything"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [2, 3] 
+    enabled_rules:
+      tier1_case_id: false 
+      tier1_name_date: false
+      tier2_case_id: true 
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false  
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true  
+
+  - name: "tier1_only_v2"
+    description: "V2: Tier 1 only with improvements (no tier1 names, 180d case ID dates)"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [1] 
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false 
+      tier2_case_id: false
+      tier2_subject_date_or_case: false
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true  
+
+  - name: "tier2_extraction_only_v2"
+    description: "V2: Tier 2 only with improvements (no officers)"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [2] 
+    enabled_rules:
+      tier1_case_id: false
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false 
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+
+  - name: "no_case_ids_v2"
+    description: "V2: Test if case IDs still problematic with improved baseline"
+    date_proximity_days: 180  
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false 
+    disable_case_ids: true  
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true  
+
+  - name: "no_subject_names_v2"
+    description: "V2: Test contribution of subject names with improved baseline"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [1, 2]  
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false  
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false 
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: true  
+    disable_officer_names: true
+
+  - name: "case_ids_dates_only_v2"
+    description: "V2: Minimal matching (only case IDs + dates, no names)"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2] 
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false 
+      tier2_case_id: true
+      tier2_subject_date_or_case: false  
+      tier2_date_officer_case_or_subject: false 
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: true  
+    disable_officer_names: true  
+
+  - name: "no_dates_v2"
+    description: "V2: Remove ALL date matching (test if case IDs+names sufficient)"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [1, 2]  
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false  
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false  
+    disable_case_ids: false
+    disable_dates: true  
+    disable_subject_names: false
+    disable_officer_names: true  
+
+  - name: "no_all_names_v2"
+    description: "V2: Remove ALL name matching (test if case IDs+dates sufficient)"
+    date_proximity_days: 180 
+    require_dates_present: false
+    enabled_tiers: [1, 2] 
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false 
+      tier2_case_id: true
+      tier2_subject_date_or_case: false  
+      tier2_date_officer_case_or_subject: false  
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: true  
+    disable_officer_names: true 
+
+  - name: "names_dates_only_v2"
+    description: "V2: Minimal matching (only names + dates, no case IDs)"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2]
+    enabled_rules:
+      tier1_case_id: false
+      tier1_name_date: false
+      tier2_case_id: false
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: true
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+
+  # ============================================================================
+  # DATE PROXIMITY WINDOW ABLATIONS (baseline_v2 with varying date windows)
+  # ============================================================================
+
+  - name: "date_prox_90d"
+    description: "Date proximity window: 90 days (baseline_v2 with tighter window)"
+    date_proximity_days: 90
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+
+  - name: "date_prox_365d"
+    description: "Date proximity window: 365 days (baseline_v2 with wider window)"
+    date_proximity_days: 365
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+
+  # ============================================================================
+  # EMBEDDING SIMILARITY GATE ABLATIONS (baseline_v2 with varying Tier 3 gate)
+  # ============================================================================
+
+  - name: "emb_gate_085"
+    description: "Embedding similarity gate: 0.85"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+    embedding_similarity_threshold: 0.85
+
+  - name: "emb_gate_095"
+    description: "Embedding similarity gate: 0.95 (stricter Tier 3 filter, fewer LLM calls)"
+    date_proximity_days: 180
+    require_dates_present: false
+    enabled_tiers: [1, 2, 3]
+    enabled_rules:
+      tier1_case_id: true
+      tier1_name_date: false
+      tier2_case_id: true
+      tier2_subject_date_or_case: true
+      tier2_date_officer_case_or_subject: false
+    disable_case_ids: false
+    disable_dates: false
+    disable_subject_names: false
+    disable_officer_names: true
+    embedding_similarity_threshold: 0.95
+
+# Evaluation settings
+evaluation:
+  ground_truth_column: "provisional_case_name"
+  output_dir: "../../data/output/ablations_v2_dir_fallback"
+  reports_dir: "../../evaluation/reports/ablations"
