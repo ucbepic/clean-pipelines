@@ -1,0 +1,95 @@
+incident_name,incident_first_name,incident_middle_name,incident_last_name,incident_suffix,incident_date,post_name,post_first_name,post_middle_name,post_last_name,post_suffix,post_start_date,post_end_date,similarity_score,label
+frank  harper,frank,,harper,,2002-01-03,frank  harper,frank,,harper,,1995-02-13,,1.0,1
+frank  harper,frank,,harper,,2002-01-03,frank  martinez,frank,,martinez,,1988-07-22,2003-12-12,0.8125,0
+frank  harper,frank,,harper,,2002-01-03,francisco  martinez,francisco,,martinez,,1988-04-18,,0.7369444444444450,0
+neil  dadian,neil,,dadian,,2002-01-03,neil gordon dadian,neil,gordon,dadian,,1981-04-24,2013-10-26,0.8235294117647060,1
+richard  pierce,richard,,pierce,,2002-01-03,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,0.8235294117647060,1
+isaac  torres,isaac,,torres,,2002-01-03,isaac  torres,isaac,,torres,,1997-12-15,,1.0,1
+isaac  torres,isaac,,torres,,2002-01-03,gabriel  torres,gabriel,,torres,,1997-08-04,2012-01-25,0.7238095238095240,0
+isaac  torres,isaac,,torres,,2002-01-03,isaias  barbosa,isaias,,barbosa,,2001-02-09,,0.7076190476190480,0
+anthony  montiel,anthony,,montiel,,2002-01-03,anthony  montiel,anthony,,montiel,,1988-07-25,2014-03-29,1.0,1
+scott  moore,scott,,moore,,2002-01-03,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,0.8235294117647060,1
+steve  mccomas,steve,,mccomas,,2002-05-25,stephen  mccomas,stephen,,mccomas,,1995-05-22,,0.9266666666666670,0
+bryan  morgan,bryan,,morgan,,2002-05-25,bryan s morgan,bryan,s,morgan,,1986-01-21,2004-12-08,0.8235294117647060,0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,chris m serrano,chris,m,serrano,,1996-03-25,,0.7027777777777780,0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,thomas a alberda,thomas,a,alberda,,1992-07-17,2016-08-23,0.6890522875816990,0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,dolores g delgado,dolores,g,delgado,,1987-07-01,2011-01-03,0.6792483660130720,0
+patrick  oh,patrick,,oh,,2002-09-30,patrick  oh,patrick,,oh,,1983-09-12,2005-09-09,1.0,1
+kent  matsuzaki,kent,,matsuzaki,,2002-12-16,kent heiji matsuzaki,kent,heiji,matsuzaki,,1995-10-23,2013-09-30,0.8235294117647060,0
+jennifer  horton,jennifer,,horton,,2002-12-16,jennifer  horsford,jennifer,,horsford,,1997-12-29,,0.9027777777777780,0
+jennifer  horton,jennifer,,horton,,2002-12-16,jeff  kertson,jeff,,kertson,,1994-05-13,,0.7563492063492060,0
+jennifer  horton,jennifer,,horton,,2008-11-26,jennifer  horton,jennifer,,horton,,1989-04-07,2020-03-21,1.0,1
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1
+shawn  erwin,shawn,,erwin,,2009-07-14,shawn  erwin,shawn,,erwin,,1989-08-07,,1.0,1
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1
+jerry  dyer,jerry,,dyer,,2014-02-23,jerry p dyer,jerry,p,dyer,,1980-06-11,2019-10-16,0.8235294117647060,1
+jordan  wamhoff,jordan,,wamhoff,,2014-02-23,jordan  wamhoff,jordan,,wamhoff,,2011-08-31,,1.0,1
+paul  preston,paul,,preston,,2014-02-23,paul e preston,paul,e,preston,,1996-02-12,2023-09-30,0.8235294117647060,1
+john  viveros,john,,viveros,,2014-02-23,john  viveros,john,,viveros,,1996-12-16,,1.0,1
+stephen  viveros,stephen,,viveros,,2014-02-23,stephen  viveros,stephen,,viveros,,1999-01-04,,1.0,1
+l  lara,l,,lara,,2014-05-22,lorenzo  lara,lorenzo,,lara,,2013-08-19,2021-02-27,0.8714285714285710,1
+walden  o'neill,walden,,o'neill,,2014-10-04,walden  oneill,walden,,oneill,,2008-02-25,2017-12-18,0.9785714285714290,1
+angel  delafuente,angel,,delafuente,,2015-09-07,angel  delafuente,angel,,delafuente,,2001-11-04,2020-12-29,1.0,1
+angel  delafuente,angel,,delafuente,,2015-09-07,manuel  delgado,manuel,,delgado,,1995-11-20,,0.7396825396825400,0
+angel  delafuente,angel,,delafuente,,2015-09-07,daniel  cervantes,daniel,,cervantes,,2013-06-24,,0.7203703703703700,0
+imron  ramos,imron,,ramos,,2016-06-25,ruben  ramos,ruben,,ramos,,2007-07-28,2020-05-07,0.7333333333333330,0
+imron  ramos,imron,,ramos,,2016-06-25,andre  ramos,andre,,ramos,,2008-10-06,,0.7333333333333330,0
+andrew  salazar,andrew,,salazar,,2016-06-25,andres  lopez,andres,,lopez,,2014-06-16,,0.7476190476190480,0
+andrew  salazar,andrew,,salazar,,2016-06-25,andres  garzon,andres,,garzon,,2014-01-20,2019-07-27,0.7365079365079370,0
+andrew  salazar,andrew,,salazar,,2016-06-25,arturo  salas,arturo,,salas,,1980-08-29,,0.7149206349206350,0
+scott  haugland,scott,,haugland,,2016-06-25,scott  stagis,scott,,stagis,,2015-11-09,2024-03-01,0.763888888888889,0
+frank  harper,frank,,harper,,2002-01-03,frank bernard paradise jr,frank,bernard,paradise,jr,1994-12-13,2004-06-16,0.819444444444444,0.0
+neil  dadian,neil,,dadian,,2002-01-03,neil gordon dadian,neil,gordon,dadian,,1981-04-24,2013-10-26,1.0,1.0
+neil  dadian,neil,,dadian,,2002-01-03,neil e edmiston,neil,e,edmiston,,2000-09-18,2005-03-30,0.8125,0.0
+neil  dadian,neil,,dadian,,2002-01-03,neil i berman,neil,i,berman,,1991-01-03,,0.777777777777778,0.0
+carts  hollis,carts,,hollis,,2002-01-03,martin ruiz solis,martin,ruiz,solis,,1999-04-08,2005-06-20,0.761111111111111,0.0
+carts  hollis,carts,,hollis,,2002-01-03,carlos tovar leal jr,carlos,tovar,leal,jr,1995-08-31,2010-06-10,0.743333333333333,0.0
+carts  hollis,carts,,hollis,,2002-01-03,charles m harkins ii,charles,m,harkins,ii,1977-08-19,2004-10-29,0.727142857142857,0.0
+richard  pierce,richard,,pierce,,2002-01-03,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+richard  pierce,richard,,pierce,,2002-01-03,richard guy verber,richard,guy,verber,,1988-02-01,2017-04-03,0.833333333333333,0.0
+richard  pierce,richard,,pierce,,2002-01-03,richard b hunter,richard,b,hunter,,1994-01-21,2015-06-15,0.777777777777778,0.0
+doug  jackson,doug,,jackson,,2002-01-03,douglas alan jackson jr,douglas,alan,jackson,jr,1998-03-23,2006-06-26,0.957142857142857,0.0
+doug  jackson,doug,,jackson,,2002-01-03,louis b jackson,louis,b,jackson,,1995-05-25,2015-09-15,0.816666666666667,0.0
+doug  jackson,doug,,jackson,,2002-01-03,douglas kyle kirkorian,douglas,kyle,kirkorian,,1994-08-16,2015-06-10,0.750793650793651,0.0
+elizabeth a egan,elizabeth,a,egan,,2002-01-03,elizabeth a marmolejo,elizabeth,a,marmolejo,,1993-05-01,2012-10-16,0.824404761904762,0.0
+elizabeth a egan,elizabeth,a,egan,,2002-01-03,delanie ann pimentel,delanie,ann,pimentel,,1998-04-20,2014-03-31,0.766411564625851,0.0
+elizabeth a egan,elizabeth,a,egan,,2002-01-03,gilbert andrew washington jr,gilbert,andrew,washington,jr,1987-07-13,2008-06-30,0.761054421768708,0.0
+blake j gunderson,blake,j,gunderson,,2002-01-03,brian joseph rogers,brian,joseph,rogers,,1987-09-10,2021-01-16,0.776190476190476,0.0
+blake j gunderson,blake,j,gunderson,,2002-01-03,michael jerone severson,michael,jerone,severson,,1996-09-09,,0.771386054421769,0.0
+blake j gunderson,blake,j,gunderson,,2002-01-03,michael james landon,michael,james,landon,,1999-01-04,,0.763945578231293,0.0
+isaac  torres,isaac,,torres,,2002-01-03,armando m torres,armando,m,torres,,1984-09-21,2008-04-12,0.780952380952381,0.0
+isaac  torres,isaac,,torres,,2002-01-03,christopher herrera torres,christopher,herrera,torres,,1999-12-13,,0.756565656565657,0.0
+anthony  montiel,anthony,,montiel,,2002-01-03,anthony tovar martinez,anthony,tovar,martinez,,1996-07-08,,0.870892857142857,0.0
+anthony  montiel,anthony,,montiel,,2002-01-03,anthony d gomez,anthony,d,gomez,,1999-03-08,,0.782539682539682,0.0
+scott  moore,scott,,moore,,2002-01-03,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,1.0,1.0
+bryan  morgan,bryan,,morgan,,2002-05-25,bryan s morgan,bryan,s,morgan,,1986-01-21,2004-12-08,1.0,1.0
+richard  pierce,richard,,pierce,,2002-05-25,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+scott  jones,scott,,jones,,2002-05-25,scott e jones,scott,e,jones,,1983-05-23,2013-08-30,1.0,1.0
+scott  moore,scott,,moore,,2002-05-25,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,1.0,1.0
+john  robinson,john,,robinson,,2002-09-30,john michael robinson,john,michael,robinson,,1994-10-25,,1.0,1.0
+richard  pierce,richard,,pierce,,2002-09-30,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+michael  edwards,michael,,edwards,,2002-09-30,michael s edwards,michael,s,edwards,,1982-04-23,2008-03-26,1.0,1.0
+sharla  gauthier,sharla,,gauthier,,2002-09-30,sharla c gauthier,sharla,c,gauthier,,2000-10-30,2019-09-24,1.0,1.0
+paul  biswas,paul,,biswas,,2002-09-30,paul t biswas,paul,t,biswas,,2002-05-27,2017-05-08,1.0,1.0
+scott  moore,scott,,moore,,2002-09-30,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,1.0,1.0
+kent  matsuzaki,kent,,matsuzaki,,2002-12-16,kent heiji matsuzaki,kent,heiji,matsuzaki,,1995-10-23,2013-09-30,1.0,1.0
+richard  pierce,richard,,pierce,,2002-12-16,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+richard  pierce,richard,,pierce,,2003-08-23,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+kevin  lolkus,kevin,,lolkus,,2003-09-08,kevin allen lolkus,kevin,allen,lolkus,,1999-08-23,,1.0,1.0
+greg  siemens,greg,,siemens,,2003-09-08,greg a siemens,greg,a,siemens,,1998-05-04,2016-03-01,1.0,1.0
+juan  espinoza,juan,,espinoza,,2003-09-08,juan martin espinoza,juan,martin,espinoza,,1989-06-21,2018-02-14,1.0,1.0
+scott  moore,scott,,moore,,2003-09-08,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,1.0,1.0
+richard  pierce,richard,,pierce,,2003-09-08,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+sergio  toscano,sergio,,toscano,,2003-09-08,sergio r toscano,sergio,r,toscano,,1985-01-14,2014-11-21,1.0,1.0
+sergio  toscano,sergio,,toscano,,2003-09-08,sergio r toscano,sergio,r,toscano,,1984-05-09,,1.0,1.0
+scott  jones,scott,,jones,,2003-09-08,scott e jones,scott,e,jones,,1983-05-23,2013-08-30,1.0,1.0
+andrew  cabrera,andrew,,cabrera,,2003-09-13,andrew m cabrera,andrew,m,cabrera,,2003-01-13,2004-04-09,1.0,1.0
+richard  pierce,richard,,pierce,,2003-09-13,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,1.0,1.0
+gary  johnson,gary,,johnson,,2003-09-13,gary l johnson,gary,l,johnson,,1979-02-16,2007-08-03,1.0,1.0
+connie  moore,connie,,moore,,2003-09-13,connie lynn moore,connie,lynn,moore,,1996-01-16,2005-08-29,1.0,1.0
+robert  buenrostro,robert,,buenrostro,,2003-09-13,robert cruz buenrostro,robert,cruz,buenrostro,,2000-03-06,,1.0,1.0
+shawn  erwin,shawn,,erwin,,2009-07-14,shawn  erwin,shawn,,erwin,,1989-08-07,,1.0,1
+jennifer  horton,jennifer,,horton,,2009-07-14,jennifer  horton,jennifer,,horton,,1989-04-07,2020-03-21,1.0,1
+jennifer  horton,jennifer,,horton,,2010-04-04,jennifer  horton,jennifer,,horton,,1989-04-07,2020-03-21,1.0,1
+mark  padilla,mark,,padilla,,2013-11-05,mark  padilla,mark,,padilla,,1991-06-24,2021-11-13,1.0,1
