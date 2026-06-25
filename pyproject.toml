@@ -18,6 +18,7 @@ dependencies = [
     "prap-mentioned-agencies",
     "prap-page-stream-segmentation",
     "prap-clustering",
+    "prap-post-entity-resolution",
 ]
 
 [tool.uv.workspace]
@@ -34,6 +35,7 @@ prap-involved-agency = { workspace = true }
 prap-mentioned-agencies = { workspace = true }
 prap-page-stream-segmentation = { workspace = true }
 prap-clustering = { workspace = true }
+prap-post-entity-resolution = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -65,6 +67,12 @@ select = ["E", "F", "I", "B", "UP", "W"]
 "packages/clustering/src/prap_clustering/evaluation.py" = ["E501", "E722", "E701", "B007", "E402"]
 "packages/clustering/src/prap_clustering/metrics.py" = ["E501", "E722"]
 "packages/clustering/tests/test_cluster_embeddings.py" = ["E501"]
+# post-entity-resolution: prompt text embedded as a raw string (cf. summary_filter.py);
+# AgencyType is intentionally a (str, Enum) for behavior parity with the trained model's
+# inputs (not StrEnum); training/ is a verbatim legacy model-training chain.
+"packages/post-entity-resolution/src/prap_post_entity_resolution/resolve/validation.py" = ["E501"]
+"packages/post-entity-resolution/src/prap_post_entity_resolution/schemas.py" = ["UP042"]
+"packages/post-entity-resolution/src/prap_post_entity_resolution/training/**" = ["E501", "B023", "E722"]
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -78,5 +86,6 @@ testpaths = [
     "packages/mentioned-agencies/tests",
     "packages/page-stream-segmentation/tests",
     "packages/clustering/tests",
+    "packages/post-entity-resolution/tests",
 ]
 addopts = "-ra --import-mode=importlib"
