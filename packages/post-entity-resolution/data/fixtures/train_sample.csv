@@ -1,0 +1,41 @@
+incident_name,incident_first_name,incident_middle_name,incident_last_name,incident_suffix,incident_date,post_name,post_first_name,post_middle_name,post_last_name,post_suffix,post_start_date,post_end_date,similarity_score,label
+isaac  torres,isaac,,torres,,2002-01-03,gabriel  torres,gabriel,,torres,,1997-08-04,2012-01-25,0.723809523809524,0.0
+frank  harper,frank,,harper,,2002-01-03,frank  martinez,frank,,martinez,,1988-07-22,2003-12-12,0.8125,0.0
+bryan  morgan,bryan,,morgan,,2002-05-25,bryan s morgan,bryan,s,morgan,,1986-01-21,2004-12-08,0.823529411764706,0.0
+anthony  montiel,anthony,,montiel,,2002-01-03,anthony  montiel,anthony,,montiel,,1988-07-25,2014-03-29,1.0,1.0
+shawn  erwin,shawn,,erwin,,2009-07-14,shawn  erwin,shawn,,erwin,,1989-08-07,,1.0,1.0
+john  viveros,john,,viveros,,2014-02-23,john  viveros,john,,viveros,,1996-12-16,,1.0,1.0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,dolores g delgado,dolores,g,delgado,,1987-07-01,2011-01-03,0.679248366013072,0.0
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1.0
+walden  o'neill,walden,,o'neill,,2014-10-04,walden  oneill,walden,,oneill,,2008-02-25,2017-12-18,0.978571428571429,1.0
+kent  matsuzaki,kent,,matsuzaki,,2002-12-16,kent heiji matsuzaki,kent,heiji,matsuzaki,,1995-10-23,2013-09-30,0.823529411764706,0.0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,thomas a alberda,thomas,a,alberda,,1992-07-17,2016-08-23,0.689052287581699,0.0
+imron  ramos,imron,,ramos,,2016-06-25,andre  ramos,andre,,ramos,,2008-10-06,,0.733333333333333,0.0
+andrew  salazar,andrew,,salazar,,2016-06-25,andres  garzon,andres,,garzon,,2014-01-20,2019-07-27,0.736507936507937,0.0
+richard  pierce,richard,,pierce,,2002-01-03,richard guy pierce,richard,guy,pierce,,1966-12-01,2007-01-08,0.823529411764706,1.0
+scott  haugland,scott,,haugland,,2016-06-25,scott  stagis,scott,,stagis,,2015-11-09,2024-03-01,0.763888888888889,0.0
+jennifer  horton,jennifer,,horton,,2002-12-16,jennifer  horsford,jennifer,,horsford,,1997-12-29,,0.902777777777778,0.0
+imron  ramos,imron,,ramos,,2016-06-25,ruben  ramos,ruben,,ramos,,2007-07-28,2020-05-07,0.733333333333333,0.0
+stephen  viveros,stephen,,viveros,,2014-02-23,stephen  viveros,stephen,,viveros,,1999-01-04,,1.0,1.0
+andrew  salazar,andrew,,salazar,,2016-06-25,andres  lopez,andres,,lopez,,2014-06-16,,0.747619047619048,0.0
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1.0
+jordan  wamhoff,jordan,,wamhoff,,2014-02-23,jordan  wamhoff,jordan,,wamhoff,,2011-08-31,,1.0,1.0
+scott  moore,scott,,moore,,2002-01-03,scott james moore,scott,james,moore,,1999-08-23,2018-06-02,0.823529411764706,1.0
+l  lara,l,,lara,,2014-05-22,lorenzo  lara,lorenzo,,lara,,2013-08-19,2021-02-27,0.871428571428571,1.0
+paul  preston,paul,,preston,,2014-02-23,paul e preston,paul,e,preston,,1996-02-12,2023-09-30,0.823529411764706,1.0
+angel  delafuente,angel,,delafuente,,2015-09-07,daniel  cervantes,daniel,,cervantes,,2013-06-24,,0.72037037037037,0.0
+jennifer  horton,jennifer,,horton,,2008-11-26,jennifer  horton,jennifer,,horton,,1989-04-07,2020-03-21,1.0,1.0
+angel  delafuente,angel,,delafuente,,2015-09-07,manuel  delgado,manuel,,delgado,,1995-11-20,,0.73968253968254,0.0
+neil  dadian,neil,,dadian,,2002-01-03,neil gordon dadian,neil,gordon,dadian,,1981-04-24,2013-10-26,0.823529411764706,1.0
+hollis gattie mims flores leonardo,hollis,gattie mims flores,leonardo,,2002-05-25,chris m serrano,chris,m,serrano,,1996-03-25,,0.702777777777778,0.0
+jerry  dyer,jerry,,dyer,,2014-02-23,jerry p dyer,jerry,p,dyer,,1980-06-11,2019-10-16,0.823529411764706,1.0
+jennifer  horton,jennifer,,horton,,2002-12-16,jeff  kertson,jeff,,kertson,,1994-05-13,,0.756349206349206,0.0
+steve  mccomas,steve,,mccomas,,2002-05-25,stephen  mccomas,stephen,,mccomas,,1995-05-22,,0.926666666666667,0.0
+patrick  oh,patrick,,oh,,2002-09-30,patrick  oh,patrick,,oh,,1983-09-12,2005-09-09,1.0,1.0
+isaac  torres,isaac,,torres,,2002-01-03,isaias  barbosa,isaias,,barbosa,,2001-02-09,,0.707619047619048,0.0
+frank  harper,frank,,harper,,2002-01-03,francisco  martinez,francisco,,martinez,,1988-04-18,,0.736944444444445,0.0
+angel  delafuente,angel,,delafuente,,2015-09-07,angel  delafuente,angel,,delafuente,,2001-11-04,2020-12-29,1.0,1.0
+john  golden,john,,golden,,2008-11-11,john  golden,john,,golden,,1983-08-22,2015-12-07,1.0,1.0
+andrew  salazar,andrew,,salazar,,2016-06-25,arturo  salas,arturo,,salas,,1980-08-29,,0.714920634920635,0.0
+isaac  torres,isaac,,torres,,2002-01-03,isaac  torres,isaac,,torres,,1997-12-15,,1.0,1.0
+frank  harper,frank,,harper,,2002-01-03,frank  harper,frank,,harper,,1995-02-13,,1.0,1.0

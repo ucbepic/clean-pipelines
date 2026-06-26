@@ -41,12 +41,13 @@ def parse_feature_value(value) -> list[str] | None:
     Returns:
         List of feature values or None if empty
     """
-    if pd.isna(value) or value in [None, 'None', '[]', '']:
+    if pd.isna(value) or value in [None, "None", "[]", ""]:
         return None
 
     # Handle string representation of list: "['val1', 'val2']"
-    if isinstance(value, str) and value.startswith('['):
+    if isinstance(value, str) and value.startswith("["):
         import ast
+
         try:
             parsed = ast.literal_eval(value)
             if parsed:
@@ -56,7 +57,7 @@ def parse_feature_value(value) -> list[str] | None:
 
     # Handle comma-separated: "val1, val2"
     if isinstance(value, str):
-        vals = [v.strip() for v in value.split(',') if v.strip()]
+        vals = [v.strip() for v in value.split(",") if v.strip()]
         if vals:
             return vals
 
@@ -76,7 +77,7 @@ def normalize_case_id(case_id: str) -> str:
     """
     normalized = case_id.strip().upper()
     # Standardize separators: replace underscores with hyphens
-    normalized = normalized.replace('_', '-')
+    normalized = normalized.replace("_", "-")
     return normalized
 
 
@@ -95,15 +96,24 @@ def normalize_name(name: str) -> str:
 
     # Remove common titles
     titles = [
-        'officer', 'det.', 'detective', 'sgt.', 'sergeant',
-        'lt.', 'lieutenant', 'cpl.', 'corporal', 'chief',
-        'sheriff', 'deputy'
+        "officer",
+        "det.",
+        "detective",
+        "sgt.",
+        "sergeant",
+        "lt.",
+        "lieutenant",
+        "cpl.",
+        "corporal",
+        "chief",
+        "sheriff",
+        "deputy",
     ]
 
     for title in titles:
         # Remove title if it's at the start followed by space
-        if normalized.startswith(title + ' '):
-            normalized = normalized[len(title) + 1:]
+        if normalized.startswith(title + " "):
+            normalized = normalized[len(title) + 1 :]
             break
 
     return normalized.strip()
@@ -122,17 +132,17 @@ def get_feature_value_metadata(row: dict, feature_type: str, source_mode: str) -
         List of feature values or None
     """
     if source_mode == "filepath_only":
-        col = f'extracted_{feature_type}_fp'
+        col = f"extracted_{feature_type}_fp"
         return parse_feature_value(row.get(col))
 
     elif source_mode == "filename_only":
-        col = f'extracted_{feature_type}_fn'
+        col = f"extracted_{feature_type}_fn"
         return parse_feature_value(row.get(col))
 
     elif source_mode == "combined":
         # Union of both sources
-        fp_col = f'extracted_{feature_type}_fp'
-        fn_col = f'extracted_{feature_type}_fn'
+        fp_col = f"extracted_{feature_type}_fp"
+        fn_col = f"extracted_{feature_type}_fn"
 
         fp_vals = parse_feature_value(row.get(fp_col)) or []
         fn_vals = parse_feature_value(row.get(fn_col)) or []
@@ -158,14 +168,14 @@ def calculate_edge_weight_metadata(doc1: dict, doc2: dict, source_mode: str) -> 
         1.0 if documents should cluster, 0.0 otherwise
     """
     # Get features based on source mode
-    case_ids1 = get_feature_value_metadata(doc1, 'case_ids', source_mode)
-    case_ids2 = get_feature_value_metadata(doc2, 'case_ids', source_mode)
+    case_ids1 = get_feature_value_metadata(doc1, "case_ids", source_mode)
+    case_ids2 = get_feature_value_metadata(doc2, "case_ids", source_mode)
 
-    dates1 = get_feature_value_metadata(doc1, 'dates', source_mode)
-    dates2 = get_feature_value_metadata(doc2, 'dates', source_mode)
+    dates1 = get_feature_value_metadata(doc1, "dates", source_mode)
+    dates2 = get_feature_value_metadata(doc2, "dates", source_mode)
 
-    names1 = get_feature_value_metadata(doc1, 'names', source_mode)
-    names2 = get_feature_value_metadata(doc2, 'names', source_mode)
+    names1 = get_feature_value_metadata(doc1, "names", source_mode)
+    names2 = get_feature_value_metadata(doc2, "names", source_mode)
 
     # Normalize case IDs using normalize_case_id function
     case_ids1_normalized = set()
@@ -320,7 +330,9 @@ def split_invalid_cluster(cluster_nodes: set, graph: nx.Graph, threshold: float 
     return sub_clusters
 
 
-def validate_and_split_clusters(candidate_clusters: list[set], graph: nx.Graph, threshold: float = 0.5, debug: bool = False) -> list[set]:
+def validate_and_split_clusters(
+    candidate_clusters: list[set], graph: nx.Graph, threshold: float = 0.5, debug: bool = False
+) -> list[set]:
     """
     Validate all candidate clusters and split invalid ones.
 
@@ -354,6 +366,7 @@ def get_embeddings(names):
     if not names:
         return np.array([])
     return np.array(get_llm().embed(names))
+
 
 @dataclass
 class DocumentNode(TypedDict):
@@ -395,9 +408,8 @@ def validate_response(response: str) -> float | None:
     except:
         return None
 
-def pairwise_comparison_of_paths(
-    filepath_1: str, filepath_2: str, max_retries: int = 3
-) -> float:
+
+def pairwise_comparison_of_paths(filepath_1: str, filepath_2: str, max_retries: int = 3) -> float:
     """
     Compare two document summaries and determine their similarity score.
     """
@@ -737,7 +749,7 @@ def is_valid_date(date_str):
         return False
 
     # Check if it matches YYYY-MM-DD pattern
-    if not re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
         return False
 
     # Try to parse it
@@ -801,17 +813,17 @@ def standardize_date(date_str: str) -> datetime | None:
     Returns None if the date can't be parsed.
     """
     formats = [
-        "%Y-%m-%d",       # 2023-01-15
-        "%m/%d/%Y",       # 01/15/2023
-        "%m-%d-%Y",       # 01-15-2023
-        "%m.%d.%Y",       # 01.15.2023
-        "%Y/%m/%d",       # 2023/01/15
-        "%Y.%m.%d",       # 2023.01.15
-        "%Y%m%d",         # 20230115
-        "%m/%d/%y",       # 01/15/23
-        "%m-%d-%y",       # 01-15-23
-        "%m.%d.%y",       # 01.15.23
-        "%d.%m.%y"        # 15.01.23
+        "%Y-%m-%d",  # 2023-01-15
+        "%m/%d/%Y",  # 01/15/2023
+        "%m-%d-%Y",  # 01-15-2023
+        "%m.%d.%Y",  # 01.15.2023
+        "%Y/%m/%d",  # 2023/01/15
+        "%Y.%m.%d",  # 2023.01.15
+        "%Y%m%d",  # 20230115
+        "%m/%d/%y",  # 01/15/23
+        "%m-%d-%y",  # 01-15-23
+        "%m.%d.%y",  # 01.15.23
+        "%d.%m.%y",  # 15.01.23
     ]
 
     for fmt in formats:
@@ -851,6 +863,7 @@ def calculate_days_difference(date1_str, date2_str):
         return abs((date1 - date2).days)
     return None
 
+
 def calculate_edge_weight(doc1: dict, doc2: dict) -> float:
     """Calculate similarity score between two documents based on all available signals."""
 
@@ -875,7 +888,6 @@ def calculate_edge_weight(doc1: dict, doc2: dict) -> float:
             return 1.0
         else:
             return 0.0
-
 
     # Check if documents have names and valid dates
     if doc1.get("name") and doc2.get("name") and doc1.get("date") and doc2.get("date"):
@@ -955,13 +967,12 @@ def calculate_edge_weight(doc1: dict, doc2: dict) -> float:
             return 0.0
 
         # Return weighted average, with extra weight given to summary similarities
-        weighted_sum = sum(
-            w * multiplier for w, multiplier in zip(weights, [1, 1], strict=False)
-        )
+        weighted_sum = sum(w * multiplier for w, multiplier in zip(weights, [1, 1], strict=False))
 
         return weighted_sum / sum([1, 1][: len(weights)])
 
     return 0.0
+
 
 def process_pair(pair, calculate_edge_weight_func):
     """Process a single pair of documents and return edge data if weight is sufficient."""
@@ -971,7 +982,9 @@ def process_pair(pair, calculate_edge_weight_func):
         if weight and weight > 0.5:  # Only return edges for reasonably strong connections
             return (doc1["id"], doc2["id"], weight)
     except Exception as e:
-        print(f"Error processing pair {doc1.get('document_name', 'unknown')} and {doc2.get('document_name', 'unknown')}: {str(e)}")
+        print(
+            f"Error processing pair {doc1.get('document_name', 'unknown')} and {doc2.get('document_name', 'unknown')}: {str(e)}"
+        )
     return None
 
 
@@ -1026,13 +1039,22 @@ def preprocess_documents(data: list[dict]) -> list[dict]:
 
     print("Preprocessing complete:")
     print(f"  Total documents: {total_docs}")
-    print(f"  With extracted incident IDs: {with_incident_ids} ({with_incident_ids/total_docs*100:.1f}%)")
-    print(f"  With case_numbers field: {with_case_numbers} ({with_case_numbers/total_docs*100:.1f}%)")
-    print(f"  With incident_id field: {with_incident_field} ({with_incident_field/total_docs*100:.1f}%)")
-    print(f"  With extracted dates: {with_extracted_dates} ({with_extracted_dates/total_docs*100:.1f}%)")
-    print(f"  With date field: {with_date_field} ({with_date_field/total_docs*100:.1f}%)")
+    print(
+        f"  With extracted incident IDs: {with_incident_ids} ({with_incident_ids / total_docs * 100:.1f}%)"
+    )
+    print(
+        f"  With case_numbers field: {with_case_numbers} ({with_case_numbers / total_docs * 100:.1f}%)"
+    )
+    print(
+        f"  With incident_id field: {with_incident_field} ({with_incident_field / total_docs * 100:.1f}%)"
+    )
+    print(
+        f"  With extracted dates: {with_extracted_dates} ({with_extracted_dates / total_docs * 100:.1f}%)"
+    )
+    print(f"  With date field: {with_date_field} ({with_date_field / total_docs * 100:.1f}%)")
 
     return data
+
 
 def should_compare_documents(doc1: dict, doc2: dict) -> bool:
     """
@@ -1074,7 +1096,7 @@ def should_compare_documents(doc1: dict, doc2: dict) -> bool:
 
     # If both have dates, check if any are within reasonable range
     if doc1_dates and doc2_dates:
-        min_days_diff = float('inf')
+        min_days_diff = float("inf")
         for d1 in doc1_dates:
             for d2 in doc2_dates:
                 days_diff = abs((d1 - d2).days)
@@ -1084,19 +1106,16 @@ def should_compare_documents(doc1: dict, doc2: dict) -> bool:
         if min_days_diff > 180:
             return False
 
-
     return True
+
 
 async def process_pairs_generator(doc_pairs, max_workers=50, batch_size=10000):
     """Generator that yields edge results in batches to avoid memory accumulation."""
     total_batches = (len(doc_pairs) + batch_size - 1) // batch_size
     start_time = time.time()
 
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        process_func = partial(
-            process_pair, calculate_edge_weight_func=calculate_edge_weight
-        )
+        process_func = partial(process_pair, calculate_edge_weight_func=calculate_edge_weight)
 
         for batch_idx in range(total_batches):
             batch_start = batch_idx * batch_size
@@ -1104,10 +1123,7 @@ async def process_pairs_generator(doc_pairs, max_workers=50, batch_size=10000):
             batch_pairs = doc_pairs[batch_start:batch_end]
 
             loop = asyncio.get_event_loop()
-            tasks = [
-                loop.run_in_executor(executor, process_func, pair)
-                for pair in batch_pairs
-            ]
+            tasks = [loop.run_in_executor(executor, process_func, pair) for pair in batch_pairs]
 
             try:
                 batch_results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -1128,10 +1144,12 @@ async def process_pairs_generator(doc_pairs, max_workers=50, batch_size=10000):
                 eta_seconds = remaining_pairs / rate if rate > 0 else 0
                 eta_minutes = eta_seconds / 60
 
-                print(f"Batch {batch_idx + 1}/{total_batches} complete. "
-                      f"Found {len(batch_edges)} edges this batch. "
-                      f"Rate: {rate:.1f} pairs/sec. "
-                      f"ETA: {eta_minutes:.1f} minutes")
+                print(
+                    f"Batch {batch_idx + 1}/{total_batches} complete. "
+                    f"Found {len(batch_edges)} edges this batch. "
+                    f"Rate: {rate:.1f} pairs/sec. "
+                    f"ETA: {eta_minutes:.1f} minutes"
+                )
 
                 # Yield the batch results
                 if batch_edges:
@@ -1140,6 +1158,7 @@ async def process_pairs_generator(doc_pairs, max_workers=50, batch_size=10000):
                 # Force garbage collection every 100 batches
                 if (batch_idx + 1) % 100 == 0:
                     import gc
+
                     gc.collect()
                     print(f"  Memory cleanup at batch {batch_idx + 1}")
 
@@ -1148,7 +1167,9 @@ async def process_pairs_generator(doc_pairs, max_workers=50, batch_size=10000):
                 continue
 
 
-async def cluster_results(data: list[dict], historical_data: dict = None, max_workers: int = None) -> list[dict]:
+async def cluster_results(
+    data: list[dict], historical_data: dict = None, max_workers: int = None
+) -> list[dict]:
     """Memory-efficient clustering using generator pattern to avoid accumulating results."""
 
     # Preprocess documents to extract incident IDs and dates
@@ -1160,12 +1181,13 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
 
     # Create provisional case mapping if historical data is available
     provisional_cases = {}
-    if historical_data is not None and all(k in historical_data for k in ['gdrive_name', 'provisional_case_name']):
+    if historical_data is not None and all(
+        k in historical_data for k in ["gdrive_name", "provisional_case_name"]
+    ):
         for name, prov_name in zip(
-            historical_data['gdrive_name'],
-            historical_data['provisional_case_name'], strict=False
+            historical_data["gdrive_name"], historical_data["provisional_case_name"], strict=False
         ):
-            if not pd.isna(prov_name) and prov_name not in ['', None]:
+            if not pd.isna(prov_name) and prov_name not in ["", None]:
                 provisional_cases[name] = prov_name
 
     # Generate document pairs with enhanced blocking
@@ -1178,11 +1200,11 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
         if i % 1000 == 0:
             print(f"Processing document {i}/{len(data)}")
 
-        doc1_name = doc1.get('document_name', '')
+        doc1_name = doc1.get("document_name", "")
         doc1_case = provisional_cases.get(doc1_name)
 
-        for doc2 in data[i+1:]:
-            doc2_name = doc2.get('document_name', '')
+        for doc2 in data[i + 1 :]:
+            doc2_name = doc2.get("document_name", "")
             doc2_case = provisional_cases.get(doc2_name)
 
             # Skip pairs that are already known to be in the same provisional case
@@ -1201,13 +1223,17 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
     print(f"  Total possible pairs: {len(data) * (len(data) - 1) // 2}")
     print(f"  Pairs after blocking: {len(doc_pairs)}")
     print(f"  Pairs blocked: {blocked_counts['total_blocked']}")
-    print(f"  Blocking efficiency: {blocked_counts['total_blocked'] / (len(data) * (len(data) - 1) // 2) * 100:.1f}%")
+    print(
+        f"  Blocking efficiency: {blocked_counts['total_blocked'] / (len(data) * (len(data) - 1) // 2) * 100:.1f}%"
+    )
 
     # Process pairs using generator to avoid memory accumulation
     max_workers = 50
     batch_size = 10000  # Smaller batches
 
-    print(f"Processing {len(doc_pairs)} document pairs with {max_workers} workers in batches of {batch_size}")
+    print(
+        f"Processing {len(doc_pairs)} document pairs with {max_workers} workers in batches of {batch_size}"
+    )
     print("Using memory-efficient generator pattern...")
 
     total_edges_added = 0
@@ -1274,7 +1300,7 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
         print("Applying provisional case refinement...")
         prov_case_groups = defaultdict(list)
         for doc in data:
-            doc_name = doc.get('document_name', '')
+            doc_name = doc.get("document_name", "")
             if doc_name in provisional_cases:
                 prov_case = provisional_cases[doc_name]
                 if prov_case:
@@ -1300,7 +1326,7 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
         doc_copy = doc.copy()
         doc_copy["Parent Clusters"] = [node_to_cluster.get(doc["id"], -1)]
 
-        doc_name = doc.get('document_name', '')
+        doc_name = doc.get("document_name", "")
         if doc_name in provisional_cases:
             doc_copy["provisional_case_name"] = provisional_cases[doc_name]
 
@@ -1309,7 +1335,6 @@ async def cluster_results(data: list[dict], historical_data: dict = None, max_wo
     final_clusters = len(set(node_to_cluster.values()))
     print(f"Clustering complete: {final_clusters} clusters formed")
     return result
-
 
 
 def load_historical_data(historical_csv_path: str | None = None) -> dict | None:
@@ -1321,10 +1346,9 @@ def load_historical_data(historical_csv_path: str | None = None) -> dict | None:
     df_historical = pd.read_csv(historical_csv_path)
 
     return {
-        'gdrive_name': df_historical.get('gdrive_name', []).tolist(),
-        'provisional_case_name': df_historical.get('provisional_case_name', []).tolist()
+        "gdrive_name": df_historical.get("gdrive_name", []).tolist(),
+        "provisional_case_name": df_historical.get("provisional_case_name", []).tolist(),
     }
-
 
 
 def load_csv_data(csv_path: str) -> list[dict[str, Any]]:
@@ -1340,12 +1364,12 @@ def load_csv_data(csv_path: str) -> list[dict[str, Any]]:
     for idx, row in df.iterrows():
         doc = {
             "id": str(idx),  # Use row index as unique ID
-            "document_name": row.get('gdrive_name', ''),
-            "gdrive_path": row.get('gdrive_path', ''),
-            "gdrive_name": row.get('gdrive_name', ''),
-            "date": row.get('incident_date', None),
-            "name": row.get('subject_name', None),
-            "case_numbers": row.get('case_numbers', None),
+            "document_name": row.get("gdrive_name", ""),
+            "gdrive_path": row.get("gdrive_path", ""),
+            "gdrive_name": row.get("gdrive_name", ""),
+            "date": row.get("incident_date", None),
+            "name": row.get("subject_name", None),
+            "case_numbers": row.get("case_numbers", None),
         }
 
         # Handle NaN values by converting to None
@@ -1357,6 +1381,7 @@ def load_csv_data(csv_path: str) -> list[dict[str, Any]]:
 
     return documents
 
+
 def save_clustering_results(results: list[dict], output_path: str):
     """Save clustering results to CSV file."""
     # Convert results back to DataFrame
@@ -1367,7 +1392,11 @@ def save_clustering_results(results: list[dict], output_path: str):
     print(f"Results saved to: {output_path}")
 
     # Print clustering summary
-    cluster_counts = df_results['Parent Clusters'].apply(lambda x: x[0] if isinstance(x, list) else x).value_counts()
+    cluster_counts = (
+        df_results["Parent Clusters"]
+        .apply(lambda x: x[0] if isinstance(x, list) else x)
+        .value_counts()
+    )
     print("\nClustering Summary:")
     print(f"Total documents: {len(df_results)}")
     print(f"Total clusters: {len(cluster_counts)}")
@@ -1445,6 +1474,7 @@ async def main():
     except Exception as e:
         print(f"Error during clustering: {str(e)}")
         import traceback
+
         traceback.print_exc()
         raise
 
@@ -1459,5 +1489,3 @@ def run_clustering():
     except Exception as e:
         print(f"Fatal error: {str(e)}")
         raise
-
-

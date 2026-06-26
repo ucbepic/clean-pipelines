@@ -2,7 +2,6 @@
 
 import logging
 import re
-from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger("prap.redactions.cards")
 
@@ -71,7 +70,7 @@ def luhn_validate(card_number: str) -> bool:
     return total % 10 == 0
 
 
-def get_card_type(card_number: str) -> Optional[str]:
+def get_card_type(card_number: str) -> str | None:
     """
     Determine the card type based on prefix and length.
 
@@ -98,7 +97,7 @@ def get_card_type(card_number: str) -> Optional[str]:
     return None
 
 
-def is_valid_card_number(card_number: str) -> Tuple[bool, Optional[str]]:
+def is_valid_card_number(card_number: str) -> tuple[bool, str | None]:
     """
     Validate a card number using prefix check and Luhn algorithm.
 
@@ -120,7 +119,7 @@ def is_valid_card_number(card_number: str) -> Tuple[bool, Optional[str]]:
     return True, card_type
 
 
-def find_card_numbers_in_text(text: str) -> List[Tuple[str, str]]:
+def find_card_numbers_in_text(text: str) -> list[tuple[str, str]]:
     """
     Find valid credit card numbers in text using high-precision pattern matching.
 
@@ -188,14 +187,12 @@ def find_card_numbers_in_text(text: str) -> List[Tuple[str, str]]:
 
             if is_valid:
                 found_cards.append((normalized, card_type))
-                logger.debug(
-                    f"Found valid {card_type} card: {normalized[:6]}...{normalized[-4:]}"
-                )
+                logger.debug(f"Found valid {card_type} card: {normalized[:6]}...{normalized[-4:]}")
 
     return found_cards
 
 
-def classify_pages_with_cards(ocr_text_pages: List[Dict]) -> List[int]:
+def classify_pages_with_cards(ocr_text_pages: list[dict]) -> list[int]:
     """
     Identify pages containing valid credit/debit card numbers.
 
@@ -225,8 +222,7 @@ def classify_pages_with_cards(ocr_text_pages: List[Dict]) -> List[int]:
         if found_cards:
             pages_with_cards.add(page_number)
             card_summary = ", ".join(
-                f"{card_type} ({number[:6]}...{number[-4:]})"
-                for number, card_type in found_cards
+                f"{card_type} ({number[:6]}...{number[-4:]})" for number, card_type in found_cards
             )
             logger.info(f"Page {page_number}: Found {len(found_cards)} card(s) - {card_summary}")
 
@@ -241,7 +237,7 @@ def classify_pages_with_cards(ocr_text_pages: List[Dict]) -> List[int]:
     return result
 
 
-def classify_file_for_cards(ocr_text_pages: List[Dict], sha1: str) -> Dict:
+def classify_file_for_cards(ocr_text_pages: list[dict], sha1: str) -> dict:
     """
     Classify a file for credit/debit card presence and return structured results.
 
@@ -272,8 +268,7 @@ def classify_file_for_cards(ocr_text_pages: List[Dict], sha1: str) -> Dict:
         result["success"] = True
 
         logger.info(
-            f"Successfully classified {sha1}: "
-            f"{len(pages_with_cards)} pages with card numbers"
+            f"Successfully classified {sha1}: {len(pages_with_cards)} pages with card numbers"
         )
 
     except Exception as e:

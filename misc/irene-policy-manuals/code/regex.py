@@ -1,11 +1,12 @@
-import pandas as pd
 import re
+from collections import Counter, defaultdict
 from pathlib import Path
-from collections import defaultdict, Counter
+
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
 
 # === PATHS ===
 BASE_PATH = Path(__file__).resolve().parent.parent / "processed_data"
@@ -21,14 +22,12 @@ OUTPUT_CSV = BASE_PATH / "document_predictions_with_confidence.csv"
 def extract_policy_features(df, max_pages=3, top_n=30):
     manual_pages = df[df["label"] == "policy_manual"]
     first_pages = (
-        manual_pages.sort_values("page_num")
-        .groupby("filename", group_keys=False)
-        .head(max_pages)
+        manual_pages.sort_values("page_num").groupby("filename", group_keys=False).head(max_pages)
     )
 
     texts = first_pages["text"].fillna("").tolist()
     vectorizer = TfidfVectorizer(stop_words="english", max_features=top_n)
-    tfidf_matrix = vectorizer.fit_transform(texts)
+    vectorizer.fit_transform(texts)
     keywords = set(vectorizer.get_feature_names_out())
 
     header_counter = Counter()
@@ -64,9 +63,7 @@ def scan_page(text, keyword_set, header_set, section_set):
         line = line.strip()
         if any(h in line.lower() for h in header_set):
             flags["header"] += 1
-        if re.match(r"^\d+(?:\.\d+){1,}\b", line) or any(
-            pat in line for pat in section_set
-        ):
+        if re.match(r"^\d+(?:\.\d+){1,}\b", line) or any(pat in line for pat in section_set):
             flags["section"] += 1
     return flags
 
@@ -121,8 +118,8 @@ def main():
     y = feature_df["true_label"]
 
     # Train/test split
-    X_train, X_test, y_train, y_test, filenames_train, filenames_test = (
-        train_test_split(X, y, filenames, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test, filenames_train, filenames_test = train_test_split(
+        X, y, filenames, stratify=y, random_state=42
     )
 
     # Train classifier
@@ -149,9 +146,7 @@ def main():
     )
 
     # Add match column
-    results_df["correct_prediction"] = (
-        results_df["true_label"] == results_df["predicted_label"]
-    )
+    results_df["correct_prediction"] = results_df["true_label"] == results_df["predicted_label"]
 
     # Save to CSV
     results_df.to_csv(OUTPUT_CSV, index=False)

@@ -29,151 +29,149 @@ AGENCIES = [
     #     'csv_path': '../data/input/autofolio_1.2.0_output--Ontario Police Department--2025-04-24_16-59-27 - autofolio_1.2.0_output--Ontario Police Department--2025-04-24_16-59-27.csv',
     # },
     {
-        'name': 'Bakersfield Police Department',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Bakersfield Police Department--2025-04-09_22-08-24 - autofolio_1.2.0_output--Bakersfield Police Department--2025-04-09_22-08-24.csv',
+        "name": "Bakersfield Police Department",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Bakersfield Police Department--2025-04-09_22-08-24 - autofolio_1.2.0_output--Bakersfield Police Department--2025-04-09_22-08-24.csv",
     },
     {
-        'name': 'Santa Monica Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Santa Monica Police Department--2024-12-21_02-18-20 - autofolio_1.1.0_output--Santa Monica Police Department--2024-12-21_02-18-20.csv',
+        "name": "Santa Monica Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Santa Monica Police Department--2024-12-21_02-18-20 - autofolio_1.1.0_output--Santa Monica Police Department--2024-12-21_02-18-20.csv",
     },
     {
-        'name': 'Richmond Police Department',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Richmond Police Department--2025-04-09_20-59-59 - autofolio_1.2.0_output--Richmond Police Department--2025-04-09_20-59-59.csv',
+        "name": "Richmond Police Department",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Richmond Police Department--2025-04-09_20-59-59 - autofolio_1.2.0_output--Richmond Police Department--2025-04-09_20-59-59.csv",
     },
     {
-        'name': 'Los Angeles District Attorney',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Los Angeles District Attorney--2024-11-27_05-47-23 - autofolio_1.1.0_output--Los Angeles District Attorney--2024-11-27_05-47-23.csv',
+        "name": "Los Angeles District Attorney",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Los Angeles District Attorney--2024-11-27_05-47-23 - autofolio_1.1.0_output--Los Angeles District Attorney--2024-11-27_05-47-23.csv",
     },
     {
-        'name': 'California Department of Justice',
-        'csv_path': '../data/input/autofolio_1.2.0_output--California Department of Justice--2025-03-28_09-18-52 - autofolio_1.2.0_output--California Department of Justice--2025-03-28_09-18-52.csv',
+        "name": "California Department of Justice",
+        "csv_path": "../data/input/autofolio_1.2.0_output--California Department of Justice--2025-03-28_09-18-52 - autofolio_1.2.0_output--California Department of Justice--2025-03-28_09-18-52.csv",
     },
     {
-        'name': 'Office of Inspector General for Prisons',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Office of Inspector General for Prisons--2025-04-27_21-48-50 - autofolio_1.2.0_output--Office of Inspector General for Prisons--2025-04-27_21-48-50.csv',
+        "name": "Office of Inspector General for Prisons",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Office of Inspector General for Prisons--2025-04-27_21-48-50 - autofolio_1.2.0_output--Office of Inspector General for Prisons--2025-04-27_21-48-50.csv",
     },
     {
-        'name': 'Santa Ana Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Santa Ana Police Department--2025-02-13_01-55-05 - autofolio_1.1.0_output--Santa Ana Police Department--2025-02-13_01-55-05.csv',
+        "name": "Santa Ana Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Santa Ana Police Department--2025-02-13_01-55-05 - autofolio_1.1.0_output--Santa Ana Police Department--2025-02-13_01-55-05.csv",
     },
     {
-        'name': 'San Francisco Police Commission',
-        'csv_path': '../data/input/autofolio_1.2.0_output--San Francisco Police Commission--2025-04-09_21-20-14 - autofolio_1.2.0_output--San Francisco Police Commission--2025-04-09_21-20-14.csv',
+        "name": "San Francisco Police Commission",
+        "csv_path": "../data/input/autofolio_1.2.0_output--San Francisco Police Commission--2025-04-09_21-20-14 - autofolio_1.2.0_output--San Francisco Police Commission--2025-04-09_21-20-14.csv",
     },
     {
-        'name': 'Kern County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Kern County Sheriff--2024-07-15_23-59-08 - autofolio_1.1.0_output--Kern County Sheriff--2024-07-15_23-59-08.csv',
+        "name": "Kern County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Kern County Sheriff--2024-07-15_23-59-08 - autofolio_1.1.0_output--Kern County Sheriff--2024-07-15_23-59-08.csv",
     },
     {
-        'name': 'Santa Clara County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Santa Clara County Sheriff--2024-12-13_15-09-21 - autofolio_1.1.0_output--Santa Clara County Sheriff--2024-12-13_15-09-21.csv',
+        "name": "Santa Clara County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Santa Clara County Sheriff--2024-12-13_15-09-21 - autofolio_1.1.0_output--Santa Clara County Sheriff--2024-12-13_15-09-21.csv",
     },
     {
-        'name': 'Fresno County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42 - autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42.csv',
+        "name": "Fresno County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42 - autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42.csv",
     },
     {
-        'name': 'Sacramento County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Sacramento County Sheriff--2025-03-04_10-11-24 - autofolio_1.1.0_output--Sacramento County Sheriff--2025-03-04_10-11-24.csv',
+        "name": "Sacramento County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Sacramento County Sheriff--2025-03-04_10-11-24 - autofolio_1.1.0_output--Sacramento County Sheriff--2025-03-04_10-11-24.csv",
     },
     {
-        'name': 'San Francisco County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--San Francisco County Sheriff--2024-07-20_01-57-38 - autofolio_1.1.0_output--San Francisco County Sheriff--2024-07-20_01-57-38.csv',
+        "name": "San Francisco County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--San Francisco County Sheriff--2024-07-20_01-57-38 - autofolio_1.1.0_output--San Francisco County Sheriff--2024-07-20_01-57-38.csv",
     },
     {
-        'name': 'California Department of Corrections and Rehabilitation',
-        'csv_path': '../data/input/OLDautofolio_1.2.0_output--California Department of Corrections and Rehabilitation--2025-03-24_23-57-31 - autofolio_1.2.0_output--California Department of Corrections and Rehabilitation--2025-03-24_23-57-31.csv',
+        "name": "California Department of Corrections and Rehabilitation",
+        "csv_path": "../data/input/OLDautofolio_1.2.0_output--California Department of Corrections and Rehabilitation--2025-03-24_23-57-31 - autofolio_1.2.0_output--California Department of Corrections and Rehabilitation--2025-03-24_23-57-31.csv",
     },
     # {
     #     'name': 'Orange County District Attorney',
     #     'csv_path': '../data/input/autofolio_1.2.0_output--Orange County District Attorney--2025-03-13_22-40-21 - autofolio_1.2.0_output--Orange County District Attorney--2025-03-13_22-40-21.csv',
     # },
-
     # run 2
     {
-        'name': 'Folsom Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Folsom Police Department--2025-02-27_23-14-01 - autofolio_1.1.0_output--Folsom Police Department--2025-02-27_23-14-01.csv',
+        "name": "Folsom Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Folsom Police Department--2025-02-27_23-14-01 - autofolio_1.1.0_output--Folsom Police Department--2025-02-27_23-14-01.csv",
     },
     # {
     #     'name': 'Brentwood Police Department',
     #     'csv_path': '../data/input/autofolio_1.1.0_output--Brentwood Police Department--2024-09-30_20-03-15 - autofolio_1.1.0_output--Brentwood Police Department--2024-09-30_20-03-15.csv',
     # },
     {
-        'name': 'UC Davis Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--UC Davis Police Department--2024-07-20_08-53-00 - autofolio_1.1.0_output--UC Davis Police Department--2024-07-20_08-53-00.csv',
+        "name": "UC Davis Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--UC Davis Police Department--2024-07-20_08-53-00 - autofolio_1.1.0_output--UC Davis Police Department--2024-07-20_08-53-00.csv",
     },
     # {
     #     'name': 'San Ramon Police Department',
     #     'csv_path': '../data/input/OLDautofolio_1.1.0_output--San Ramon Police Department--2024-07-16_01-32-12 - autofolio_1.1.0_output--San Ramon Police Department--2024-07-16_01-32-12.csv',
     # },
     {
-        'name': 'Seal Beach Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Seal Beach Police Department--2025-02-13_08-16-22 - autofolio_1.1.0_output--Seal Beach Police Department--2025-02-13_08-16-22.csv',
+        "name": "Seal Beach Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Seal Beach Police Department--2025-02-13_08-16-22 - autofolio_1.1.0_output--Seal Beach Police Department--2025-02-13_08-16-22.csv",
     },
     {
-        'name': 'Contra Costa County District Attorney',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Contra Costa County District Attorney--2024-11-06_07-38-04 - autofolio_1.1.0_output--Contra Costa County District Attorney--2024-11-06_07-38-04.csv',
+        "name": "Contra Costa County District Attorney",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Contra Costa County District Attorney--2024-11-06_07-38-04 - autofolio_1.1.0_output--Contra Costa County District Attorney--2024-11-06_07-38-04.csv",
     },
     {
-        'name': 'Contra Costa County Sheriff',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Contra Costa County Sheriff--2024-12-21_01-47-17 - autofolio_1.1.0_output--Contra Costa County Sheriff--2024-12-21_01-47-17.csv',
+        "name": "Contra Costa County Sheriff",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Contra Costa County Sheriff--2024-12-21_01-47-17 - autofolio_1.1.0_output--Contra Costa County Sheriff--2024-12-21_01-47-17.csv",
     },
     # {
     #     'name': 'Salinas Police Department',
     #     'csv_path': '../data/input/autofolio_1.1.0_output--Salinas Police Department--2024-12-05_13-18-13 - autofolio_1.1.0_output--Salinas Police Department--2024-12-05_13-18-13.csv',
     # },
     {
-        'name': 'Shasta County District Attorney',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Shasta County District Attorney--2024-12-18_05-02-13 - autofolio_1.1.0_output--Shasta County District Attorney--2024-12-18_05-02-13.csv',
+        "name": "Shasta County District Attorney",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Shasta County District Attorney--2024-12-18_05-02-13 - autofolio_1.1.0_output--Shasta County District Attorney--2024-12-18_05-02-13.csv",
     },
     {
-        'name': 'Riverside County Department of Public Social Services',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Riverside County Department of Public Social Services--2024-07-05_20-47-44 - autofolio_1.1.0_output--Riverside County Department of Public Social Services--2024-07-05_20-47-44.csv',
+        "name": "Riverside County Department of Public Social Services",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Riverside County Department of Public Social Services--2024-07-05_20-47-44 - autofolio_1.1.0_output--Riverside County Department of Public Social Services--2024-07-05_20-47-44.csv",
     },
     {
-        'name': 'Cal State East Bay University Police Department',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Cal State East Bay University Police Department--2025-04-09_20-14-32 - autofolio_1.2.0_output--Cal State East Bay University Police Department--2025-04-09_20-14-32.csv',
+        "name": "Cal State East Bay University Police Department",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Cal State East Bay University Police Department--2025-04-09_20-14-32 - autofolio_1.2.0_output--Cal State East Bay University Police Department--2025-04-09_20-14-32.csv",
     },
     {
-        'name': 'San Joaquin County Medical Examiner',
-        'csv_path': '../data/input/autofolio_1.1.0_output--San Joaquin County Medical Examiner--2024-10-24_19-31-44 - autofolio_1.1.0_output--San Joaquin County Medical Examiner--2024-10-24_19-31-44.csv',
+        "name": "San Joaquin County Medical Examiner",
+        "csv_path": "../data/input/autofolio_1.1.0_output--San Joaquin County Medical Examiner--2024-10-24_19-31-44 - autofolio_1.1.0_output--San Joaquin County Medical Examiner--2024-10-24_19-31-44.csv",
     },
-
     # {
     #     'name': 'CSU San Jose Police Department',
     #     'csv_path': '../data/input/autofolio_1.1.0_output--CSU San Jose Police Department--2024-05-31_13-46-58 - autofolio_1.1.0_output--CSU San Jose Police Department--2024-05-31_13-46-58.csv',
     # },
     {
-        'name': 'Pasadena Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Pasadena Police Department--2025-01-24_06-19-29 - autofolio_1.1.0_output--Pasadena Police Department--2025-01-24_06-19-29.csv',
+        "name": "Pasadena Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Pasadena Police Department--2025-01-24_06-19-29 - autofolio_1.1.0_output--Pasadena Police Department--2025-01-24_06-19-29.csv",
     },
     {
-        'name': 'Irvine Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Irvine Police Department--2024-07-09_01-45-57 - autofolio_1.1.0_output--Irvine Police Department--2024-07-09_01-45-57.csv',
+        "name": "Irvine Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Irvine Police Department--2024-07-09_01-45-57 - autofolio_1.1.0_output--Irvine Police Department--2024-07-09_01-45-57.csv",
     },
     {
-        'name': 'San Diego County Medical Examiner',
-        'csv_path': '../data/input/autofolio_1.1.0_output--San Diego County Medical Examiner--2025-01-07_23-53-09 - autofolio_1.1.0_output--San Diego County Medical Examiner--2025-01-07_23-53-09.csv',
+        "name": "San Diego County Medical Examiner",
+        "csv_path": "../data/input/autofolio_1.1.0_output--San Diego County Medical Examiner--2025-01-07_23-53-09 - autofolio_1.1.0_output--San Diego County Medical Examiner--2025-01-07_23-53-09.csv",
     },
     {
-        'name': 'San Leandro Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--San Leandro Police Department--2024-08-15_22-50-51 - autofolio_1.1.0_output--San Leandro Police Department--2024-08-15_22-50-51.csv',
+        "name": "San Leandro Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--San Leandro Police Department--2024-08-15_22-50-51 - autofolio_1.1.0_output--San Leandro Police Department--2024-08-15_22-50-51.csv",
     },
     {
-        'name': 'Santa Clara Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Santa Clara Police Department--2024-06-01_21-38-12 - autofolio_1.1.0_output--Santa Clara Police Department--2024-06-01_21-38-12.csv',
+        "name": "Santa Clara Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Santa Clara Police Department--2024-06-01_21-38-12 - autofolio_1.1.0_output--Santa Clara Police Department--2024-06-01_21-38-12.csv",
     },
     {
-        'name': 'Hayward Police Department',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Hayward Police Department--2025-04-24_18-36-37 - autofolio_1.2.0_output--Hayward Police Department--2025-04-24_18-36-37.csv',
+        "name": "Hayward Police Department",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Hayward Police Department--2025-04-24_18-36-37 - autofolio_1.2.0_output--Hayward Police Department--2025-04-24_18-36-37.csv",
     },
     {
-        'name': 'Vallejo Police Department',
-        'csv_path': '../data/input/autofolio_1.2.0_output--Vallejo Police Department--2025-03-25_00-20-52 - autofolio_1.2.0_output--Vallejo Police Department--2025-03-25_00-20-52.csv',
+        "name": "Vallejo Police Department",
+        "csv_path": "../data/input/autofolio_1.2.0_output--Vallejo Police Department--2025-03-25_00-20-52 - autofolio_1.2.0_output--Vallejo Police Department--2025-03-25_00-20-52.csv",
     },
     {
-        'name': 'Chula Vista Police Department',
-        'csv_path': '../data/input/autofolio_1.1.0_output--Chula Vista Police Department--2025-02-20_07-43-22 - autofolio_1.1.0_output--Chula Vista Police Department--2025-02-20_07-43-22.csv',
+        "name": "Chula Vista Police Department",
+        "csv_path": "../data/input/autofolio_1.1.0_output--Chula Vista Police Department--2025-02-20_07-43-22 - autofolio_1.1.0_output--Chula Vista Police Department--2025-02-20_07-43-22.csv",
     },
     # {
     #     'name': 'Whittier Police Department',
@@ -193,11 +191,8 @@ BATCH_SIZE = 256  # Optimized for RTX 4090 24GB VRAM
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('generate_embeddings.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("generate_embeddings.log"), logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
@@ -224,8 +219,8 @@ def parse_ocr_text(ocr_data) -> str:
         if isinstance(pages, list):
             all_text = []
             for page in pages:
-                if isinstance(page, dict) and 'text' in page:
-                    all_text.append(page['text'])
+                if isinstance(page, dict) and "text" in page:
+                    all_text.append(page["text"])
             return "\n\n".join(all_text)
         else:
             return str(ocr_data)
@@ -246,9 +241,9 @@ def process_single_csv(input_csv: str, output_csv: str, model):
         output_csv: Path to output CSV file
         model: Loaded SentenceTransformer model
     """
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Processing: {Path(input_csv).name}")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Input CSV: {input_csv}")
     logger.info(f"Output CSV: {output_csv}")
     logger.info(f"Model: {MODEL_NAME}")
@@ -277,15 +272,17 @@ def process_single_csv(input_csv: str, output_csv: str, model):
 
             # Identify which rows have been processed
             # Use sha1 as unique identifier
-            if 'sha1' in df.columns and 'sha1' in df_existing.columns:
-                processed_sha1s = set(df_existing[df_existing['embeddings_generated']]['sha1'].dropna())
+            if "sha1" in df.columns and "sha1" in df_existing.columns:
+                processed_sha1s = set(
+                    df_existing[df_existing["embeddings_generated"]]["sha1"].dropna()
+                )
                 logger.info(f"Found {len(processed_sha1s)} already processed documents")
 
                 # Merge existing embeddings back into input df
-                if 'embedding' in df_existing.columns:
+                if "embedding" in df_existing.columns:
                     # Keep only unprocessed rows + merge processed ones
-                    df_unprocessed = df[~df['sha1'].isin(processed_sha1s)]
-                    df_processed = df_existing[df_existing['sha1'].isin(df['sha1'])]
+                    df_unprocessed = df[~df["sha1"].isin(processed_sha1s)]
+                    df_processed = df_existing[df_existing["sha1"].isin(df["sha1"])]
 
                     # Combine them
                     df = pd.concat([df_processed, df_unprocessed], ignore_index=True)
@@ -297,8 +294,8 @@ def process_single_csv(input_csv: str, output_csv: str, model):
             logger.warning("Starting fresh extraction...")
 
     # Check if all embeddings already exist
-    if 'embedding' in df.columns and 'embeddings_generated' in df.columns:
-        already_done = (df['embeddings_generated']).sum()
+    if "embedding" in df.columns and "embeddings_generated" in df.columns:
+        already_done = (df["embeddings_generated"]).sum()
         if already_done == len(df):
             logger.info(f"All {len(df)} documents already have embeddings. Nothing to do!")
             logger.info("Set FORCE_REGENERATE=True to regenerate.")
@@ -314,26 +311,28 @@ def process_single_csv(input_csv: str, output_csv: str, model):
     errors = 0
 
     # Initialize embedding list if not already present
-    if 'embedding' not in df.columns:
-        df['embedding'] = [None] * len(df)
-    if 'embeddings_generated' not in df.columns:
-        df['embeddings_generated'] = False
+    if "embedding" not in df.columns:
+        df["embedding"] = [None] * len(df)
+    if "embeddings_generated" not in df.columns:
+        df["embeddings_generated"] = False
 
     # Identify unprocessed documents
-    unprocessed_mask = not df['embeddings_generated']
+    unprocessed_mask = not df["embeddings_generated"]
     unprocessed_indices = df[unprocessed_mask].index.tolist()
 
     if len(unprocessed_indices) == 0:
         logger.info("No documents to process!")
         skipped_count = len(df)
     else:
-        logger.info(f"Processing {len(unprocessed_indices)} documents in batches of {BATCH_SIZE}...")
+        logger.info(
+            f"Processing {len(unprocessed_indices)} documents in batches of {BATCH_SIZE}..."
+        )
 
         # Parse OCR text for all unprocessed documents
         logger.info("Parsing OCR text for all unprocessed documents...")
         unprocessed_texts = []
         for idx in tqdm(unprocessed_indices, desc="Parsing OCR text"):
-            ocr_data = df.at[idx, 'ocr_text_per_page']
+            ocr_data = df.at[idx, "ocr_text_per_page"]
             ocr_text = parse_ocr_text(ocr_data)
             unprocessed_texts.append(ocr_text)
 
@@ -348,7 +347,9 @@ def process_single_csv(input_csv: str, output_csv: str, model):
             batch_indices = unprocessed_indices[batch_start:batch_end]
             batch_texts = unprocessed_texts[batch_start:batch_end]
 
-            logger.info(f"Processing batch {batch_idx + 1}/{num_batches} ({len(batch_indices)} documents)")
+            logger.info(
+                f"Processing batch {batch_idx + 1}/{num_batches} ({len(batch_indices)} documents)"
+            )
 
             try:
                 # Identify which docs in this batch have actual OCR text
@@ -361,16 +362,13 @@ def process_single_csv(input_csv: str, output_csv: str, model):
                         texts_to_encode,
                         batch_size=BATCH_SIZE,
                         show_progress_bar=True,
-                        convert_to_numpy=True
+                        convert_to_numpy=True,
                     )
                     encode_iter = iter(encoded)
                 else:
                     encode_iter = iter([])
 
-                batch_embeddings = [
-                    next(encode_iter) if has else np.zeros(384)
-                    for has in has_ocr
-                ]
+                batch_embeddings = [next(encode_iter) if has else np.zeros(384) for has in has_ocr]
 
                 # Store embeddings back into dataframe
                 for i, idx in enumerate(batch_indices):
@@ -380,25 +378,34 @@ def process_single_csv(input_csv: str, output_csv: str, model):
                     if np.allclose(embedding, 0):
                         zero_vectors += 1
 
-                    df.at[idx, 'embedding'] = embedding
-                    df.at[idx, 'embeddings_generated'] = True
+                    df.at[idx, "embedding"] = embedding
+                    df.at[idx, "embeddings_generated"] = True
                     processed_count += 1
 
                 # Save checkpoint after each batch
                 logger.info(f"Batch {batch_idx + 1} complete. Saving checkpoint...")
 
                 checkpoint_columns = [
-                    'provisional_case_name', 'gdrive_id', 'sha1',
-                    'gdrive_path', 'gdrive_name', 'ocr_text_per_page',
-                    'embedding', 'embeddings_generated'
+                    "provisional_case_name",
+                    "gdrive_id",
+                    "sha1",
+                    "gdrive_path",
+                    "gdrive_name",
+                    "ocr_text_per_page",
+                    "embedding",
+                    "embeddings_generated",
                 ]
-                existing_checkpoint_columns = [col for col in checkpoint_columns if col in df.columns]
+                existing_checkpoint_columns = [
+                    col for col in checkpoint_columns if col in df.columns
+                ]
                 df_checkpoint = df[existing_checkpoint_columns]
 
                 output_path = Path(output_csv)
                 output_path.parent.mkdir(parents=True, exist_ok=True)
                 df_checkpoint.to_csv(output_csv, index=False)
-                logger.info(f"Checkpoint saved: {processed_count}/{len(unprocessed_indices)} documents processed")
+                logger.info(
+                    f"Checkpoint saved: {processed_count}/{len(unprocessed_indices)} documents processed"
+                )
 
             except Exception as e:
                 logger.error(f"Error processing batch {batch_idx + 1}: {e}")
@@ -406,28 +413,25 @@ def process_single_csv(input_csv: str, output_csv: str, model):
 
                 # Set zero vectors for entire batch on error
                 for idx in batch_indices:
-                    df.at[idx, 'embedding'] = np.zeros(384)
-                    df.at[idx, 'embeddings_generated'] = True
+                    df.at[idx, "embedding"] = np.zeros(384)
+                    df.at[idx, "embeddings_generated"] = True
 
         skipped_count = len(df) - len(unprocessed_indices)
 
     # Filter output to only relevant columns
     output_columns = [
         # Ground truth and identifiers
-        'provisional_case_name',
-        'gdrive_id',
-        'sha1',
-
+        "provisional_case_name",
+        "gdrive_id",
+        "sha1",
         # Path information
-        'gdrive_path',
-        'gdrive_name',
-
+        "gdrive_path",
+        "gdrive_name",
         # OCR text (needed for verification)
-        'ocr_text_per_page',
-
+        "ocr_text_per_page",
         # Embedding
-        'embedding',
-        'embeddings_generated'
+        "embedding",
+        "embeddings_generated",
     ]
 
     # Only keep columns that exist in the dataframe
@@ -442,7 +446,7 @@ def process_single_csv(input_csv: str, output_csv: str, model):
 
     # Summary statistics
     elapsed_time = time.time() - start_time
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info("EMBEDDING GENERATION COMPLETE")
     logger.info(f"Total documents: {len(df)}")
     logger.info(f"New embeddings generated: {processed_count}")
@@ -451,23 +455,23 @@ def process_single_csv(input_csv: str, output_csv: str, model):
     logger.info(f"Errors encountered: {errors}")
     logger.info(f"Elapsed time: {elapsed_time:.2f} seconds")
     if processed_count > 0:
-        logger.info(f"Average time per document: {elapsed_time/processed_count:.2f} seconds")
+        logger.info(f"Average time per document: {elapsed_time / processed_count:.2f} seconds")
     logger.info(f"Output saved to: {output_csv}")
-    logger.info(f"{'='*80}\n")
+    logger.info(f"{'=' * 80}\n")
     return True
 
 
 def main():
     """Main entry point that processes all agencies."""
     script_dir = Path(__file__).parent
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("BATCH EMBEDDING GENERATION - Phase 2a")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Total agencies to process: {len(AGENCIES)}")
     logger.info(f"Output directory: {OUTPUT_DIR}")
     logger.info(f"Model: {MODEL_NAME}")
     logger.info(f"Batch size: {BATCH_SIZE}")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Load model once for all CSVs (lazy-loaded via prap_clustering.embeddings)
     logger.info(f"Loading sentence-transformers model: {MODEL_NAME}")
@@ -489,12 +493,12 @@ def main():
 
     # Process each agency
     for idx, agency in enumerate(AGENCIES, 1):
-        agency_name = agency['name']
-        csv_path = str(script_dir / agency['csv_path'])
+        agency_name = agency["name"]
+        csv_path = str(script_dir / agency["csv_path"])
 
-        logger.info(f"\n{'#'*80}")
+        logger.info(f"\n{'#' * 80}")
         logger.info(f"[{idx}/{len(AGENCIES)}] {agency_name}")
-        logger.info(f"{'#'*80}\n")
+        logger.info(f"{'#' * 80}\n")
 
         # Check if input file exists
         input_path = Path(csv_path)
@@ -505,10 +509,10 @@ def main():
 
         # Generate output filename: add _embeddings suffix before .csv extension
         input_filename = input_path.name
-        if input_filename.endswith('.csv'):
-            output_filename = input_filename[:-4] + '_embeddings.csv'
+        if input_filename.endswith(".csv"):
+            output_filename = input_filename[:-4] + "_embeddings.csv"
         else:
-            output_filename = input_filename + '_embeddings.csv'
+            output_filename = input_filename + "_embeddings.csv"
 
         output_csv = str(output_dir / output_filename)
 
@@ -525,14 +529,14 @@ def main():
 
     # Final summary
     total_elapsed = time.time() - total_start_time
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("BATCH PROCESSING COMPLETE")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Total agencies processed: {len(AGENCIES)}")
     logger.info(f"Successful: {successful}")
     logger.info(f"Failed: {failed}")
-    logger.info(f"Total elapsed time: {total_elapsed:.2f} seconds ({total_elapsed/60:.2f} minutes)")
+    logger.info(
+        f"Total elapsed time: {total_elapsed:.2f} seconds ({total_elapsed / 60:.2f} minutes)"
+    )
     logger.info(f"Output directory: {output_dir}")
-    logger.info("="*80 + "\n")
-
-
+    logger.info("=" * 80 + "\n")

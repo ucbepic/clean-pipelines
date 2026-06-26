@@ -992,22 +992,22 @@ Return your analysis as a JSON object with the following structure:
 
 # Export all prompts in organized structure
 PROMPTS = {
-    'summarization': {
-        'memory_log': memory_log_template,
-        'summary_for_memory': summary_template_for_memory_log,
-        'page_summary': page_summary_template,
-        'page_verification': page_summary_verification_template,
-        'combine': combine_template,
-        'verification': verification_template,
-        'condense_interval': condense_interval_template,
+    "summarization": {
+        "memory_log": memory_log_template,
+        "summary_for_memory": summary_template_for_memory_log,
+        "page_summary": page_summary_template,
+        "page_verification": page_summary_verification_template,
+        "combine": combine_template,
+        "verification": verification_template,
+        "condense_interval": condense_interval_template,
     },
-    'extraction': {
-        'extract': extract_template,
-        'verification': extract_verification_template,
-        'format_conversion': format_conversion_template,
+    "extraction": {
+        "extract": extract_template,
+        "verification": extract_verification_template,
+        "format_conversion": format_conversion_template,
     },
-    'citations': {
-        'primary_citation': primary_citation_template,
-        'validator_citation': validator_citation_template,
+    "citations": {
+        "primary_citation": primary_citation_template,
+        "validator_citation": validator_citation_template,
     },
 }

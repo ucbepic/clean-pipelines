@@ -12,7 +12,6 @@ import subprocess
 import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import requests
 from PIL import Image
@@ -47,9 +46,7 @@ class AzureContentSafetyService:
 
             # Resize if too large
             if width > 2000 or height > 2000:
-                logger.debug(
-                    f"Resizing image {image_path} from {img.size} to 2000x2000..."
-                )
+                logger.debug(f"Resizing image {image_path} from {img.size} to 2000x2000...")
                 new_size = (2000, 2000)
                 img.thumbnail(new_size, Image.LANCZOS)
                 resized_path = image_path.replace(".jpg", "_resized.jpg")
@@ -74,9 +71,7 @@ class AzureContentSafetyService:
         with open(image_path, "rb") as image_file:
             base64_encoded = base64.b64encode(image_file.read()).decode("utf-8")
 
-        endpoint = (
-            f"{self.api_endpoint}/contentsafety/image:analyze?api-version=2024-09-01"
-        )
+        endpoint = f"{self.api_endpoint}/contentsafety/image:analyze?api-version=2024-09-01"
         logger.debug(f"Calling Azure Content Safety API: {endpoint}")
 
         payload = {"image": {"content": base64_encoded}}
@@ -104,8 +99,8 @@ class GraphicImageryClassifier:
         self.violence_threshold = violence_threshold
 
     def pdf_to_images(
-        self, pdf_path: str, output_dir: str, page_numbers: Optional[List[int]] = None
-    ) -> List[str]:
+        self, pdf_path: str, output_dir: str, page_numbers: list[int] | None = None
+    ) -> list[str]:
         """
         Convert PDF pages to JPG images using pdftoppm.
 
@@ -147,18 +142,13 @@ class GraphicImageryClassifier:
 
                 subprocess_result = subprocess.run(
                     page_cmd,
-                    stderr=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
+                    capture_output=True,
                 )
 
                 if subprocess_result.returncode != 0:
                     error_msg = subprocess_result.stderr.decode("utf-8")
-                    logger.error(
-                        f"Error converting page {page_num} to image: {error_msg}"
-                    )
-                    raise Exception(
-                        f"PDF conversion failed for page {page_num}: {error_msg}"
-                    )
+                    logger.error(f"Error converting page {page_num} to image: {error_msg}")
+                    raise Exception(f"PDF conversion failed for page {page_num}: {error_msg}")
 
             # Get list of generated image files
             image_files = sorted(
@@ -174,8 +164,7 @@ class GraphicImageryClassifier:
 
             subprocess_result = subprocess.run(
                 cmd,
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
+                capture_output=True,
             )
 
             if subprocess_result.returncode != 0:
@@ -195,7 +184,7 @@ class GraphicImageryClassifier:
         logger.debug(f"Converted PDF to {len(image_files)} images")
         return image_files
 
-    def analyze_page(self, image_path: str) -> Dict:
+    def analyze_page(self, image_path: str) -> dict:
         """
         Analyze a single page image for graphic content.
 
@@ -261,9 +250,7 @@ class GraphicImageryClassifier:
 
         return page_number, scores
 
-    def classify_pdf(
-        self, sha1: str, page_numbers: Optional[List[int]] = None
-    ) -> Dict:
+    def classify_pdf(self, sha1: str, page_numbers: list[int] | None = None) -> dict:
         """
         Classify pages in a PDF for graphic imagery.
 
@@ -336,14 +323,16 @@ class GraphicImageryClassifier:
                                 if scores["violence_score"] >= self.violence_threshold:
                                     result["pages_with_graphic_imagery"].append(page_number)
                                     logger.info(
-                                        f"Page {page_number}: Graphic imagery detected (violence score: {scores['violence_score']})"
+                                        f"Page {page_number}: Graphic imagery detected "
+                                        f"(violence score: {scores['violence_score']})"
                                     )
                         except Exception as e:
                             logger.error(f"Failed to analyze {image_file}: {str(e)}")
 
                 result["success"] = True
                 logger.info(
-                    f"Successfully classified PDF {sha1}: {len(result['pages_with_graphic_imagery'])} pages with graphic imagery"
+                    f"Successfully classified PDF {sha1}: "
+                    f"{len(result['pages_with_graphic_imagery'])} pages with graphic imagery"
                 )
 
             except Exception as e:
@@ -356,9 +345,9 @@ class GraphicImageryClassifier:
 def classify_pdf_for_graphic_imagery(
     sha1: str,
     violence_threshold: int = 4,
-    page_numbers: Optional[List[int]] = None,
+    page_numbers: list[int] | None = None,
     settings: Settings | None = None,
-) -> Dict:
+) -> dict:
     """
     Convenience function to classify a PDF for graphic imagery.
 
@@ -372,7 +361,5 @@ def classify_pdf_for_graphic_imagery(
     Returns:
         Dict with classification results
     """
-    classifier = GraphicImageryClassifier(
-        violence_threshold=violence_threshold, settings=settings
-    )
+    classifier = GraphicImageryClassifier(violence_threshold=violence_threshold, settings=settings)
     return classifier.classify_pdf(sha1, page_numbers=page_numbers)

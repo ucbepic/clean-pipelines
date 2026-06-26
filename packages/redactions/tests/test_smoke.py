@@ -26,9 +26,7 @@ def test_schemas_load():
 
     # Construct each with required fields; pydantic ValidationError would
     # surface here if the schemas were misdefined.
-    PersonExtraction(
-        name="x", person_type="victim", reasoning="r", confidence="high", context="c"
-    )
+    PersonExtraction(name="x", person_type="victim", reasoning="r", confidence="high", context="c")
     NameExtractionResponse()
     PersonVerification(name="x", should_be_included=True, reasoning="r")
     VerificationResponse(verified_persons=[])

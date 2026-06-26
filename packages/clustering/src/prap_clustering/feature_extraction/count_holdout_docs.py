@@ -66,8 +66,8 @@ for agency_key in sorted(HOLDOUT_AGENCIES):
     df = pd.read_csv(csv_path, low_memory=False)
 
     n_total = len(df)
-    if 'ocr_text_per_page' in df.columns:
-        n_ocr = (~(df['ocr_text_per_page'].fillna("") == "")).sum()
+    if "ocr_text_per_page" in df.columns:
+        n_ocr = (~(df["ocr_text_per_page"].fillna("") == "")).sum()
     else:
         n_ocr = 0
         print(f"  WARNING: no ocr_text_per_page column in {csv_path.name}")

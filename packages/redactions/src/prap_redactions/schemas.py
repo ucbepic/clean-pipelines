@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -22,7 +20,7 @@ class PersonExtraction(BaseModel):
 class NameExtractionResponse(BaseModel):
     """Response model for name extraction"""
 
-    extracted_persons: List[PersonExtraction] = Field(
+    extracted_persons: list[PersonExtraction] = Field(
         default_factory=list, description="List of extracted persons"
     )
 
@@ -33,28 +31,29 @@ class PersonVerification(BaseModel):
     name: str = Field(description="Full name of the person")
     should_be_included: bool = Field(description="Whether person should be included")
     reasoning: str = Field(description="Explanation for inclusion/exclusion decision")
-    evidence_from_text: Optional[str] = Field(
+    evidence_from_text: str | None = Field(
         default=None, description="Direct quote supporting the decision"
     )
-    exclusion_category: Optional[str] = Field(
+    exclusion_category: str | None = Field(
         default=None,
-        description="Category if excluded: law_enforcement|defendant|legal_professional|court_staff|government_official|other",
+        description=(
+            "Category if excluded: law_enforcement|defendant|legal_professional|"
+            "court_staff|government_official|other"
+        ),
     )
 
 
 class VerificationResponse(BaseModel):
     """Response model for person verification"""
 
-    verified_persons: List[PersonVerification] = Field(
-        description="List of person verifications"
-    )
+    verified_persons: list[PersonVerification] = Field(description="List of person verifications")
 
 
 class FormattedPerson(BaseModel):
     """Model for a formatted person in final output"""
 
     name: str = Field(description="Full name of person")
-    person_type: List[str] = Field(description="Array of all applicable types")
+    person_type: list[str] = Field(description="Array of all applicable types")
     confidence: str = Field(description="Confidence level: high|medium|low")
     reasoning: str = Field(description="Concise explanation of inclusion")
 
@@ -62,7 +61,7 @@ class FormattedPerson(BaseModel):
 class FormattedOutput(BaseModel):
     """Final formatted output model"""
 
-    extracted_persons: List[FormattedPerson] = Field(
+    extracted_persons: list[FormattedPerson] = Field(
         default_factory=list, description="List of verified persons to include"
     )
 
@@ -72,14 +71,10 @@ class AddressFinding(BaseModel):
 
     name: str = Field(description="Person's name exactly as provided")
     address_found: bool = Field(description="Whether address was found")
-    address: Optional[str] = Field(
-        default=None, description="Complete address if found"
-    )
-    confidence: Optional[str] = Field(
-        default=None, description="Confidence level if found"
-    )
+    address: str | None = Field(default=None, description="Complete address if found")
+    confidence: str | None = Field(default=None, description="Confidence level if found")
     reasoning: str = Field(description="Explanation of findings")
-    context: Optional[str] = Field(
+    context: str | None = Field(
         default=None, description="Direct quote containing address if found"
     )
 
@@ -87,9 +82,7 @@ class AddressFinding(BaseModel):
 class AddressResponse(BaseModel):
     """Response model for address findings"""
 
-    addresses: List[AddressFinding] = Field(
-        description="Address findings for each person"
-    )
+    addresses: list[AddressFinding] = Field(description="Address findings for each person")
 
 
 class RunResult(BaseModel):

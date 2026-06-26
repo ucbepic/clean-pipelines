@@ -1,17 +1,15 @@
 import argparse
-import os
-from pathlib import Path
-import fitz  # PyMuPDF
-import logging
-from PIL import Image
-import pytesseract
 import io
+import logging
+from pathlib import Path
+
+import fitz  # PyMuPDF
 import pandas as pd
+import pytesseract
+from PIL import Image
 
 # Logging setup
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -97,9 +95,7 @@ if __name__ == "__main__":
         "--output-csv",
         type=Path,
         default=None,
-        help=(
-            "Output CSV path. Defaults to <input-dir>/../processed_data/sample_processed.csv."
-        ),
+        help=("Output CSV path. Defaults to <input-dir>/../processed_data/sample_processed.csv."),
     )
     args = parser.parse_args()
 

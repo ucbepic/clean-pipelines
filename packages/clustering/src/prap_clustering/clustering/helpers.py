@@ -31,7 +31,7 @@ def parse_feature_list(feature_value: Any) -> list[str]:
     Returns:
         List of string values, empty list if None/empty
     """
-    if pd.isna(feature_value) or feature_value in [None, 'None', '[]', '']:
+    if pd.isna(feature_value) or feature_value in [None, "None", "[]", ""]:
         return []
 
     # Already a list
@@ -43,7 +43,7 @@ def parse_feature_list(feature_value: Any) -> list[str]:
         feature_value = feature_value.strip()
 
         # Try ast.literal_eval for Python list strings
-        if feature_value.startswith('['):
+        if feature_value.startswith("["):
             try:
                 parsed = ast.literal_eval(feature_value)
                 if isinstance(parsed, list):
@@ -65,8 +65,8 @@ def parse_feature_list(feature_value: Any) -> list[str]:
             pass
 
         # Try comma-separated
-        if ',' in feature_value:
-            return [v.strip() for v in feature_value.split(',') if v.strip()]
+        if "," in feature_value:
+            return [v.strip() for v in feature_value.split(",") if v.strip()]
 
         # Single value
         if feature_value:
@@ -107,7 +107,7 @@ def normalize_case_ids(case_ids: list[str]) -> set[str]:
         case_id = str(case_id).upper().strip()
 
         # Remove all non-alphanumeric characters (spaces, dashes, #, ., etc.)
-        case_id = re.sub(r'[^A-Z0-9]', '', case_id)
+        case_id = re.sub(r"[^A-Z0-9]", "", case_id)
 
         # Remove leading zeros from numeric parts
         # Pattern: Find sequences of digits and remove leading zeros
@@ -116,7 +116,7 @@ def normalize_case_ids(case_ids: list[str]) -> set[str]:
             # Keep at least one digit (don't turn "000" into "")
             return str(int(num)) if num.isdigit() else num
 
-        case_id = re.sub(r'\d+', remove_leading_zeros, case_id)
+        case_id = re.sub(r"\d+", remove_leading_zeros, case_id)
 
         if case_id:
             normalized.add(case_id)
@@ -157,43 +157,38 @@ def normalize_dates(dates: list[str]) -> set[str]:
 
         # Filter out timestamps (HH:MM:SS patterns)
         # Patterns like "18.14.24", "11-52-06", "23:07:34"
-        timestamp_pattern = r'^\d{1,2}[:\-\.]\d{1,2}[:\-\.]\d{1,2}$'
+        timestamp_pattern = r"^\d{1,2}[:\-\.]\d{1,2}[:\-\.]\d{1,2}$"
         if re.match(timestamp_pattern, date_str):
             continue
 
         # Filter out values that look like times (HH:MM format)
-        time_pattern = r'^\d{1,2}:\d{2}$'
+        time_pattern = r"^\d{1,2}:\d{2}$"
         if re.match(time_pattern, date_str):
             continue
 
         # Try multiple date formats (order matters - most specific first)
         formats = [
             # ISO formats with full year
-            "%Y-%m-%d",           # 2024-01-15
-            "%Y/%m/%d",           # 2024/01/15
-            "%Y.%m.%d",           # 2024.01.15
-
+            "%Y-%m-%d",  # 2024-01-15
+            "%Y/%m/%d",  # 2024/01/15
+            "%Y.%m.%d",  # 2024.01.15
             # US formats with full year
-            "%m/%d/%Y",           # 01/15/2024
-            "%m-%d-%Y",           # 01-15-2024
-            "%m.%d.%Y",           # 01.15.2024
-
+            "%m/%d/%Y",  # 01/15/2024
+            "%m-%d-%Y",  # 01-15-2024
+            "%m.%d.%Y",  # 01.15.2024
             # 2-digit year formats (YY-MM-DD style)
-            "%y-%m-%d",           # 20-08-23
-            "%y/%m/%d",           # 20/08/23
-            "%y.%m.%d",           # 15.08.03 (YY.MM.DD)
-
+            "%y-%m-%d",  # 20-08-23
+            "%y/%m/%d",  # 20/08/23
+            "%y.%m.%d",  # 15.08.03 (YY.MM.DD)
             # US formats with 2-digit year
-            "%m/%d/%y",           # 01/15/24
-            "%m-%d-%y",           # 01-15-24, 10-13-21
-            "%m.%d.%y",           # 01.15.24, 8.5.21
-
+            "%m/%d/%y",  # 01/15/24
+            "%m-%d-%y",  # 01-15-24, 10-13-21
+            "%m.%d.%y",  # 01.15.24, 8.5.21
             # Compact 8-digit formats
-            "%Y%m%d",             # 20240115
-
+            "%Y%m%d",  # 20240115
             # Month name formats
-            "%B %d, %Y",          # January 15, 2024
-            "%b %d, %Y",          # Jan 15, 2024
+            "%B %d, %Y",  # January 15, 2024
+            "%b %d, %Y",  # Jan 15, 2024
         ]
 
         parsed_date = None
@@ -205,7 +200,7 @@ def normalize_dates(dates: list[str]) -> set[str]:
                 continue
 
         # Handle compact 6-digit format MMDDYY (e.g., "021320" → Feb 13, 2020)
-        if not parsed_date and re.match(r'^\d{6}$', date_str):
+        if not parsed_date and re.match(r"^\d{6}$", date_str):
             try:
                 parsed_date = datetime.strptime(date_str, "%m%d%y")
             except ValueError:
@@ -216,7 +211,7 @@ def normalize_dates(dates: list[str]) -> set[str]:
                     pass
 
         # Handle compact 8-digit format without separators (e.g., "20240115")
-        if not parsed_date and re.match(r'^\d{8}$', date_str):
+        if not parsed_date and re.match(r"^\d{8}$", date_str):
             try:
                 parsed_date = datetime.strptime(date_str, "%Y%m%d")
             except ValueError:
@@ -267,13 +262,24 @@ def normalize_names(names: list[str]) -> set[str]:
 
     # Titles to remove
     titles = [
-        r'\bOfficer\b', r'\bOff\.\b', r'\bOfc\.\b',
-        r'\bDetective\b', r'\bDet\.\b',
-        r'\bSergeant\b', r'\bSgt\.\b',
-        r'\bLieutenant\b', r'\bLt\.\b',
-        r'\bCorporal\b', r'\bCpl\.\b',
-        r'\bChief\b', r'\bSheriff\b', r'\bDeputy\b',
-        r'\bMr\.\b', r'\bMrs\.\b', r'\bMs\.\b', r'\bDr\.\b'
+        r"\bOfficer\b",
+        r"\bOff\.\b",
+        r"\bOfc\.\b",
+        r"\bDetective\b",
+        r"\bDet\.\b",
+        r"\bSergeant\b",
+        r"\bSgt\.\b",
+        r"\bLieutenant\b",
+        r"\bLt\.\b",
+        r"\bCorporal\b",
+        r"\bCpl\.\b",
+        r"\bChief\b",
+        r"\bSheriff\b",
+        r"\bDeputy\b",
+        r"\bMr\.\b",
+        r"\bMrs\.\b",
+        r"\bMs\.\b",
+        r"\bDr\.\b",
     ]
 
     for name in names:
@@ -284,17 +290,17 @@ def normalize_names(names: list[str]) -> set[str]:
 
         # Remove titles
         for title in titles:
-            name = re.sub(title, '', name, flags=re.IGNORECASE)
+            name = re.sub(title, "", name, flags=re.IGNORECASE)
 
         # Lowercase
         name = name.lower()
 
         # Remove all punctuation (commas, periods, hyphens, apostrophes, etc.)
         # Replace with space to preserve word boundaries
-        name = re.sub(r'[^\w\s]', ' ', name)
+        name = re.sub(r"[^\w\s]", " ", name)
 
         # Normalize whitespace (collapse multiple spaces into one)
-        name = re.sub(r'\s+', ' ', name).strip()
+        name = re.sub(r"\s+", " ", name).strip()
 
         if name and len(name) >= 2:  # Filter out single letters
             normalized.add(name)
@@ -354,8 +360,8 @@ def parse_structured_dates(structured_value: Any) -> list[str]:
             data = structured_value
 
         # Extract incident_date
-        if isinstance(data, dict) and 'incident_date' in data:
-            incident_date = data['incident_date']
+        if isinstance(data, dict) and "incident_date" in data:
+            incident_date = data["incident_date"]
             if incident_date and incident_date is not None:
                 return [str(incident_date)]
 
@@ -389,8 +395,8 @@ def parse_structured_case_ids(structured_value: Any) -> list[str]:
         if isinstance(data, list):
             ids = []
             for item in data:
-                if isinstance(item, dict) and 'id' in item:
-                    case_id = item['id']
+                if isinstance(item, dict) and "id" in item:
+                    case_id = item["id"]
                     if case_id:
                         ids.append(str(case_id))
             return ids
@@ -425,8 +431,8 @@ def parse_structured_subject_names(structured_value: Any) -> list[str]:
         if isinstance(data, list):
             names = []
             for item in data:
-                if isinstance(item, dict) and 'name' in item:
-                    name = item['name']
+                if isinstance(item, dict) and "name" in item:
+                    name = item["name"]
                     if name:
                         names.append(str(name))
             return names
@@ -461,8 +467,8 @@ def parse_structured_officer_names(structured_value: Any) -> list[str]:
         if isinstance(data, list):
             names = []
             for item in data:
-                if isinstance(item, dict) and 'name' in item:
-                    name = item['name']
+                if isinstance(item, dict) and "name" in item:
+                    name = item["name"]
                     if name:
                         names.append(str(name))
             return names

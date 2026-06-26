@@ -57,7 +57,7 @@ INPUT_CSV = "../../data/output/autofolio_1.2.0_output--Oakland Police Department
 OUTPUT_PATHS = {
     "filepath_only": "../../data/output/test_clustering_results_deterministic_filepath_only.csv",
     "filename_only": "../../data/output/test_clustering_results_deterministic_filename_only.csv",
-    "combined": "../../data/output/test_clustering_results_deterministic_combined.csv"
+    "combined": "../../data/output/test_clustering_results_deterministic_combined.csv",
 }
 
 # VARIATION CONTROL - Set to True to run that variation
@@ -69,10 +69,7 @@ RUN_COMBINED = True
 DEBUG = True
 # ============================================================================
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -116,7 +113,7 @@ class UnionFind:
 def get_normalized_case_ids(doc: dict, source_mode: str) -> set[str]:
     """Extract and normalize all case IDs for a document."""
     row = pd.Series(doc)
-    case_ids_raw = get_feature_value_metadata(row, 'case_ids', source_mode)
+    case_ids_raw = get_feature_value_metadata(row, "case_ids", source_mode)
 
     normalized = set()
     if case_ids_raw:
@@ -130,7 +127,7 @@ def get_normalized_case_ids(doc: dict, source_mode: str) -> set[str]:
 def get_standardized_dates(doc: dict, source_mode: str) -> set[str]:
     """Extract and standardize all dates for a document."""
     row = pd.Series(doc)
-    dates_raw = get_feature_value_metadata(row, 'dates', source_mode)
+    dates_raw = get_feature_value_metadata(row, "dates", source_mode)
 
     standardized = set()
     if dates_raw:
@@ -138,7 +135,7 @@ def get_standardized_dates(doc: dict, source_mode: str) -> set[str]:
             parsed = standardize_date(date_str)
             if parsed:
                 # Convert to string format YYYY-MM-DD
-                standardized.add(parsed.strftime('%Y-%m-%d'))
+                standardized.add(parsed.strftime("%Y-%m-%d"))
 
     return standardized
 
@@ -146,7 +143,7 @@ def get_standardized_dates(doc: dict, source_mode: str) -> set[str]:
 def get_normalized_names(doc: dict, source_mode: str) -> set[str]:
     """Extract and normalize all names for a document."""
     row = pd.Series(doc)
-    names_raw = get_feature_value_metadata(row, 'names', source_mode)
+    names_raw = get_feature_value_metadata(row, "names", source_mode)
 
     normalized = set()
     if names_raw:
@@ -180,15 +177,19 @@ def cluster_by_case_ids(docs: list[dict], source_mode: str) -> dict[int, int]:
         if case_ids:
             docs_with_case_ids += 1
         for case_id in case_ids:
-            case_id_to_docs[case_id].append(doc['id'])
+            case_id_to_docs[case_id].append(doc["id"])
 
-    logger.info(f"  ✓ Indexed {len(case_id_to_docs):,} unique case IDs in {time.time() - index_start:.2f}s")
-    logger.info(f"  ℹ Documents with case IDs: {docs_with_case_ids:,} ({docs_with_case_ids/len(docs)*100:.1f}%)")
+    logger.info(
+        f"  ✓ Indexed {len(case_id_to_docs):,} unique case IDs in {time.time() - index_start:.2f}s"
+    )
+    logger.info(
+        f"  ℹ Documents with case IDs: {docs_with_case_ids:,} ({docs_with_case_ids / len(docs) * 100:.1f}%)"
+    )
 
     # Union-Find: merge all docs that share at least 1 case ID
     logger.info("  Merging documents via Union-Find...")
     uf_start = time.time()
-    uf = UnionFind([doc['id'] for doc in docs])
+    uf = UnionFind([doc["id"] for doc in docs])
 
     merge_count = 0
     case_ids_with_links = 0
@@ -206,7 +207,9 @@ def cluster_by_case_ids(docs: list[dict], source_mode: str) -> dict[int, int]:
     logger.info(f"  ✓ Performed {merge_count:,} union operations in {time.time() - uf_start:.2f}s")
 
     # Avoid division by zero if no case IDs found
-    case_id_link_pct = (case_ids_with_links/len(case_id_to_docs)*100) if len(case_id_to_docs) > 0 else 0.0
+    case_id_link_pct = (
+        (case_ids_with_links / len(case_id_to_docs) * 100) if len(case_id_to_docs) > 0 else 0.0
+    )
     logger.info(f"  ℹ Case IDs that linked docs: {case_ids_with_links:,} ({case_id_link_pct:.1f}%)")
 
     # Get groups
@@ -218,13 +221,15 @@ def cluster_by_case_ids(docs: list[dict], source_mode: str) -> dict[int, int]:
 
     total_in_groups = sum(len(members) for members in multi_doc_groups.values())
     logger.info(f"  ✓ Formed {len(multi_doc_groups):,} groups with 2+ documents")
-    logger.info(f"  ✓ Total documents in groups: {total_in_groups:,} ({total_in_groups/len(docs)*100:.1f}%)")
+    logger.info(
+        f"  ✓ Total documents in groups: {total_in_groups:,} ({total_in_groups / len(docs) * 100:.1f}%)"
+    )
 
     # Group size distribution
     group_sizes = [len(members) for members in multi_doc_groups.values()]
     if group_sizes:
         logger.info(f"  ℹ Largest group: {max(group_sizes):,} documents")
-        logger.info(f"  ℹ Average group size: {sum(group_sizes)/len(group_sizes):.1f} documents")
+        logger.info(f"  ℹ Average group size: {sum(group_sizes) / len(group_sizes):.1f} documents")
 
     # Create initial mapping (only for grouped docs)
     node_to_cluster = {}
@@ -233,13 +238,14 @@ def cluster_by_case_ids(docs: list[dict], source_mode: str) -> dict[int, int]:
             node_to_cluster[doc_id] = cluster_id
 
     logger.info(f"  ⏱ Phase 1 complete in {time.time() - phase_start:.2f}s")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     return node_to_cluster
 
 
-def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int],
-                                source_mode: str) -> dict[int, int]:
+def cluster_by_date_and_names(
+    docs: list[dict], already_clustered: dict[int, int], source_mode: str
+) -> dict[int, int]:
     """
     Group unclustered documents that share at least 1 date AND at least 1 name.
 
@@ -250,8 +256,10 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
     phase_start = time.time()
 
     # Filter to unclustered documents
-    unclustered_docs = [doc for doc in docs if doc['id'] not in already_clustered]
-    logger.info(f"  {len(unclustered_docs):,} documents remaining to cluster ({len(unclustered_docs)/len(docs)*100:.1f}%)")
+    unclustered_docs = [doc for doc in docs if doc["id"] not in already_clustered]
+    logger.info(
+        f"  {len(unclustered_docs):,} documents remaining to cluster ({len(unclustered_docs) / len(docs) * 100:.1f}%)"
+    )
 
     if not unclustered_docs:
         logger.info("  ℹ All documents already clustered, skipping phase 2")
@@ -276,20 +284,26 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
         if names:
             docs_with_names += 1
 
-        doc_dates[doc['id']] = dates
-        doc_names[doc['id']] = names
+        doc_dates[doc["id"]] = dates
+        doc_names[doc["id"]] = names
 
         for date in dates:
-            date_to_docs[date].append(doc['id'])
+            date_to_docs[date].append(doc["id"])
         for name in names:
-            name_to_docs[name].append(doc['id'])
+            name_to_docs[name].append(doc["id"])
 
-    logger.info(f"  ✓ Indexed {len(date_to_docs):,} unique dates and {len(name_to_docs):,} unique names in {time.time() - index_start:.2f}s")
-    logger.info(f"  ℹ Docs with dates: {docs_with_dates:,} ({docs_with_dates/len(unclustered_docs)*100:.1f}%)")
-    logger.info(f"  ℹ Docs with names: {docs_with_names:,} ({docs_with_names/len(unclustered_docs)*100:.1f}%)")
+    logger.info(
+        f"  ✓ Indexed {len(date_to_docs):,} unique dates and {len(name_to_docs):,} unique names in {time.time() - index_start:.2f}s"
+    )
+    logger.info(
+        f"  ℹ Docs with dates: {docs_with_dates:,} ({docs_with_dates / len(unclustered_docs) * 100:.1f}%)"
+    )
+    logger.info(
+        f"  ℹ Docs with names: {docs_with_names:,} ({docs_with_names / len(unclustered_docs) * 100:.1f}%)"
+    )
 
     # Union-Find for unclustered docs
-    uf = UnionFind([doc['id'] for doc in unclustered_docs])
+    uf = UnionFind([doc["id"] for doc in unclustered_docs])
 
     # Generate candidate pairs (docs that share at least 1 date)
     logger.info("  Generating candidate pairs (docs sharing dates)...")
@@ -301,7 +315,9 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
                 for j in range(i + 1, len(doc_ids)):
                     candidates.add((min(doc_ids[i], doc_ids[j]), max(doc_ids[i], doc_ids[j])))
 
-    logger.info(f"  ✓ Generated {len(candidates):,} candidate pairs in {time.time() - cand_start:.2f}s")
+    logger.info(
+        f"  ✓ Generated {len(candidates):,} candidate pairs in {time.time() - cand_start:.2f}s"
+    )
 
     # Check each candidate pair for date AND name overlap
     logger.info("  Checking candidates for (date ∩ name) overlap...")
@@ -321,12 +337,16 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
             if DEBUG and merged_count <= 10:  # Log first 10
                 shared_dates = dates1 & dates2
                 shared_names = names1 & names2
-                logger.info(f"    Merged docs {doc_id1}, {doc_id2}: date={list(shared_dates)[0]}, name={list(shared_names)[0]}")
+                logger.info(
+                    f"    Merged docs {doc_id1}, {doc_id2}: date={list(shared_dates)[0]}, name={list(shared_names)[0]}"
+                )
 
         # Progress logging for large datasets
         if (idx + 1) % 50000 == 0:
             progress = (idx + 1) / len(candidates) * 100
-            logger.info(f"    Progress: {progress:.1f}% ({idx+1:,}/{len(candidates):,}), {merged_count:,} merges so far")
+            logger.info(
+                f"    Progress: {progress:.1f}% ({idx + 1:,}/{len(candidates):,}), {merged_count:,} merges so far"
+            )
 
     logger.info(f"  ✓ Checked {len(candidates):,} pairs in {time.time() - check_start:.2f}s")
     logger.info(f"  ✓ Merged {merged_count:,} document pairs")
@@ -340,13 +360,17 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
 
     total_in_new_groups = sum(len(members) for members in multi_doc_groups.values())
     logger.info(f"  ✓ Formed {len(multi_doc_groups):,} new groups with 2+ documents")
-    logger.info(f"  ✓ Total documents in new groups: {total_in_new_groups:,} ({total_in_new_groups/len(unclustered_docs)*100:.1f}%)")
+    logger.info(
+        f"  ✓ Total documents in new groups: {total_in_new_groups:,} ({total_in_new_groups / len(unclustered_docs) * 100:.1f}%)"
+    )
 
     # Group size distribution
     group_sizes = [len(members) for members in multi_doc_groups.values()]
     if group_sizes:
         logger.info(f"  ℹ Largest new group: {max(group_sizes):,} documents")
-        logger.info(f"  ℹ Average new group size: {sum(group_sizes)/len(group_sizes):.1f} documents")
+        logger.info(
+            f"  ℹ Average new group size: {sum(group_sizes) / len(group_sizes):.1f} documents"
+        )
 
     # Create updated mapping
     node_to_cluster = already_clustered.copy()
@@ -358,7 +382,7 @@ def cluster_by_date_and_names(docs: list[dict], already_clustered: dict[int, int
         next_cluster_id += 1
 
     logger.info(f"  ⏱ Phase 2 complete in {time.time() - phase_start:.2f}s")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     return node_to_cluster
 
@@ -378,14 +402,16 @@ def assign_singletons(docs: list[dict], existing_mapping: dict[int, int]) -> dic
 
     singleton_count = 0
     for doc in docs:
-        if doc['id'] not in existing_mapping:
-            node_to_cluster[doc['id']] = next_cluster_id
+        if doc["id"] not in existing_mapping:
+            node_to_cluster[doc["id"]] = next_cluster_id
             next_cluster_id += 1
             singleton_count += 1
 
-    logger.info(f"  ✓ Assigned {singleton_count:,} singleton clusters ({singleton_count/len(docs)*100:.1f}%)")
+    logger.info(
+        f"  ✓ Assigned {singleton_count:,} singleton clusters ({singleton_count / len(docs) * 100:.1f}%)"
+    )
     logger.info(f"  ⏱ Phase 3 complete in {time.time() - phase_start:.2f}s")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     return node_to_cluster
 
@@ -402,11 +428,11 @@ def cluster_documents_deterministic(data: list[dict], source_mode: str) -> dict[
     Returns:
         node_to_cluster mapping
     """
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
     logger.info(f"DETERMINISTIC CLUSTERING: {source_mode}")
     logger.info(f"Total documents: {len(data):,}")
     logger.info("Algorithm: Union-Find (O(n) complexity)")
-    logger.info(f"{'='*80}\n")
+    logger.info(f"{'=' * 80}\n")
 
     total_start = time.time()
 
@@ -420,20 +446,20 @@ def cluster_documents_deterministic(data: list[dict], source_mode: str) -> dict[
     node_to_cluster = assign_singletons(data, node_to_cluster)
 
     total_time = time.time() - total_start
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info("CLUSTERING COMPLETE")
-    logger.info(f"Total time: {total_time:.2f}s ({total_time/60:.1f}m)")
-    logger.info(f"{'='*80}")
+    logger.info(f"Total time: {total_time:.2f}s ({total_time / 60:.1f}m)")
+    logger.info(f"{'=' * 80}")
 
     return node_to_cluster
 
 
 def run_single_variation(documents: list[dict], feature_source: str, output_path: str):
     """Run clustering for a single feature source variation."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info(f"STARTING VARIATION: {feature_source}")
     logger.info(f"Output: {output_path}")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Cluster
     node_to_cluster = cluster_documents_deterministic(documents, feature_source)
@@ -441,7 +467,7 @@ def run_single_variation(documents: list[dict], feature_source: str, output_path
     # Build results
     logger.info("Building final results...")
     df = pd.DataFrame(documents)
-    df['Parent Clusters'] = df['id'].map(lambda idx: [node_to_cluster.get(idx, -1)])
+    df["Parent Clusters"] = df["id"].map(lambda idx: [node_to_cluster.get(idx, -1)])
 
     # Save
     logger.info(f"Saving results to {output_path}")
@@ -457,7 +483,7 @@ def run_single_variation(documents: list[dict], feature_source: str, output_path
     singleton_count = sum(1 for size in cluster_sizes.values() if size == 1)
     multi_doc_clusters = [size for size in cluster_sizes.values() if size > 1]
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("CLUSTERING SUMMARY")
     logger.info(f"Feature source: {feature_source}")
     logger.info("Algorithm: Deterministic (no graph, natural transitivity)")
@@ -467,9 +493,11 @@ def run_single_variation(documents: list[dict], feature_source: str, output_path
     logger.info(f"Multi-document clusters: {len(multi_doc_clusters)}")
     if multi_doc_clusters:
         logger.info(f"Largest cluster size: {max(multi_doc_clusters)}")
-        logger.info(f"Average multi-doc cluster size: {sum(multi_doc_clusters) / len(multi_doc_clusters):.1f}")
+        logger.info(
+            f"Average multi-doc cluster size: {sum(multi_doc_clusters) / len(multi_doc_clusters):.1f}"
+        )
     logger.info(f"Results saved to: {output_path}")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
 
 def main():
@@ -487,24 +515,24 @@ def main():
         logger.error("No variations enabled! Set at least one RUN_* flag to True.")
         return
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("DETERMINISTIC CLUSTERING - MULTI-VARIATION RUN")
     logger.info(f"Input: {INPUT_CSV}")
     logger.info(f"Variations to run: {', '.join(variations_to_run)}")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Load data once
     logger.info(f"\nLoading CSV from {INPUT_CSV}")
     df = pd.read_csv(INPUT_CSV)
 
-    if 'ocr_text_per_page' in df.columns:
+    if "ocr_text_per_page" in df.columns:
         df = df.drop(columns=["ocr_text_per_page"])
 
     # Add ID column if not present
-    if 'id' not in df.columns:
-        df['id'] = df.index
+    if "id" not in df.columns:
+        df["id"] = df.index
 
-    documents = df.to_dict('records')
+    documents = df.to_dict("records")
     logger.info(f"Loaded {len(documents)} documents")
 
     if DEBUG and documents:
@@ -519,17 +547,15 @@ def main():
 
     # Run each enabled variation
     for idx, feature_source in enumerate(variations_to_run, 1):
-        logger.info(f"\n{'#'*80}")
+        logger.info(f"\n{'#' * 80}")
         logger.info(f"# VARIATION {idx}/{len(variations_to_run)}: {feature_source}")
-        logger.info(f"{'#'*80}")
+        logger.info(f"{'#' * 80}")
 
         output_path = OUTPUT_PATHS[feature_source]
         run_single_variation(documents, feature_source, output_path)
 
     # Final summary
-    logger.info("\n" + "#"*80)
+    logger.info("\n" + "#" * 80)
     logger.info("ALL VARIATIONS COMPLETE")
     logger.info(f"Ran {len(variations_to_run)} variations: {', '.join(variations_to_run)}")
-    logger.info("#"*80)
-
-
+    logger.info("#" * 80)

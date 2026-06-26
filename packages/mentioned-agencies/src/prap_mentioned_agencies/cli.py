@@ -25,7 +25,9 @@ def run(
     input: Path = typer.Option(
         ...,
         "--input",
-        help="Either a directory of agency_case_file_bundle-*.json files or a jsonl of CaseBundles.",
+        help=(
+            "Either a directory of agency_case_file_bundle-*.json files or a jsonl of CaseBundles."
+        ),
     ),
     output: Path = typer.Option(..., "--output", help="Path to output jsonl."),
     n_threads: int = typer.Option(16, "--n-threads"),
@@ -34,7 +36,5 @@ def run(
 ) -> None:
     """Extract mentioned law-enforcement agencies per case."""
     _setup_logging(log_level)
-    result = pipeline_run(
-        input, output, n_threads=n_threads, dedup_threshold=dedup_threshold
-    )
+    result = pipeline_run(input, output, n_threads=n_threads, dedup_threshold=dedup_threshold)
     typer.echo(json.dumps(result.model_dump(), indent=2))

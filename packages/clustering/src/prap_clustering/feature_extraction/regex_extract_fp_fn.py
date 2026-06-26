@@ -3,7 +3,7 @@ import re
 
 from pydantic import BaseModel, Field
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -24,31 +24,31 @@ class Names(BaseModel):
 # ============================================================================
 
 EXCLUDE_CASE_ID_PATTERNS = [
-    r'^F\d{1,3}$',           # F313, F990, F101 (form numbers)
-    r'^TF\d+[A-Z]?$',        # TF967, TF752, TF967B, TF1050A (traffic forms)
-    r'^FMT\d+$',             # FMT5 (form codes)
-    r'^\d{1,6}$',            # 109, 1208, 190416 (too short, likely not unique)
-    r'^[A-Z]{1,2}\d{1,2}$',  # V1, V2, W3 (too generic)
-    r'^[A-Z]{2,6}$',         # OISLL, COM, RAVA (abbreviations without numbers)
-    r'^FILE\d+$',            # FILE20150803011837 (file system timestamps)
-    r'^IADFORM\d*$',         # IADFORM13, IADFORM11 (IA form templates)
-    r'^INCIDENT\d*$',        # INCIDENT1 (generic incident placeholders)
-    r'^REPORT\d*$',          # REPORT (generic report IDs)
-    r'^FORM\d*$',            # FORM (generic form references)
+    r"^F\d{1,3}$",  # F313, F990, F101 (form numbers)
+    r"^TF\d+[A-Z]?$",  # TF967, TF752, TF967B, TF1050A (traffic forms)
+    r"^FMT\d+$",  # FMT5 (form codes)
+    r"^\d{1,6}$",  # 109, 1208, 190416 (too short, likely not unique)
+    r"^[A-Z]{1,2}\d{1,2}$",  # V1, V2, W3 (too generic)
+    r"^[A-Z]{2,6}$",  # OISLL, COM, RAVA (abbreviations without numbers)
+    r"^FILE\d+$",  # FILE20150803011837 (file system timestamps)
+    r"^IADFORM\d*$",  # IADFORM13, IADFORM11 (IA form templates)
+    r"^INCIDENT\d*$",  # INCIDENT1 (generic incident placeholders)
+    r"^REPORT\d*$",  # REPORT (generic report IDs)
+    r"^FORM\d*$",  # FORM (generic form references)
 ]
 
 EXCLUDE_NAME_PATTERNS = [
-    r'^b\s*\d+\s*b',                    # b 6 b, b 5 b (redacted)
-    r'^\d+\s*\d+\s*b\s*\d+\s*[a-z]',    # 832 7 b 6 b, 832 7 b 6 a (redacted)
-    r'subject\s*b\s*\d+\s*b',           # subject b 6 b
-    r'witness\s+\d+',                    # witness 1, witness 3
-    r'unnamed\s+(suspect|person|individual)',
-    r'name\s*redacted',
-    r'^victim$',
-    r'^suspect$',
-    r'^confidential\s+informant',        # confidential informant ci
-    r'\bci\b',                           # CI (confidential informant)
-    r'^[a-z]+$',                         # Single word names (too ambiguous alone)
+    r"^b\s*\d+\s*b",  # b 6 b, b 5 b (redacted)
+    r"^\d+\s*\d+\s*b\s*\d+\s*[a-z]",  # 832 7 b 6 b, 832 7 b 6 a (redacted)
+    r"subject\s*b\s*\d+\s*b",  # subject b 6 b
+    r"witness\s+\d+",  # witness 1, witness 3
+    r"unnamed\s+(suspect|person|individual)",
+    r"name\s*redacted",
+    r"^victim$",
+    r"^suspect$",
+    r"^confidential\s+informant",  # confidential informant ci
+    r"\bci\b",  # CI (confidential informant)
+    r"^[a-z]+$",  # Single word names (too ambiguous alone)
 ]
 
 
@@ -222,10 +222,18 @@ def extract_names_from_metadata(text: str) -> list[str]:
                         # These are fragments like "of Police", "of Police Commissioners", etc.
                         name_lower = name.lower()
                         org_fragments = [
-                            "of police", "or police", "of the police",
-                            "police department", "police commission", "police board",
-                            "city of", "county of", "state of",
-                            "department of", "board of", "bureau of"
+                            "of police",
+                            "or police",
+                            "of the police",
+                            "police department",
+                            "police commission",
+                            "police board",
+                            "city of",
+                            "county of",
+                            "state of",
+                            "department of",
+                            "board of",
+                            "bureau of",
                         ]
                         if not any(fragment in name_lower for fragment in org_fragments):
                             all_names.append(name)

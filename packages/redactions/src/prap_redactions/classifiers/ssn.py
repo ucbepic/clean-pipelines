@@ -2,12 +2,11 @@
 
 import logging
 import re
-from typing import Dict, List
 
 logger = logging.getLogger("prap.redactions.ssn")
 
 
-def classify_pages_with_ssn(ocr_text_pages: List[Dict]) -> List[int]:
+def classify_pages_with_ssn(ocr_text_pages: list[dict]) -> list[int]:
     """
     Identify pages containing social security numbers (SSNs)
 
@@ -21,17 +20,17 @@ def classify_pages_with_ssn(ocr_text_pages: List[Dict]) -> List[int]:
         List of page numbers (integers) that contain SSN references
     """
     pages_with_ssn = set()
-    ssn_pattern = r'[0-9]{3}-[0-9]{2}-[0-9]{4}'
+    ssn_pattern = r"[0-9]{3}-[0-9]{2}-[0-9]{4}"
     ssn_regex = re.compile(ssn_pattern)
     for page in ocr_text_pages:
-        if 'text' not in page or not page['text']:
+        if "text" not in page or not page["text"]:
             continue
         # sometimes the ssn pattern matches the evidence number from a photograph,
         # usually in those cases the evidence number is the only extracted text,
-        if len(page['text']) < 15:
+        if len(page["text"]) < 15:
             continue
-        page_text = page['text']
-        page_number = page.get('page_number', 0)
+        page_text = page["text"]
+        page_number = page.get("page_number", 0)
         if ssn_regex.search(page_text):
             pages_with_ssn.add(page_number)
             logger.debug(f"Found SSN on page {page_number}")
@@ -47,7 +46,7 @@ def classify_pages_with_ssn(ocr_text_pages: List[Dict]) -> List[int]:
     return result
 
 
-def classify_file_for_ssn(ocr_text_pages: List[Dict], sha1: str) -> Dict:
+def classify_file_for_ssn(ocr_text_pages: list[dict], sha1: str) -> dict:
     """
     Classify a file for SSN presence and return structured results.
 
@@ -78,8 +77,7 @@ def classify_file_for_ssn(ocr_text_pages: List[Dict], sha1: str) -> Dict:
         result["success"] = True
 
         logger.info(
-            f"Successfully classified {sha1}: "
-            f"{len(pages_with_ssn)} pages with SSN references"
+            f"Successfully classified {sha1}: {len(pages_with_ssn)} pages with SSN references"
         )
 
     except Exception as e:

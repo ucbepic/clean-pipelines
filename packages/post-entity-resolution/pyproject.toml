@@ -1,0 +1,40 @@
+[project]
+name = "prap-post-entity-resolution"
+version = "0.1.0a0"
+description = "PRAP pipeline: officer entity resolution against POST/NPI records via a trained XGBoost model, plus the offline model-training chain."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+# resolve/ routes LLM calls through prap-core (model-agnostic). The ML stack
+# (scikit-learn/xgboost/sentence-transformers) is required by the scorer/featurizer.
+dependencies = [
+    "prap-core",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "scikit-learn>=1.3",
+    "xgboost>=2.0",
+    "jellyfish>=1.0",
+    "sentence-transformers>=2.2",
+    "requests>=2.31",
+    "tenacity>=8.0",
+    "typer>=0.12",
+    "openpyxl>=3.1",
+]
+
+[project.scripts]
+prap-post-entity-resolution = "prap_post_entity_resolution.resolve.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prap_post_entity_resolution"]
+
+# Runtime artifacts loaded by filesystem path (scoring.py / io.py) must ship in the
+# wheel. The trained model + scaler and the common-last-names reference are required;
+# .env (gitignored secrets) is intentionally NOT listed.
+[tool.hatch.build.targets.wheel.force-include]
+"src/prap_post_entity_resolution/resolve/models" = "prap_post_entity_resolution/resolve/models"
+"src/prap_post_entity_resolution/resolve/data/input/common_last_names.csv" = "prap_post_entity_resolution/resolve/data/input/common_last_names.csv"

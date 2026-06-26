@@ -17,9 +17,9 @@ from .regex_extract_fp_fn import (
 def test_case_id_exclusions():
     """Test that problematic case IDs are correctly excluded."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING CASE ID EXCLUSIONS")
-    print("="*80)
+    print("=" * 80)
 
     # IDs that SHOULD be blocked
     should_block = [
@@ -73,9 +73,9 @@ def test_case_id_exclusions():
 def test_name_exclusions():
     """Test that problematic names are correctly excluded."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING NAME EXCLUSIONS")
-    print("="*80)
+    print("=" * 80)
 
     # Names that SHOULD be blocked
     should_block = [
@@ -131,46 +131,46 @@ def test_name_exclusions():
 def test_extraction_from_filepath():
     """Test extraction from realistic filepath examples."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING EXTRACTION FROM FILEPATHS")
-    print("="*80)
+    print("=" * 80)
 
     test_cases = [
         {
             "path": "/folder/IA2018-0167_Report/document.pdf",
             "expected_ids": ["IA2018-0167"],
             "expected_names": [],
-            "reason": "IA case in folder name"
+            "reason": "IA case in folder name",
         },
         {
             "path": "/folder/TF967B_Traffic_Report.pdf",
             "expected_ids": [],  # Should be blocked
             "expected_names": [],
-            "reason": "TF code should be blocked"
+            "reason": "TF code should be blocked",
         },
         {
             "path": "/cases/190416/document.pdf",
             "expected_ids": [],  # Should be blocked (too short)
             "expected_names": [],
-            "reason": "Short numeric ID should be blocked"
+            "reason": "Short numeric ID should be blocked",
         },
         {
             "path": "/FILE20150803011837/report.pdf",
             "expected_ids": [],  # Should be blocked
             "expected_names": [],
-            "reason": "FILE timestamp should be blocked"
+            "reason": "FILE timestamp should be blocked",
         },
         {
             "path": "/cases/2018-4567_Smith_John/report.pdf",
             "expected_ids": ["2018-4567"],
             "expected_names": [],  # "Smith" and "John" are single words, should be blocked
-            "reason": "Valid numeric case ID"
+            "reason": "Valid numeric case ID",
         },
         {
             "path": "/LOP170405000550_Investigation/file.pdf",
             "expected_ids": ["LOP170405000550"],
             "expected_names": [],
-            "reason": "Long alphanumeric case ID"
+            "reason": "Long alphanumeric case ID",
         },
     ]
 
@@ -179,28 +179,32 @@ def test_extraction_from_filepath():
         print(f"\nTest Case {i}: {test['reason']}")
         print(f"  Path: {test['path']}")
 
-        extracted_ids = extract_ids_from_metadata(test['path'])
-        extracted_names = extract_names_from_metadata(test['path'])
+        extracted_ids = extract_ids_from_metadata(test["path"])
+        extracted_names = extract_names_from_metadata(test["path"])
 
         print(f"  Expected IDs:   {test['expected_ids']}")
         print(f"  Extracted IDs:  {extracted_ids}")
 
         # Check IDs match
-        if set(extracted_ids) == set(test['expected_ids']):
+        if set(extracted_ids) == set(test["expected_ids"]):
             print("  ✓ Case IDs match")
         else:
             print("  ✗ Case IDs DO NOT match (FAIL)")
-            failures.append(f"Test {i}: Case IDs mismatch - got {extracted_ids}, expected {test['expected_ids']}")
+            failures.append(
+                f"Test {i}: Case IDs mismatch - got {extracted_ids}, expected {test['expected_ids']}"
+            )
 
         print(f"  Expected Names: {test['expected_names']}")
         print(f"  Extracted Names: {extracted_names}")
 
         # Check names match
-        if set(extracted_names) == set(test['expected_names']):
+        if set(extracted_names) == set(test["expected_names"]):
             print("  ✓ Names match")
         else:
             print("  ✗ Names DO NOT match (FAIL)")
-            failures.append(f"Test {i}: Names mismatch - got {extracted_names}, expected {test['expected_names']}")
+            failures.append(
+                f"Test {i}: Names mismatch - got {extracted_names}, expected {test['expected_names']}"
+            )
 
     return failures
 
@@ -208,30 +212,30 @@ def test_extraction_from_filepath():
 def test_extraction_from_filename():
     """Test extraction from realistic filename examples."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING EXTRACTION FROM FILENAMES")
-    print("="*80)
+    print("=" * 80)
 
     test_cases = [
         {
             "filename": "IA2018-0167_Investigation_Report.pdf",
             "expected_ids": ["IA2018-0167"],
-            "reason": "IA case in filename"
+            "reason": "IA case in filename",
         },
         {
             "filename": "V1_Video_Recording.mp4",
             "expected_ids": [],  # Should be blocked
-            "reason": "V1 should be blocked (too generic)"
+            "reason": "V1 should be blocked (too generic)",
         },
         {
             "filename": "Report_TF1050A.pdf",
             "expected_ids": [],  # Should be blocked
-            "reason": "TF code should be blocked"
+            "reason": "TF code should be blocked",
         },
         {
             "filename": "Case_22-1460_Final.pdf",
             "expected_ids": ["22-1460"],
-            "reason": "Valid year-case number format"
+            "reason": "Valid year-case number format",
         },
     ]
 
@@ -240,16 +244,18 @@ def test_extraction_from_filename():
         print(f"\nTest Case {i}: {test['reason']}")
         print(f"  Filename: {test['filename']}")
 
-        extracted_ids = extract_ids_from_metadata(test['filename'])
+        extracted_ids = extract_ids_from_metadata(test["filename"])
 
         print(f"  Expected: {test['expected_ids']}")
         print(f"  Extracted: {extracted_ids}")
 
-        if set(extracted_ids) == set(test['expected_ids']):
+        if set(extracted_ids) == set(test["expected_ids"]):
             print("  ✓ PASS")
         else:
             print("  ✗ FAIL")
-            failures.append(f"Filename test {i}: got {extracted_ids}, expected {test['expected_ids']}")
+            failures.append(
+                f"Filename test {i}: got {extracted_ids}, expected {test['expected_ids']}"
+            )
 
     return failures
 
@@ -257,9 +263,9 @@ def test_extraction_from_filename():
 def main():
     """Run all tests and report results."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("REGEX EXTRACTION TEST SUITE")
-    print("="*80)
+    print("=" * 80)
 
     all_failures = []
 
@@ -270,9 +276,9 @@ def main():
     all_failures.extend(test_extraction_from_filename())
 
     # Print summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TEST SUMMARY")
-    print("="*80)
+    print("=" * 80)
 
     if not all_failures:
         print("✓ ALL TESTS PASSED")

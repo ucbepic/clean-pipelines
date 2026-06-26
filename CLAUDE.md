@@ -21,9 +21,12 @@ packages/
 ├── split-officer-names/
 ├── page-stream-segmentation/
 ├── clustering/
-└── redactions/                 # WIP, currently exits non-zero
+├── redactions/                 # WIP, currently exits non-zero
+└── post-entity-resolution/     # officer entity resolution (resolve/ = §4 pipeline; training/ = offline tool)
 misc/                           # non-§4 code (CV classifiers, AWS-only utils, notebooks)
 ```
+
+**`post-entity-resolution`** has two halves. `resolve/` is a §4-compliant inference pipeline (resolves officer mentions to POST employment records via a trained XGBoost model + the NPI employment API): `prap_core`-backed LLM/IO, `schemas.py`, a Typer `prepare`/`run`/`eval` CLI (`prap-post-entity-resolution`), offline tests in `testpaths`. `training/` is the offline XGBoost model-generation chain (Makefile-driven `clean → train-data → ts-blocking → ts-features → ts-train`), kept as a dev tool rather than a jsonl pipeline; its `src.py` scripts are lint-carved-out under `[tool.ruff.lint.per-file-ignores]` like `clustering/**`. The trained `models/*.pkl` + `common_last_names.csv` ship in the wheel; the LLM provider comes from `PRAP_LLM_*`, the NPI API base URL from `NPI_API_URL`. See the package README.
 
 `prap-core` is **domain-free**: no `Officer`, no `IncidentDate`. Modules: `llm` (LiteLLM wrapper + retries + structured output + on-disk cache), `ocr` (`OCREngine` protocol + Azure/Tesseract/Unstructured adapters), `pdf`, `io` (jsonl streaming, manifests), `config` (pydantic-settings), `prompts` (versioned loader), `eval` (P/R/F1), `summary_filter`. Pipeline packages must not import provider SDKs directly — go through `prap_core.config.Settings` / `prap_core.llm.LLM`.
 

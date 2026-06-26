@@ -34,9 +34,7 @@ def test_schemas_load():
     assert a.has_dual_role is False
 
     # Ensure all citation/eval schemas instantiate
-    PrimaryCitationAnalysis(
-        has_citation=False, reasoning="r", quote="q", confidence="HIGH"
-    )
+    PrimaryCitationAnalysis(has_citation=False, reasoning="r", quote="q", confidence="HIGH")
     ValidatorCitationResult(
         final_decision=False,
         validator_reasoning="r",
@@ -52,7 +50,8 @@ def test_schemas_load():
         extraction_reasoning="r",
     )
 
-    # SingleAgencyVerification with required fields (corrected_agency_type is required but Optional[str])
+    # SingleAgencyVerification with required fields
+    # (corrected_agency_type is required but Optional[str])
     SingleAgencyVerification(
         verification_status="REJECTED",
         corrected_agency_type=None,

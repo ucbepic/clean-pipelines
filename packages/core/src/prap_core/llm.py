@@ -183,9 +183,7 @@ class LLM:
             TokenUsage(
                 prompt_tokens=prompt_tokens,
                 total_tokens=total_tokens,
-                cost_usd=float(
-                    raw_dict.get("_hidden_params", {}).get("response_cost", 0.0) or 0.0
-                ),
+                cost_usd=float(raw_dict.get("_hidden_params", {}).get("response_cost", 0.0) or 0.0),
             )
         )
         return vectors

@@ -132,7 +132,9 @@ class AblationConfig:
     enable_validation: bool = True  # If False, skip connectivity threshold validation
 
     # Tier 3 embedding gate (override module-level EMBEDDING_SIMILARITY_THRESHOLD)
-    embedding_similarity_threshold: float = 0.9  # Minimum embedding similarity to trigger Tier 3 LLM
+    embedding_similarity_threshold: float = (
+        0.9  # Minimum embedding similarity to trigger Tier 3 LLM
+    )
 
 
 def load_ablation_config(config_name: str) -> AblationConfig:
@@ -168,26 +170,28 @@ def load_ablation_config(config_name: str) -> AblationConfig:
             yaml_data = yaml.safe_load(f)
 
         # Find the matching ablation config
-        for ablation in yaml_data.get('ablations', []):
-            all_available.append(ablation['name'])
+        for ablation in yaml_data.get("ablations", []):
+            all_available.append(ablation["name"])
 
-            if ablation['name'] == config_name:
+            if ablation["name"] == config_name:
                 return AblationConfig(
-                    name=ablation['name'],
-                    description=ablation['description'],
-                    date_proximity_days=ablation['date_proximity_days'],
-                    require_dates_present=ablation['require_dates_present'],
-                    enabled_tiers=ablation['enabled_tiers'],
-                    enabled_rules=ablation['enabled_rules'],
-                    use_learned_model=ablation.get('use_learned_model', False),
-                    disable_case_ids=ablation.get('disable_case_ids', False),
-                    disable_dates=ablation.get('disable_dates', False),
-                    disable_subject_names=ablation.get('disable_subject_names', False),
-                    disable_officer_names=ablation.get('disable_officer_names', False),
-                    model_path=ablation.get('model_path', None),
-                    feature_subset=ablation.get('feature_subset', None),
-                    enable_validation=ablation.get('enable_validation', True),
-                    embedding_similarity_threshold=ablation.get('embedding_similarity_threshold', 0.9),
+                    name=ablation["name"],
+                    description=ablation["description"],
+                    date_proximity_days=ablation["date_proximity_days"],
+                    require_dates_present=ablation["require_dates_present"],
+                    enabled_tiers=ablation["enabled_tiers"],
+                    enabled_rules=ablation["enabled_rules"],
+                    use_learned_model=ablation.get("use_learned_model", False),
+                    disable_case_ids=ablation.get("disable_case_ids", False),
+                    disable_dates=ablation.get("disable_dates", False),
+                    disable_subject_names=ablation.get("disable_subject_names", False),
+                    disable_officer_names=ablation.get("disable_officer_names", False),
+                    model_path=ablation.get("model_path", None),
+                    feature_subset=ablation.get("feature_subset", None),
+                    enable_validation=ablation.get("enable_validation", True),
+                    embedding_similarity_threshold=ablation.get(
+                        "embedding_similarity_threshold", 0.9
+                    ),
                 )
 
     # If not found, raise error with available configs
@@ -219,7 +223,7 @@ def compute_date_diff_days(dates1: set[str], dates2: set[str]) -> int:
     except ValueError:
         return -1  # Changed from 999999
 
-    min_diff = float('inf')
+    min_diff = float("inf")
     for d1 in parsed_dates1:
         for d2 in parsed_dates2:
             diff = abs((d1 - d2).days)
@@ -330,7 +334,8 @@ def extract_pair_features_for_model(doc1: DocumentFeatures, doc2: DocumentFeatur
     )
     # Ignore -1 (missing) when taking the minimum: min(5, -1) should be 5, not -1
     _valid_diffs = [
-        d for d in [features["tier1_min_date_diff_days"], features["tier2_min_date_diff_days"]]
+        d
+        for d in [features["tier1_min_date_diff_days"], features["tier2_min_date_diff_days"]]
         if d >= 0
     ]
     features["combined_min_date_diff_days"] = min(_valid_diffs) if _valid_diffs else -1
@@ -365,14 +370,12 @@ def extract_pair_features_for_model(doc1: DocumentFeatures, doc2: DocumentFeatur
 
     # ========== TIER AVAILABILITY FEATURES (Option B) ==========
     # Must match learn_matching_rules.py exactly so inference features == training features.
-    features["tier1_has_any_data"] = (
-        bool(doc1.tier1_case_ids or doc1.tier1_dates or doc1.tier1_names) and
-        bool(doc2.tier1_case_ids or doc2.tier1_dates or doc2.tier1_names)
-    )
-    features["tier2_has_any_data"] = (
-        bool(doc1.tier2_case_ids or doc1.tier2_dates or doc1.tier2_subject_names) and
-        bool(doc2.tier2_case_ids or doc2.tier2_dates or doc2.tier2_subject_names)
-    )
+    features["tier1_has_any_data"] = bool(
+        doc1.tier1_case_ids or doc1.tier1_dates or doc1.tier1_names
+    ) and bool(doc2.tier1_case_ids or doc2.tier1_dates or doc2.tier1_names)
+    features["tier2_has_any_data"] = bool(
+        doc1.tier2_case_ids or doc1.tier2_dates or doc1.tier2_subject_names
+    ) and bool(doc2.tier2_case_ids or doc2.tier2_dates or doc2.tier2_subject_names)
 
     return features
 
@@ -397,18 +400,20 @@ def filter_features_by_tier(feature_cols: list[str], tier_subset: str) -> list[s
     if tier_subset == "tier1_only":
         # Only tier1_* features + directory features (those are tier1 structural)
         # NOTE: any_* and combined_* features use BOTH tiers, so exclude them
-        return [col for col in feature_cols if
-                col.startswith("tier1_") or
-                col.startswith("shared_dir")]
+        return [
+            col for col in feature_cols if col.startswith("tier1_") or col.startswith("shared_dir")
+        ]
 
     elif tier_subset == "tier2_only":
         # Only tier2_* features + directory features (shared_dir is a structural baseline for all tiers)
-        return [col for col in feature_cols if
-                col.startswith("tier2_") or
-                col.startswith("shared_dir")]
+        return [
+            col for col in feature_cols if col.startswith("tier2_") or col.startswith("shared_dir")
+        ]
 
     else:
-        raise ValueError(f"Unknown tier_subset: {tier_subset}. Must be 'tier1_only', 'tier2_only', 'both', or None")
+        raise ValueError(
+            f"Unknown tier_subset: {tier_subset}. Must be 'tier1_only', 'tier2_only', 'both', or None"
+        )
 
 
 def extract_pair_features_wrapper(pair_tuple):
@@ -439,14 +444,16 @@ def load_trained_model(model_path: str):
 
     logger.info(f"Loading trained model from: {model_path}")
 
-    with open(model_path, 'rb') as f:
+    with open(model_path, "rb") as f:
         model = pickle.load(f)
 
     logger.info(f"  Model type: {type(model).__name__}")
     return model
 
 
-def _build_feature_row(pair_features: dict, feature_names: list[str], use_nan: bool = False) -> pd.DataFrame:
+def _build_feature_row(
+    pair_features: dict, feature_names: list[str], use_nan: bool = False
+) -> pd.DataFrame:
     """Build a single-row DataFrame for model prediction.
 
     Args:
@@ -469,10 +476,7 @@ def _build_feature_row(pair_features: dict, feature_names: list[str], use_nan: b
 
 
 def compare_with_learned_model(
-    doc1: DocumentFeatures,
-    doc2: DocumentFeatures,
-    model,
-    feature_names: list[str]
+    doc1: DocumentFeatures, doc2: DocumentFeatures, model, feature_names: list[str]
 ) -> MatchResult | None:
     """
     Compare two documents using a trained model instead of hand-coded rules.
@@ -497,10 +501,10 @@ def compare_with_learned_model(
     if isinstance(model, dict) and model.get("type") == "cascade_or":
         t1_model = model["tier1_model"]
         t1_feats = model["tier1_features"]
-        t1_nan   = model.get("tier1_use_nan", False)
+        t1_nan = model.get("tier1_use_nan", False)
         t2_model = model["tier2_model"]
         t2_feats = model["tier2_features"]
-        t2_nan   = model.get("tier2_use_nan", False)
+        t2_nan = model.get("tier2_use_nan", False)
 
         X1 = _build_feature_row(pair_features, t1_feats, use_nan=t1_nan)
         X2 = _build_feature_row(pair_features, t2_feats, use_nan=t2_nan)
@@ -527,7 +531,7 @@ def compare_with_learned_model(
     if prediction == 1:
         # Model predicts MATCH
         # Get prediction probability if available
-        if hasattr(model, 'predict_proba'):
+        if hasattr(model, "predict_proba"):
             proba = model.predict_proba(X)[0][1]  # Probability of class 1 (match)
         else:
             proba = 1.0
@@ -556,7 +560,7 @@ DEBUG = True
 
 # Validation settings
 ENABLE_VALIDATION = True  # Apply connectivity threshold validation
-VALIDATION_THRESHOLD = .3
+VALIDATION_THRESHOLD = 0.3
 
 # Frequency filter settings
 # Case IDs appearing in more than this percentage of documents are filtered out
@@ -580,9 +584,11 @@ TIER1_MIN_SHARED_DIRS = 2  # Minimum shared directory levels for Tier 1 comparis
 MAX_CONCURRENT_LLM = 100  # High concurrency for Tier 3 async calls
 
 # Post-processing settings
-ENABLE_DIRECTORY_FALLBACK = False  # Enable directory-based singleton clustering after main clustering
-                                    # Set to False for clean ablations (see true feature performance)
-                                    # Set to True to demonstrate utility of directory-based fallback
+ENABLE_DIRECTORY_FALLBACK = (
+    False  # Enable directory-based singleton clustering after main clustering
+)
+# Set to False for clean ablations (see true feature performance)
+# Set to True to demonstrate utility of directory-based fallback
 
 # ============================================================================
 # LOGGING SETUP
@@ -624,8 +630,8 @@ def rerun_regex_extraction(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("=" * 80)
 
     # Determine which column to use for filename
-    fn_col = 'gdrive_name' if 'gdrive_name' in df.columns else 'file_name_from_json'
-    fp_col = 'gdrive_path'
+    fn_col = "gdrive_name" if "gdrive_name" in df.columns else "file_name_from_json"
+    fp_col = "gdrive_path"
 
     logger.info(f"  Filepath column: {fp_col}")
     logger.info(f"  Filename column: {fn_col}")
@@ -641,12 +647,12 @@ def rerun_regex_extraction(df: pd.DataFrame) -> pd.DataFrame:
 
     # Re-extract for each row
     for idx in range(total):
-        filepath = df.iloc[idx].get(fp_col, '')
-        filename = df.iloc[idx].get(fn_col, '')
+        filepath = df.iloc[idx].get(fp_col, "")
+        filename = df.iloc[idx].get(fn_col, "")
 
         # Convert to string, handle NaN
-        filepath = str(filepath) if pd.notna(filepath) else ''
-        filename = str(filename) if pd.notna(filename) else ''
+        filepath = str(filepath) if pd.notna(filepath) else ""
+        filename = str(filename) if pd.notna(filename) else ""
 
         # Extract from filepath
         fp_case_ids = extract_ids_from_metadata(filepath)
@@ -659,28 +665,46 @@ def rerun_regex_extraction(df: pd.DataFrame) -> pd.DataFrame:
         fn_names = extract_names_from_metadata(filename)
 
         # Update DataFrame
-        df.at[df.index[idx], 'extracted_case_ids_fp'] = str(fp_case_ids) if fp_case_ids else '[]'
-        df.at[df.index[idx], 'extracted_case_ids_fn'] = str(fn_case_ids) if fn_case_ids else '[]'
-        df.at[df.index[idx], 'extracted_dates_fp'] = str(fp_dates) if fp_dates else '[]'
-        df.at[df.index[idx], 'extracted_dates_fn'] = str(fn_dates) if fn_dates else '[]'
-        df.at[df.index[idx], 'extracted_names_fp'] = str(fp_names) if fp_names else '[]'
-        df.at[df.index[idx], 'extracted_names_fn'] = str(fn_names) if fn_names else '[]'
+        df.at[df.index[idx], "extracted_case_ids_fp"] = str(fp_case_ids) if fp_case_ids else "[]"
+        df.at[df.index[idx], "extracted_case_ids_fn"] = str(fn_case_ids) if fn_case_ids else "[]"
+        df.at[df.index[idx], "extracted_dates_fp"] = str(fp_dates) if fp_dates else "[]"
+        df.at[df.index[idx], "extracted_dates_fn"] = str(fn_dates) if fn_dates else "[]"
+        df.at[df.index[idx], "extracted_names_fp"] = str(fp_names) if fp_names else "[]"
+        df.at[df.index[idx], "extracted_names_fn"] = str(fn_names) if fn_names else "[]"
 
         # Track counts
-        if fp_case_ids: fp_case_ids_count += 1
-        if fn_case_ids: fn_case_ids_count += 1
-        if fp_dates: fp_dates_count += 1
-        if fn_dates: fn_dates_count += 1
-        if fp_names: fp_names_count += 1
-        if fn_names: fn_names_count += 1
+        if fp_case_ids:
+            fp_case_ids_count += 1
+        if fn_case_ids:
+            fn_case_ids_count += 1
+        if fp_dates:
+            fp_dates_count += 1
+        if fn_dates:
+            fn_dates_count += 1
+        if fp_names:
+            fp_names_count += 1
+        if fn_names:
+            fn_names_count += 1
 
     logger.info(f"\nRe-extraction complete for {total:,} documents:")
-    logger.info(f"  Case IDs from filepath: {fp_case_ids_count:,} docs ({fp_case_ids_count/total*100:.1f}%)")
-    logger.info(f"  Case IDs from filename: {fn_case_ids_count:,} docs ({fn_case_ids_count/total*100:.1f}%)")
-    logger.info(f"  Dates from filepath:    {fp_dates_count:,} docs ({fp_dates_count/total*100:.1f}%)")
-    logger.info(f"  Dates from filename:    {fn_dates_count:,} docs ({fn_dates_count/total*100:.1f}%)")
-    logger.info(f"  Names from filepath:    {fp_names_count:,} docs ({fp_names_count/total*100:.1f}%)")
-    logger.info(f"  Names from filename:    {fn_names_count:,} docs ({fn_names_count/total*100:.1f}%)")
+    logger.info(
+        f"  Case IDs from filepath: {fp_case_ids_count:,} docs ({fp_case_ids_count / total * 100:.1f}%)"
+    )
+    logger.info(
+        f"  Case IDs from filename: {fn_case_ids_count:,} docs ({fn_case_ids_count / total * 100:.1f}%)"
+    )
+    logger.info(
+        f"  Dates from filepath:    {fp_dates_count:,} docs ({fp_dates_count / total * 100:.1f}%)"
+    )
+    logger.info(
+        f"  Dates from filename:    {fn_dates_count:,} docs ({fn_dates_count / total * 100:.1f}%)"
+    )
+    logger.info(
+        f"  Names from filepath:    {fp_names_count:,} docs ({fp_names_count / total * 100:.1f}%)"
+    )
+    logger.info(
+        f"  Names from filename:    {fn_names_count:,} docs ({fn_names_count / total * 100:.1f}%)"
+    )
     logger.info("=" * 80 + "\n")
 
     return df
@@ -691,13 +715,14 @@ def rerun_regex_extraction(df: pd.DataFrame) -> pd.DataFrame:
 # ============================================================================
 
 
-
 # ============================================================================
 # FEATURE EXTRACTION
 # ============================================================================
 
 
-def extract_document_features(row: pd.Series, freq_filter: FrequencyFilter = None) -> DocumentFeatures:
+def extract_document_features(
+    row: pd.Series, freq_filter: FrequencyFilter = None
+) -> DocumentFeatures:
     """
     Extract and normalize all features from a document row.
 
@@ -721,18 +746,14 @@ def extract_document_features(row: pd.Series, freq_filter: FrequencyFilter = Non
         tier1_case_ids = freq_filter.filter_case_ids(tier1_case_ids)
 
     # Combine fp + fn dates
-    tier1_dates_raw = combine_features(
-        row.get("extracted_dates_fp"), row.get("extracted_dates_fn")
-    )
+    tier1_dates_raw = combine_features(row.get("extracted_dates_fp"), row.get("extracted_dates_fn"))
     tier1_dates = normalize_dates(tier1_dates_raw)
     # Apply frequency filter to remove metadata dates
     if freq_filter:
         tier1_dates = freq_filter.filter_dates(tier1_dates)
 
     # Combine fp + fn names
-    tier1_names_raw = combine_features(
-        row.get("extracted_names_fp"), row.get("extracted_names_fn")
-    )
+    tier1_names_raw = combine_features(row.get("extracted_names_fp"), row.get("extracted_names_fn"))
     tier1_names = normalize_names(tier1_names_raw)
     # Apply frequency filter only (blocklist filtering disabled)
     if freq_filter:
@@ -752,11 +773,15 @@ def extract_document_features(row: pd.Series, freq_filter: FrequencyFilter = Non
     tier2_dates = normalize_dates(tier2_dates_raw)
 
     # LLM subject names from structured JSON: [{"name": "Kevin Bushnell", "subject_type": "suspect"}]
-    tier2_subject_names_raw = parse_structured_subject_names(row.get("extracted_subject_names_llm_structured"))
+    tier2_subject_names_raw = parse_structured_subject_names(
+        row.get("extracted_subject_names_llm_structured")
+    )
     tier2_subject_names = normalize_names(tier2_subject_names_raw)  # Blocklist filtering disabled
 
     # LLM officer names from structured JSON: [{"name": "Officer Butera", "context": "responded to scene"}]
-    tier2_officer_names_raw = parse_structured_officer_names(row.get("extracted_officer_names_llm_structured"))
+    tier2_officer_names_raw = parse_structured_officer_names(
+        row.get("extracted_officer_names_llm_structured")
+    )
     tier2_officer_names = normalize_names(tier2_officer_names_raw)  # Blocklist filtering disabled
 
     # ========== TIER 3: Summaries ==========
@@ -864,9 +889,7 @@ def extract_document_features(row: pd.Series, freq_filter: FrequencyFilter = Non
     # ========== Metadata ==========
 
     has_tier1 = bool(tier1_case_ids or tier1_dates or tier1_names)
-    has_tier2 = bool(
-        tier2_case_ids or tier2_dates or tier2_subject_names or tier2_officer_names
-    )
+    has_tier2 = bool(tier2_case_ids or tier2_dates or tier2_subject_names or tier2_officer_names)
     # Only has Tier 3 if document has at least one meaningful core summary
     has_tier3 = has_meaningful_core_summary
 
@@ -1029,10 +1052,7 @@ def should_compare_tier3(
 
 
 def dates_within_range(
-    dates1: set[str],
-    dates2: set[str],
-    days: int = 365,
-    require_dates_present: bool = False
+    dates1: set[str], dates2: set[str], days: int = 365, require_dates_present: bool = False
 ) -> bool:
     """
     Check if two sets of dates have any pair within the specified range.
@@ -1206,9 +1226,7 @@ def dates_within_range(
 
 
 def compare_tier1(
-    doc1: DocumentFeatures,
-    doc2: DocumentFeatures,
-    config: AblationConfig
+    doc1: DocumentFeatures, doc2: DocumentFeatures, config: AblationConfig
 ) -> MatchResult | None:
     """
     Tier 1: Compare filepath + filename features.
@@ -1293,11 +1311,7 @@ def compare_tier1(
             date_overlap = doc1.tier1_dates & doc2.tier1_dates
 
         if name_overlap and date_overlap:
-            substantial_names = {
-                name for name in name_overlap
-                if ' ' in name
-                or len(name) >= 8
-            }
+            substantial_names = {name for name in name_overlap if " " in name or len(name) >= 8}
 
             if substantial_names:
                 if not case_id_conflict:
@@ -1308,7 +1322,10 @@ def compare_tier1(
                         reason=f"Tier 1: Name + Date match ({list(substantial_names)[0]}, {list(date_overlap)[0]})",
                         doc_ids=(doc1.doc_id, doc2.doc_id),
                         match_type="name_and_date",
-                        shared_features={"tier1_names": substantial_names, "tier1_dates": date_overlap},
+                        shared_features={
+                            "tier1_names": substantial_names,
+                            "tier1_dates": date_overlap,
+                        },
                     )
                 any_signal = True
 
@@ -1329,10 +1346,9 @@ def compare_tier1(
     # Covers: conflict + signal, no IDs + signal, no IDs + no signal
     return None
 
+
 def compare_tier2(
-    doc1: DocumentFeatures,
-    doc2: DocumentFeatures,
-    config: AblationConfig
+    doc1: DocumentFeatures, doc2: DocumentFeatures, config: AblationConfig
 ) -> MatchResult | None:
     """
     Tier 2: Compare LLM-extracted features.
@@ -1369,7 +1385,7 @@ def compare_tier2(
                 dates1,
                 dates2,
                 days=config.date_proximity_days,
-                require_dates_present=config.require_dates_present
+                require_dates_present=config.require_dates_present,
             ):
                 # Dates differ by more than allowed window - ambiguous case ID, don't match
                 return None
@@ -1453,11 +1469,15 @@ def compare_tier2(
                 subject_overlap = doc1.tier2_subject_names & doc2.tier2_subject_names
 
             if case_id_overlap or subject_overlap:
-                match_type = "date_officer_and_case_id" if case_id_overlap else "date_officer_and_subject"
-                reason = f"Tier 2: Date + Officer + {'Case ID' if case_id_overlap else 'Subject'} match"
+                match_type = (
+                    "date_officer_and_case_id" if case_id_overlap else "date_officer_and_subject"
+                )
+                reason = (
+                    f"Tier 2: Date + Officer + {'Case ID' if case_id_overlap else 'Subject'} match"
+                )
                 shared_features = {
                     "tier2_dates": date_overlap,
-                    "tier2_officer_names": officer_overlap
+                    "tier2_officer_names": officer_overlap,
                 }
 
                 if case_id_overlap:
@@ -1478,7 +1498,6 @@ def compare_tier2(
 
     # No match
     return None
-
 
 
 # ============================================================================
@@ -1653,13 +1672,17 @@ def split_invalid_cluster(
         # Collect all case IDs from first node
         first_node = next(iter(cluster_nodes))
         if first_node in features_map:
-            common_case_ids = features_map[first_node].tier1_case_ids | features_map[first_node].tier2_case_ids
+            common_case_ids = (
+                features_map[first_node].tier1_case_ids | features_map[first_node].tier2_case_ids
+            )
 
             # Check if all other nodes share at least one of these case IDs
             all_share_case_id = True
             for node in cluster_nodes:
                 if node in features_map:
-                    node_case_ids = features_map[node].tier1_case_ids | features_map[node].tier2_case_ids
+                    node_case_ids = (
+                        features_map[node].tier1_case_ids | features_map[node].tier2_case_ids
+                    )
                     if not (common_case_ids & node_case_ids):
                         all_share_case_id = False
                         break
@@ -1669,7 +1692,9 @@ def split_invalid_cluster(
             # If all nodes share at least one common case ID, don't split
             if all_share_case_id and common_case_ids:
                 if DEBUG and cluster_size > 10:
-                    logger.info(f"      CASE ID CONSTRAINT: Cluster of {cluster_size} docs shares case ID(s) {common_case_ids} - keeping together")
+                    logger.info(
+                        f"      CASE ID CONSTRAINT: Cluster of {cluster_size} docs shares case ID(s) {common_case_ids} - keeping together"
+                    )
                 return [cluster_nodes]
 
     # Step 1: Find ALL nodes below threshold in one pass (O(n²))
@@ -1711,7 +1736,9 @@ def split_invalid_cluster(
         # Move rescued nodes back to kept
         if nodes_to_rescue:
             if DEBUG and len(nodes_to_rescue) > 0:
-                logger.info(f"      CASE ID CONSTRAINT: Rescued {len(nodes_to_rescue)} nodes (shared case IDs with kept nodes)")
+                logger.info(
+                    f"      CASE ID CONSTRAINT: Rescued {len(nodes_to_rescue)} nodes (shared case IDs with kept nodes)"
+                )
             nodes_to_keep.update(nodes_to_rescue)
             nodes_to_remove -= nodes_to_rescue
 
@@ -1728,7 +1755,9 @@ def split_invalid_cluster(
 
         # Step 4: Recursively validate each component (can be parallelized in future)
         for component in components:
-            validated_clusters.extend(split_invalid_cluster(component, graph, threshold, features_map))
+            validated_clusters.extend(
+                split_invalid_cluster(component, graph, threshold, features_map)
+            )
 
     # Step 5: Add all removed nodes as singletons
     for node in nodes_to_remove:
@@ -1767,20 +1796,24 @@ def validate_and_split_clusters(
     large_clusters_count = sum(1 for c in sorted_clusters if len(c) > 100)
 
     if debug and large_clusters_count > 0:
-        logger.info(f"  Validating {len(sorted_clusters):,} clusters ({large_clusters_count} large clusters >100 docs)")
+        logger.info(
+            f"  Validating {len(sorted_clusters):,} clusters ({large_clusters_count} large clusters >100 docs)"
+        )
 
     for idx, cluster in enumerate(sorted_clusters):
         cluster_size = len(cluster)
 
         # Log progress for large clusters
         if debug and cluster_size > 100:
-            logger.info(f"  Processing cluster {idx+1}/{len(sorted_clusters)}: size={cluster_size:,}")
+            logger.info(
+                f"  Processing cluster {idx + 1}/{len(sorted_clusters)}: size={cluster_size:,}"
+            )
 
         if validate_cluster(cluster, graph, threshold):
             # Cluster is valid, keep as-is
             validated_clusters.append(cluster)
             if debug and cluster_size > 100:
-                logger.info(f"    ✓ Valid (all nodes have ≥{threshold*100:.0f}% connectivity)")
+                logger.info(f"    ✓ Valid (all nodes have ≥{threshold * 100:.0f}% connectivity)")
         else:
             # Cluster is invalid, split it
             if debug and cluster_size > 100:
@@ -1808,9 +1841,7 @@ def validate_and_split_clusters(
 
 
 async def cluster_documents(
-    data: list[dict],
-    config: AblationConfig,
-    tier3_threshold: float = 1.0
+    data: list[dict], config: AblationConfig, tier3_threshold: float = 1.0
 ) -> dict:
     """
     Main clustering pipeline using optimized two-phase approach.
@@ -1858,7 +1889,7 @@ async def cluster_documents(
     freq_filter = FrequencyFilter(
         date_threshold=dynamic_date_threshold,  # Dynamic: X% of corpus
         name_threshold=dynamic_name_threshold,  # Dynamic: X% of corpus
-        case_id_threshold=dynamic_case_id_threshold  # Dynamic: X% of corpus
+        case_id_threshold=dynamic_case_id_threshold,  # Dynamic: X% of corpus
     )
     freq_filter.build_from_dataframe(df)
     logger.info("=" * 80 + "\n")
@@ -1900,13 +1931,15 @@ async def cluster_documents(
             logger.info(f"Loading feature names from: {pair_features_path}")
             df_features = pd.read_csv(pair_features_path, nrows=1)
             # Exclude non-feature columns
-            model_feature_names = [col for col in df_features.columns if col not in ["agency", "label"]]
+            model_feature_names = [
+                col for col in df_features.columns if col not in ["agency", "label"]
+            ]
             logger.info(f"  Model expects {len(model_feature_names)} features")
         else:
             logger.warning(f"Could not find pair_features_balanced.csv in {model_dir}")
             logger.warning("Will attempt to infer feature names from model")
             # Try to get feature names from model if it's a tree-based model
-            if hasattr(trained_model, 'feature_names_in_'):
+            if hasattr(trained_model, "feature_names_in_"):
                 model_feature_names = list(trained_model.feature_names_in_)
             else:
                 raise ValueError("Cannot determine feature names for model")
@@ -1915,7 +1948,9 @@ async def cluster_documents(
         if config.feature_subset:
             logger.info(f"Filtering features to: {config.feature_subset}")
             original_count = len(model_feature_names)
-            model_feature_names = filter_features_by_tier(model_feature_names, config.feature_subset)
+            model_feature_names = filter_features_by_tier(
+                model_feature_names, config.feature_subset
+            )
             logger.info(f"  Filtered from {original_count} to {len(model_feature_names)} features")
             logger.info(f"  Sample features: {', '.join(model_feature_names[:10])}")
 
@@ -1924,9 +1959,9 @@ async def cluster_documents(
     # ========== TIER 3 STATISTICS ==========
     # Count documents with tier3 summaries
     tier3_docs = [doc for doc in features_map.values() if doc.has_tier3_summaries]
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info("TIER 3 BLOCKING ANALYSIS")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
     logger.info(f"Documents with tier3 summaries: {len(tier3_docs):,} / {len(features_map):,}")
 
     # Count by summary type
@@ -1955,7 +1990,7 @@ async def cluster_documents(
     logger.info(f"  Baseline (no embedding filter): {old_logic_pairs:,} pairs")
 
     tier3_doc_list = [doc for doc in features_map.values() if doc.has_tier3_summaries]
-    thresholds_to_test = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, .95]
+    thresholds_to_test = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95]
 
     for threshold in thresholds_to_test:
         pairs_at_threshold = 0
@@ -1973,7 +2008,7 @@ async def cluster_documents(
             f"(reduction: {reduction:,} pairs, {reduction_pct:.1f}%){marker}"
         )
 
-    logger.info(f"{'='*80}\n")
+    logger.info(f"{'=' * 80}\n")
 
     # ========== STEP 2: Generate all pairs ==========
     doc_ids = list(features_map.keys())
@@ -1992,7 +2027,7 @@ async def cluster_documents(
 
         BATCH_SIZE = 1000000
         batch_pairs = []  # Accumulate pairs for batching
-        batch_docs = []   # Store doc tuples for creating MatchResults
+        batch_docs = []  # Store doc tuples for creating MatchResults
         pairs_processed = 0
         tier1_blocked = 0  # Track pairs blocked by directory filtering
         report_interval = 1000000
@@ -2046,7 +2081,7 @@ async def cluster_documents(
                         doc_id1, doc_id2 = batch_docs[idx]
 
                         # Get confidence if available
-                        if hasattr(trained_model, 'predict_proba'):
+                        if hasattr(trained_model, "predict_proba"):
                             proba = trained_model.predict_proba(X.iloc[[idx]])[0][1]
                         else:
                             proba = 1.0
@@ -2067,17 +2102,20 @@ async def cluster_documents(
                 rate = pairs_processed / total_elapsed if total_elapsed > 0 else 0
 
                 # Update progress bar postfix with stats
-                pbar.set_postfix({
-                    'blocked': f"{tier1_blocked:,}",
-                    'matches': f"{len(tier1_edges):,}",
-                    'batch_rate': f"{len(batch_pairs)/batch_elapsed:.0f}/s"
-                }, refresh=True)
+                pbar.set_postfix(
+                    {
+                        "blocked": f"{tier1_blocked:,}",
+                        "matches": f"{len(tier1_edges):,}",
+                        "batch_rate": f"{len(batch_pairs) / batch_elapsed:.0f}/s",
+                    },
+                    refresh=True,
+                )
 
                 # Progress reporting (keep less frequent logging)
                 if pairs_processed % report_interval == 0 or pairs_processed == total_pairs:
                     logger.info(
                         f"Phase 1 progress: {pairs_processed:,}/{total_pairs:,} pairs | "
-                        f"Batch: {len(batch_pairs)} pairs in {batch_elapsed:.1f}s ({len(batch_pairs)/batch_elapsed:.0f} pairs/s) | "
+                        f"Batch: {len(batch_pairs)} pairs in {batch_elapsed:.1f}s ({len(batch_pairs) / batch_elapsed:.0f} pairs/s) | "
                         f"Overall: {rate:.0f} pairs/s | Blocked: {tier1_blocked:,} | Matches: {len(tier1_edges)}"
                     )
 
@@ -2120,13 +2158,22 @@ async def cluster_documents(
                     tier1_blocked += 1
 
             # Try Tier 2 if no Tier 1 result (match or hard block) - only if enabled in config
-            if result is None and 2 in config.enabled_tiers and doc1.has_tier2_features and doc2.has_tier2_features:
+            if (
+                result is None
+                and 2 in config.enabled_tiers
+                and doc1.has_tier2_features
+                and doc2.has_tier2_features
+            ):
                 result = compare_tier2(doc1, doc2, config)
                 if result:
                     tier2_edges.append(result)
 
             # Check if we need Tier 3 (with embedding-based filtering) - only if enabled in config
-            if result is None and 3 in config.enabled_tiers and should_compare_tier3(doc1, doc2, config.embedding_similarity_threshold):
+            if (
+                result is None
+                and 3 in config.enabled_tiers
+                and should_compare_tier3(doc1, doc2, config.embedding_similarity_threshold)
+            ):
                 tier3_pairs.append((id1, id2, doc1, doc2))
 
             pairs_processed += 1
@@ -2146,7 +2193,9 @@ async def cluster_documents(
     tier3_edges = []
 
     if tier3_pairs:
-        logger.info(f"Phase 2: Running Tier 3 async comparisons with {MAX_CONCURRENT_LLM} concurrency...")
+        logger.info(
+            f"Phase 2: Running Tier 3 async comparisons with {MAX_CONCURRENT_LLM} concurrency..."
+        )
         phase2_start = time.time()
 
         # Create semaphore to limit concurrency
@@ -2173,7 +2222,7 @@ async def cluster_documents(
 
             logger.info(
                 f"Phase 2 progress: {total_completed:,}/{len(tasks):,} pairs | "
-                f"Batch: {len(batch)} in {batch_elapsed:.1f}s ({len(batch)/batch_elapsed:.1f} pairs/s) | "
+                f"Batch: {len(batch)} in {batch_elapsed:.1f}s ({len(batch) / batch_elapsed:.1f} pairs/s) | "
                 f"Overall: {rate:.1f} pairs/s"
             )
 
@@ -2185,7 +2234,7 @@ async def cluster_documents(
         total_elapsed = time.time() - phase2_start
         logger.info(
             f"Phase 2 complete! Tier 3 matches: {len(tier3_edges)} | "
-            f"Total time: {total_elapsed:.1f}s | Average: {len(tasks)/total_elapsed:.1f} pairs/s"
+            f"Total time: {total_elapsed:.1f}s | Average: {len(tasks) / total_elapsed:.1f} pairs/s"
         )
 
     # ========== STEP 3: Build graph from edges ==========
@@ -2210,11 +2259,15 @@ async def cluster_documents(
     # ========== STEP 4.5: Validate and split clusters ==========
     if config.enable_validation:
         logger.info(f"\nApplying cluster validation (threshold={VALIDATION_THRESHOLD})...")
-        logger.info(f"  Each node must connect to ≥{VALIDATION_THRESHOLD*100:.0f}% of cluster")
+        logger.info(f"  Each node must connect to ≥{VALIDATION_THRESHOLD * 100:.0f}% of cluster")
 
         validation_start = time.time()
         clusters = validate_and_split_clusters(
-            candidate_clusters, G, threshold=VALIDATION_THRESHOLD, debug=DEBUG, features_map=features_map
+            candidate_clusters,
+            G,
+            threshold=VALIDATION_THRESHOLD,
+            debug=DEBUG,
+            features_map=features_map,
         )
         validation_time = time.time() - validation_start
 
@@ -2260,9 +2313,9 @@ async def cluster_documents(
     singleton_count = sum(1 for size in cluster_sizes if size == 1)
     multi_doc_clusters = sum(1 for size in cluster_sizes if size > 1)
 
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info("CLUSTERING SUMMARY")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
     logger.info(f"Total documents:        {len(data):,}")
     logger.info(f"Total pairs compared:   {total_pairs:,}")
     logger.info(f"Total clusters:         {len(clusters):,}")
@@ -2270,14 +2323,16 @@ async def cluster_documents(
     logger.info(f"  Multi-doc clusters:   {multi_doc_clusters:,}")
     logger.info("")
     logger.info("Tier 1 blocking:")
-    logger.info(f"  Blocked by dir filter: {tier1_blocked:,} ({tier1_blocked/total_pairs*100:.1f}%)")
+    logger.info(
+        f"  Blocked by dir filter: {tier1_blocked:,} ({tier1_blocked / total_pairs * 100:.1f}%)"
+    )
     logger.info("")
     logger.info(f"Edges added:            {len(all_edges):,}")
     logger.info(f"  Tier 1 matches:       {len(tier1_edges):,}")
     logger.info(f"  Tier 2 matches:       {len(tier2_edges):,}")
     logger.info(f"  Tier 3 matches:       {len(tier3_edges):,}")
     logger.info(f"  Tier 3 comparisons:   {len(tier3_pairs):,}")
-    logger.info(f"{'='*80}\n")
+    logger.info(f"{'=' * 80}\n")
 
     # Calculate validation statistics
     if config.enable_validation:
@@ -2319,7 +2374,9 @@ async def cluster_documents(
 # ============================================================================
 
 
-def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tuple[list[dict], dict]:
+def merge_singletons_by_directory(
+    results: list[dict], features_map: dict
+) -> tuple[list[dict], dict]:
     """
     Post-processing step: Merge singleton clusters that share directories.
 
@@ -2337,9 +2394,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
     Returns:
         Tuple of (updated results, statistics dict with llm_min_depth)
     """
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info("POST-PROCESSING: Directory-Based Singleton Clustering")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     # Step 1: Identify singletons and their cluster IDs
     cluster_counts = {}
@@ -2430,9 +2487,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
     # Create output log file
     log_output_path = "../../data/output/singleton_merge_validations.txt"
     Path(log_output_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(log_output_path, 'w') as f:
+    with open(log_output_path, "w") as f:
         f.write("SINGLETON MERGE VALIDATION LOG\n")
-        f.write(f"{'='*80}\n")
+        f.write(f"{'=' * 80}\n")
         f.write(f"Total directories to validate: {len(potential_merges)}\n")
 
     logger.info(f"Logging validation decisions to: {log_output_path}")
@@ -2446,7 +2503,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
         full_filepaths = []
         for idx, _doc_id in singleton_list:
             gdrive_path = results[idx].get("gdrive_path", "")
-            gdrive_name = results[idx].get("gdrive_name", "") or results[idx].get("file_name_from_json", "")
+            gdrive_name = results[idx].get("gdrive_name", "") or results[idx].get(
+                "file_name_from_json", ""
+            )
             if gdrive_path and gdrive_name:
                 if gdrive_path.endswith(gdrive_name):
                     full_path = gdrive_path  # Already has filename
@@ -2457,7 +2516,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
                 full_filepaths.append(gdrive_path)
 
         # Ask LLM if these files should be merged
-        should_merge = should_merge_singletons(grouping_dir, full_filepaths, output_log_path=log_output_path)
+        should_merge = should_merge_singletons(
+            grouping_dir, full_filepaths, output_log_path=log_output_path
+        )
         return grouping_dir, singleton_list, should_merge
 
     merge_candidates = {}
@@ -2546,7 +2607,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
     logger.info(f"  New clusters created: {new_clusters_created:,}")
     logger.info(f"  Singletons before: {len(singleton_cluster_ids):,}")
     logger.info(f"  Singletons after: {new_singleton_count:,}")
-    logger.info(f"  Reduction: {len(singleton_cluster_ids) - new_singleton_count:,} ({(len(singleton_cluster_ids) - new_singleton_count) / len(singleton_cluster_ids) * 100:.1f}%)")
+    logger.info(
+        f"  Reduction: {len(singleton_cluster_ids) - new_singleton_count:,} ({(len(singleton_cluster_ids) - new_singleton_count) / len(singleton_cluster_ids) * 100:.1f}%)"
+    )
 
     stats = {
         "singletons_before": len(singleton_cluster_ids),
@@ -2567,7 +2630,9 @@ def merge_singletons_by_directory(results: list[dict], features_map: dict) -> tu
 # ============================================================================
 
 
-async def main(csv_path: str, ablation_config_name: str, output_dir: str = "../../data/output/ablations"):
+async def main(
+    csv_path: str, ablation_config_name: str, output_dir: str = "../../data/output/ablations"
+):
     """
     Main entry point for ablation clustering.
 
@@ -2641,13 +2706,17 @@ async def main(csv_path: str, ablation_config_name: str, output_dir: str = "../.
 
     # Save edge metadata for diagnostic analysis
     import pickle
+
     edge_metadata_path = str(output_path).replace(".csv", "_edge_metadata.pkl")
     logger.info(f"Saving edge metadata to: {edge_metadata_path}")
     with open(edge_metadata_path, "wb") as f:
-        pickle.dump({
-            "edges": output["edges"],
-            "features_map": output["features_map"],
-        }, f)
+        pickle.dump(
+            {
+                "edges": output["edges"],
+                "features_map": output["features_map"],
+            },
+            f,
+        )
 
     logger.info("=" * 80)
     logger.info("CLUSTERING COMPLETE")
@@ -2666,10 +2735,8 @@ def run_clustering(csv_path: str = None, ablation_config_name: str = "baseline_3
     """
     if csv_path is None:
         # Use the hardcoded CSV_PATH from configuration section
-        csv_path = CSV_PATH if 'CSV_PATH' in globals() else None
+        csv_path = CSV_PATH if "CSV_PATH" in globals() else None
         if csv_path is None:
             raise ValueError("No CSV path provided and CSV_PATH not set in configuration")
 
     return asyncio.run(main(csv_path, ablation_config_name))
-
-

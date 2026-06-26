@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib import resources
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 from jinja2 import Template
 
@@ -26,14 +26,14 @@ def _load_prompt(name: str) -> str:
 
 
 def analyze_page_for_agency_citation(
-    llm: "LLM",
+    llm: LLM,
     page_text: str,
     page_number: int,
     file_name: str,
     agency_name: str,
     agency_type: str,
-    extraction_context: Optional[str] = None,
-) -> Dict[str, Any]:
+    extraction_context: str | None = None,
+) -> dict[str, Any]:
     """Two-stage analysis: Primary LLM searches for agency citations,
     followed by validator LLM to verify the citation quality.
     """
@@ -50,9 +50,7 @@ def analyze_page_for_agency_citation(
             extraction_context=extraction_context or "No additional context provided",
         )
 
-        primary_result = llm.complete(
-            primary_prompt, response_format=PrimaryCitationAnalysis
-        )
+        primary_result = llm.complete(primary_prompt, response_format=PrimaryCitationAnalysis)
 
         if not primary_result.has_citation:
             return {
@@ -75,9 +73,7 @@ def analyze_page_for_agency_citation(
             page_text=page_text,
         )
 
-        validator_result = llm.complete(
-            validator_prompt, response_format=ValidatorCitationResult
-        )
+        validator_result = llm.complete(validator_prompt, response_format=ValidatorCitationResult)
 
         return {
             "page_number": page_number,
@@ -103,28 +99,27 @@ def analyze_page_for_agency_citation(
 
 
 def analyze_page_wrapper(
-    llm: "LLM",
-    page_data: Dict[str, Any],
+    llm: LLM,
+    page_data: dict[str, Any],
     file_name: str,
     file_id: str,
     gdrive_id: str,
     agency_name: str,
     agency_type: str,
-    extraction_context: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    extraction_context: str | None = None,
+) -> dict[str, Any] | None:
     """Wrapper function for parallel processing of page analysis."""
     page_number = page_data.get("page_number", 0)
     page_content = page_data.get("text", "")
 
     if not page_content or len(page_content.strip()) < 50:
         logger.debug(
-            f"  Page {page_number} ({file_name}): Skipped (content too short: {len(page_content)} chars)"
+            f"  Page {page_number} ({file_name}): Skipped "
+            f"(content too short: {len(page_content)} chars)"
         )
         return None
 
-    logger.info(
-        f"  Page {page_number} ({file_name}): Analyzing ({len(page_content)} chars)..."
-    )
+    logger.info(f"  Page {page_number} ({file_name}): Analyzing ({len(page_content)} chars)...")
 
     result = analyze_page_for_agency_citation(
         llm=llm,
@@ -141,9 +136,7 @@ def analyze_page_wrapper(
             "file_name": file_name,
             "file_id": file_id,
             "gdrive_id": gdrive_id,
-            "gdrive_url": f"https://drive.google.com/file/d/{gdrive_id}/view"
-            if gdrive_id
-            else "",
+            "gdrive_url": f"https://drive.google.com/file/d/{gdrive_id}/view" if gdrive_id else "",
             "page_number": page_number,
             "quote": result["quote"],
             "validator_reasoning": result["validator_analysis"],
@@ -151,12 +144,10 @@ def analyze_page_wrapper(
             "agency_name": agency_name,
             "agency_type": agency_type,
         }
-        logger.info(f"    ✓✓✓ CITATION FOUND ✓✓✓")
+        logger.info("    ✓✓✓ CITATION FOUND ✓✓✓")
         logger.info(f"    Agency: {agency_name} ({agency_type})")
         logger.info(f"    File: {file_name}, Page: {page_number}")
-        logger.info(
-            f"    Evidence Strength: {result.get('evidence_strength', 'N/A')}"
-        )
+        logger.info(f"    Evidence Strength: {result.get('evidence_strength', 'N/A')}")
         logger.info(f"    Quote preview: {result['quote'][:150]}...")
         return citation
     else:
@@ -167,27 +158,25 @@ def analyze_page_wrapper(
 
 
 def find_agency_citations(
-    llm: "LLM",
-    case_files: List[Dict[str, Any]],
+    llm: LLM,
+    case_files: list[dict[str, Any]],
     agency_name: str,
     agency_type: str,
-    extraction_context: Optional[str] = None,
+    extraction_context: str | None = None,
     max_citations: int = 3,
     max_workers: int = 10,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Search through case files to find 2-3 citations supporting the agency extraction.
 
     Uses parallel processing to analyze pages concurrently.
     """
-    logger.info(f"=" * 60)
-    logger.info(
-        f"CITATION SEARCH: Looking for up to {max_citations} citations"
-    )
+    logger.info("=" * 60)
+    logger.info(f"CITATION SEARCH: Looking for up to {max_citations} citations")
     logger.info(f"Agency: {agency_name} ({agency_type})")
     logger.info(f"Using parallel processing with {max_workers} workers")
-    logger.info(f"=" * 60)
+    logger.info("=" * 60)
 
-    citations_found: List[Dict[str, Any]] = []
+    citations_found: list[dict[str, Any]] = []
     total_pages_analyzed = 0
     total_pages_skipped = 0
 
@@ -225,7 +214,7 @@ def find_agency_citations(
             )
 
     logger.info(f"\nTotal pages queued for analysis: {len(page_tasks)}")
-    logger.info(f"Starting parallel processing...\n")
+    logger.info("Starting parallel processing...\n")
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_task = {
@@ -245,9 +234,7 @@ def find_agency_citations(
 
         for future in as_completed(future_to_task):
             if len(citations_found) >= max_citations:
-                logger.info(
-                    f"\n✓ Found {max_citations} citations. Cancelling remaining tasks."
-                )
+                logger.info(f"\n✓ Found {max_citations} citations. Cancelling remaining tasks.")
                 for f in future_to_task:
                     f.cancel()
                 break
@@ -266,26 +253,22 @@ def find_agency_citations(
 
             except Exception as e:
                 task = future_to_task[future]
-                logger.error(
-                    f"Error processing page from {task['file_name']}: {e}"
-                )
+                logger.error(f"Error processing page from {task['file_name']}: {e}")
                 total_pages_analyzed += 1
 
-    logger.info(f"\n" + "=" * 60)
-    logger.info(f"CITATION SEARCH COMPLETE")
-    logger.info(f"=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("CITATION SEARCH COMPLETE")
+    logger.info("=" * 60)
     logger.info(f"Agency: {agency_name} ({agency_type})")
-    logger.info(
-        f"Citations found: {len(citations_found)}/{max_citations}"
-    )
+    logger.info(f"Citations found: {len(citations_found)}/{max_citations}")
     logger.info(f"Total pages analyzed: {total_pages_analyzed}")
     logger.info(f"Total pages skipped: {total_pages_skipped}")
-    logger.info(f"=" * 60)
+    logger.info("=" * 60)
 
     return citations_found
 
 
-def format_citations_for_output(citations: List[Dict[str, Any]]) -> str:
+def format_citations_for_output(citations: list[dict[str, Any]]) -> str:
     """Format citations list into a readable string for CSV output."""
     if not citations:
         return "No citations found"
@@ -294,7 +277,8 @@ def format_citations_for_output(citations: List[Dict[str, Any]]) -> str:
     for i, citation in enumerate(citations, 1):
         formatted.append(
             f"Citation {i}:\n"
-            f"  Agency: {citation.get('agency_name', 'N/A')} ({citation.get('agency_type', 'N/A')})\n"
+            f"  Agency: {citation.get('agency_name', 'N/A')} "
+            f"({citation.get('agency_type', 'N/A')})\n"
             f"  File: {citation['file_name']}\n"
             f"  File ID: {citation.get('file_id', 'N/A')}\n"
             f"  Page: {citation['page_number']}\n"

@@ -5,10 +5,9 @@ from __future__ import annotations
 import concurrent.futures
 import json
 import logging
-import re
 from importlib import resources
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 from jinja2 import Template
@@ -42,16 +41,15 @@ def _load_prompt(name: str) -> str:
 
 
 def extract_agencies(
-    llm: "LLM",
-    first_look_summaries: Dict[str, str],
+    llm: LLM,
+    first_look_summaries: dict[str, str],
     case_name: str | None = None,
 ) -> AgencyExtraction:
     """Extract investigating and responding agencies from document summaries."""
     first_look_summaries = clean_summaries(first_look_summaries)
 
     summaries_list = [
-        f"# {slug}\n\n{summary}"
-        for slug, summary in sorted(first_look_summaries.items())
+        f"# {slug}\n\n{summary}" for slug, summary in sorted(first_look_summaries.items())
     ]
 
     filtered_summaries = filter_important_summaries(llm, summaries_list)
@@ -60,20 +58,18 @@ def extract_agencies(
     prompt_template = Template(_load_prompt("extract_agencies"))
     initial_prompt = prompt_template.render(source_text=concatenated_summary)
 
-    agency_extraction = llm.complete(
-        initial_prompt, response_format=AgencyExtraction
-    )
+    agency_extraction = llm.complete(initial_prompt, response_format=AgencyExtraction)
     return agency_extraction
 
 
 def verify_agency(
-    llm: "LLM",
+    llm: LLM,
     agency: Agency,
     agency_type: str,
     source_text: str,
     all_extraction_context: str,
     case_name: str | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Verify a single agency extraction against source documents."""
     verification_template = Template(_load_prompt("verify_agency"))
 
@@ -95,7 +91,7 @@ def verify_agency(
 # ============================================================================
 
 
-def format_case_summaries_for_filtering(case_files: List[Dict]) -> Dict[str, str]:
+def format_case_summaries_for_filtering(case_files: list[dict]) -> dict[str, str]:
     """Convert case_files list into {slug: summary} format."""
     summaries_dict = {}
     for file_data in case_files:
@@ -109,10 +105,10 @@ def format_case_summaries_for_filtering(case_files: List[Dict]) -> Dict[str, str
 
 
 def process_case(
-    llm: "LLM",
-    case_data: Dict[str, Any],
+    llm: LLM,
+    case_data: dict[str, Any],
     case_name: str,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Process a single case to extract agencies and find citations.
 
     `case_data` is the full case bundle dict (an `agency_case_file_bundle-*.json`
@@ -185,10 +181,7 @@ def process_case(
     logger.info(f"Extracting agencies for case {case_name}")
     extraction_result = extract_agencies(llm, summaries_dict, case_name=case_name)
 
-    if (
-        not extraction_result.responding_agencies
-        and not extraction_result.investigating_agencies
-    ):
+    if not extraction_result.responding_agencies and not extraction_result.investigating_agencies:
         logger.warning(f"No agencies extracted for case {case_name}")
         return [
             {
@@ -216,17 +209,15 @@ def process_case(
 
     extraction_context = (
         f"RESPONDING AGENCIES: {[a.agency_name for a in extraction_result.responding_agencies]}\n"
-        f"INVESTIGATING AGENCIES: {[a.agency_name for a in extraction_result.investigating_agencies]}"
+        f"INVESTIGATING AGENCIES: "
+        f"{[a.agency_name for a in extraction_result.investigating_agencies]}"
     )
 
-    summaries_list = [
-        f"# {slug}\n\n{summary}"
-        for slug, summary in sorted(summaries_dict.items())
-    ]
+    summaries_list = [f"# {slug}\n\n{summary}" for slug, summary in sorted(summaries_dict.items())]
     filtered_summaries = filter_important_summaries(llm, summaries_list)
     source_text = "\n\n".join(filtered_summaries)
 
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
 
     # Process responding agencies
     for agency in extraction_result.responding_agencies:
@@ -340,14 +331,14 @@ def process_case(
 
         if verification["has_dual_role"]:
             agency_already_added = any(
-                r["agency_name"] == verification["verified_agency_name"]
-                and r["has_dual_role"]
+                r["agency_name"] == verification["verified_agency_name"] and r["has_dual_role"]
                 for r in results
             )
 
             if agency_already_added:
                 logger.info(
-                    f"Dual-role agency {verification['verified_agency_name']} already processed - skipping"
+                    f"Dual-role agency {verification['verified_agency_name']} "
+                    f"already processed - skipping"
                 )
                 continue
 
@@ -423,9 +414,7 @@ def process_case(
             )
 
     if not results:
-        logger.warning(
-            f"Case {case_name}: Agencies extracted but all excluded during verification"
-        )
+        logger.warning(f"Case {case_name}: Agencies extracted but all excluded during verification")
         return [
             {
                 "case_name": case_name,
@@ -456,13 +445,13 @@ def _row(
     case_name: str,
     provisional_case_name: str,
     case_url: str,
-    verification: Dict[str, Any],
+    verification: dict[str, Any],
     agency_type: str,
-    citations: List[Dict[str, Any]],
+    citations: list[dict[str, Any]],
     extraction_context: str,
     *,
     dual: bool,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "case_name": case_name,
         "provisional_case_name": provisional_case_name,
@@ -497,9 +486,9 @@ def _process_case_wrapper(args):
     )
 
     try:
-        logger.info(f"\n{'='*80}")
+        logger.info(f"\n{'=' * 80}")
         logger.info(f"Case {idx}/{total_cases}: {case_name}")
-        logger.info(f"{'='*80}")
+        logger.info(f"{'=' * 80}")
 
         results = process_case(llm, case_record, case_name)
 
@@ -521,7 +510,7 @@ def run(
     input: str | Path,
     output: str | Path,
     *,
-    llm: "LLM | None" = None,
+    llm: LLM | None = None,
     n_threads: int = 15,
     settings: Any = None,
     resume: bool = False,
@@ -562,33 +551,26 @@ def run(
         logger.error("No case records found in input!")
         df = pd.DataFrame()
         df.to_csv(output_path, index=False)
-        return RunResult(
-            n_cases=0, n_agencies_extracted=0, output_path=str(output_path)
-        )
+        return RunResult(n_cases=0, n_agencies_extracted=0, output_path=str(output_path))
 
     # Resume support
     processed_cases: set[str] = set()
     existing_results: list = []
     if resume and output_path.exists():
-        logger.info(
-            f"Resume mode enabled - loading existing results from {output_path}"
-        )
+        logger.info(f"Resume mode enabled - loading existing results from {output_path}")
         try:
             existing_df = pd.read_csv(output_path)
             if "case_name" in existing_df.columns:
                 processed_cases = set(existing_df["case_name"].unique())
                 existing_results = existing_df.to_dict("records")
-                logger.info(
-                    f"Found {len(processed_cases)} already processed cases"
-                )
+                logger.info(f"Found {len(processed_cases)} already processed cases")
         except Exception as e:
             logger.warning(f"Could not load existing CSV: {e} - starting fresh")
 
         case_records = [
             r
             for r in case_records
-            if (r.get("case_name") or r.get("provisional_case_name"))
-            not in processed_cases
+            if (r.get("case_name") or r.get("provisional_case_name")) not in processed_cases
         ]
         logger.info(f"Remaining cases to process: {len(case_records)}")
 
@@ -696,7 +678,7 @@ def run(
 
         logger.info(f"\n✓ Error log saved to {error_log_path}")
     else:
-        logger.info(f"\n✓ No errors encountered")
+        logger.info("\n✓ No errors encountered")
 
     df = pd.DataFrame(all_results)
     df.to_csv(output_path, index=False)
@@ -706,9 +688,7 @@ def run(
     logger.info("PIPELINE COMPLETE")
     logger.info("=" * 80)
     logger.info(f"Total cases attempted: {len(case_records)}")
-    logger.info(
-        f"Cases successfully processed: {len(case_records) - cases_with_errors}"
-    )
+    logger.info(f"Cases successfully processed: {len(case_records) - cases_with_errors}")
     logger.info(f"Cases with errors: {cases_with_errors}")
     logger.info(f"Cases with agencies: {cases_with_agencies}")
     logger.info(f"Cases without agencies: {cases_without_agencies}")

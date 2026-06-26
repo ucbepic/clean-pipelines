@@ -35,7 +35,7 @@ class FrequencyFilter:
         self,
         date_threshold: int = 300,
         name_threshold: int = 300,
-        case_id_threshold: int = None  # None = disabled (conservative)
+        case_id_threshold: int = None,  # None = disabled (conservative)
     ):
         """
         Initialize frequency filter with thresholds.
@@ -72,9 +72,13 @@ class FrequencyFilter:
         """
         print(f"\nBuilding frequency filter from {len(df)} documents...")
         if self.case_id_threshold is not None:
-            print(f"Thresholds: dates={self.date_threshold}, names={self.name_threshold}, case_ids={self.case_id_threshold}")
+            print(
+                f"Thresholds: dates={self.date_threshold}, names={self.name_threshold}, case_ids={self.case_id_threshold}"
+            )
         else:
-            print(f"Thresholds: dates={self.date_threshold}, names={self.name_threshold}, case_ids=disabled")
+            print(
+                f"Thresholds: dates={self.date_threshold}, names={self.name_threshold}, case_ids=disabled"
+            )
 
         # Count date frequencies
         date_counter = Counter()
@@ -99,7 +103,9 @@ class FrequencyFilter:
                 fp_ids = normalize_case_ids(parse_feature_list(row.get("extracted_case_ids_fp")))
                 fn_ids = normalize_case_ids(parse_feature_list(row.get("extracted_case_ids_fn")))
                 # Tier 2: LLM-extracted structured case IDs
-                llm_ids = normalize_case_ids(parse_structured_case_ids(row.get("extracted_case_ids_llm_structured")))
+                llm_ids = normalize_case_ids(
+                    parse_structured_case_ids(row.get("extracted_case_ids_llm_structured"))
+                )
                 case_id_counter.update(fp_ids | fn_ids | llm_ids)
 
         # Store frequencies
@@ -109,31 +115,32 @@ class FrequencyFilter:
 
         # Identify features to block
         self.blocked_dates = {
-            date for date, count in date_counter.items()
-            if count >= self.date_threshold
+            date for date, count in date_counter.items() if count >= self.date_threshold
         }
         self.blocked_names = {
-            name for name, count in name_counter.items()
-            if count >= self.name_threshold
+            name for name, count in name_counter.items() if count >= self.name_threshold
         }
         if self.case_id_threshold is not None:
             self.blocked_case_ids = {
-                cid for cid, count in case_id_counter.items()
-                if count >= self.case_id_threshold
+                cid for cid, count in case_id_counter.items() if count >= self.case_id_threshold
             }
         else:
             self.blocked_case_ids = set()  # Empty set when disabled
 
         # Report
         print("\nFrequency filter built:")
-        print(f"  Blocking {len(self.blocked_dates)} high-frequency dates (>={self.date_threshold} docs)")
+        print(
+            f"  Blocking {len(self.blocked_dates)} high-frequency dates (>={self.date_threshold} docs)"
+        )
         if self.blocked_dates:
             for date in sorted(self.blocked_dates):
                 count = self.date_frequencies[date]
                 pct = count / len(df) * 100
                 print(f"    - {date}: {count} docs ({pct:.1f}%)")
 
-        print(f"  Blocking {len(self.blocked_names)} high-frequency names (>={self.name_threshold} docs)")
+        print(
+            f"  Blocking {len(self.blocked_names)} high-frequency names (>={self.name_threshold} docs)"
+        )
         if self.blocked_names:
             for name in sorted(self.blocked_names):
                 count = self.name_frequencies[name]
@@ -141,7 +148,9 @@ class FrequencyFilter:
                 print(f"    - '{name}': {count} docs ({pct:.1f}%)")
 
         if self.case_id_threshold is not None:
-            print(f"  Blocking {len(self.blocked_case_ids)} high-frequency case IDs (>={self.case_id_threshold} docs)")
+            print(
+                f"  Blocking {len(self.blocked_case_ids)} high-frequency case IDs (>={self.case_id_threshold} docs)"
+            )
             if self.blocked_case_ids:
                 for cid in sorted(self.blocked_case_ids):
                     count = self.case_id_frequencies[cid]

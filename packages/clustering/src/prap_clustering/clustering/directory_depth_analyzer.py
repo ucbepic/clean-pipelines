@@ -33,7 +33,9 @@ Determine the minimum shared directory depth (min_depth) for safely merging sing
 Be conservative - only use values > 0 if you clearly see generic directory names like "Data", "Documents", "Files", "Export", "Batch"."""
 
 
-def analyze_directory_depth(singleton_filepaths: list[str], sample_size: int = 20, output_dir: str = "../../data/output") -> int:
+def analyze_directory_depth(
+    singleton_filepaths: list[str], sample_size: int = 20, output_dir: str = "../../data/output"
+) -> int:
     """
     Determine minimum directory depth for merging singletons using LLM analysis.
 
@@ -53,10 +55,11 @@ def analyze_directory_depth(singleton_filepaths: list[str], sample_size: int = 2
 
     # Save sampled paths to text file for manual review
     from pathlib import Path
+
     output_path = Path(output_dir) / "llm_directory_depth_analysis_sample.txt"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         f.write(f"Sampled {sample_count} paths from {len(singleton_filepaths)} singletons\n")
         f.write("=" * 80 + "\n\n")
         for path in sampled_paths:
@@ -74,7 +77,7 @@ def analyze_directory_depth(singleton_filepaths: list[str], sample_size: int = 2
         min_depth = max(0, min(3, min_depth))
 
         # Append result to the same file
-        with open(output_path, 'a') as f:
+        with open(output_path, "a") as f:
             f.write("\n" + "=" * 80 + "\n")
             f.write(f"LLM RESULT: min_depth = {min_depth}\n")
 
@@ -84,7 +87,7 @@ def analyze_directory_depth(singleton_filepaths: list[str], sample_size: int = 2
         logger.error(f"Error in LLM analysis: {e}, defaulting to 0")
 
         # Log error to file
-        with open(output_path, 'a') as f:
+        with open(output_path, "a") as f:
             f.write("\n" + "=" * 80 + "\n")
             f.write(f"ERROR: {e}\n")
             f.write("Defaulting to min_depth = 0\n")

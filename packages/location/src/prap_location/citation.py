@@ -16,12 +16,13 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
 from string import Template
-from typing import Any, Iterable
+from typing import Any
 
 import pandas as pd
 from prap_core.llm import LLM
@@ -32,9 +33,7 @@ logger = logging.getLogger("prap.location.citation")
 
 def _load_prompt(name: str) -> str:
     return (
-        resources.files("prap_location.prompts")
-        .joinpath(f"{name}.txt")
-        .read_text(encoding="utf-8")
+        resources.files("prap_location.prompts").joinpath(f"{name}.txt").read_text(encoding="utf-8")
     )
 
 
@@ -155,9 +154,7 @@ def _parse_ocr_pages(ocr_text_json: Any) -> list[dict[str, Any]]:
     return out
 
 
-def _collect_page_tasks(
-    filtered: pd.DataFrame, documents: pd.DataFrame
-) -> list[PageTask]:
+def _collect_page_tasks(filtered: pd.DataFrame, documents: pd.DataFrame) -> list[PageTask]:
     tasks: list[PageTask] = []
     docs_by_case = dict(tuple(documents.groupby("provisional_case_name")))
     for _, row in filtered.iterrows():
@@ -290,7 +287,9 @@ def run_targeted_sample(
     if "extracted_location" not in run_df.columns:
         raise ValueError(f"run jsonl missing 'extracted_location' column: {run_jsonl}")
 
-    filtered = run_df[run_df["extracted_location"].apply(lambda v: _matches_filter(v, patterns))].copy()
+    filtered = run_df[
+        run_df["extracted_location"].apply(lambda v: _matches_filter(v, patterns))
+    ].copy()
     logger.info(f"Filtered {len(filtered)} / {len(run_df)} cases match the targeted filter")
     if filtered.empty:
         filtered.to_csv(output_csv, index=False)
@@ -324,7 +323,7 @@ def run_targeted_sample(
     for _, row in filtered.iterrows():
         case_name = row["provisional_case_name"]
         case_docs_list: list[dict[str, Any]] = []
-        for url, doc_result in grouped.get(case_name, {}).items():
+        for _url, doc_result in grouped.get(case_name, {}).items():
             doc_result = dict(doc_result)
             doc_result["summary"] = _doc_summary(doc_result)
             case_docs_list.append(doc_result)
@@ -342,7 +341,9 @@ def run_targeted_sample(
 
         case_docs_rows = docs_by_case.get(case_name)
         if case_docs_rows is not None:
-            gdrive_urls_col.append("; ".join(case_docs_rows.get("gdrive_url", pd.Series()).astype(str).tolist()))
+            gdrive_urls_col.append(
+                "; ".join(case_docs_rows.get("gdrive_url", pd.Series()).astype(str).tolist())
+            )
             filenames_col.append(
                 "; ".join(case_docs_rows.get("filename", pd.Series()).astype(str).tolist())
                 if "filename" in case_docs_rows.columns

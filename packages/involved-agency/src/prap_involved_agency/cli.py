@@ -119,18 +119,14 @@ def eval(
     extractions_df = filter_extractions(extractions_df, set(gt_df["case_name"].unique()))
 
     llm = LLM()
-    matched = match_extractions_to_groundtruth(
-        llm, gt_df, extractions_df, max_workers=n_threads
-    )
+    matched = match_extractions_to_groundtruth(llm, gt_df, extractions_df, max_workers=n_threads)
 
     detail_path = out_dir / f"agency_eval_results__{model_name}.csv"
     matched.to_csv(detail_path, index=False)
     typer.echo(f"Wrote detailed results to {detail_path}")
 
     # Per-case mismatch CSV (FP + FN rows)
-    mismatches = matched[
-        matched["result_type"].isin(["false_positive", "false_negative"])
-    ]
+    mismatches = matched[matched["result_type"].isin(["false_positive", "false_negative"])]
     mismatch_path = out_dir / f"agency_eval_mismatches__{model_name}.csv"
     mismatches.to_csv(mismatch_path, index=False)
     typer.echo(f"Wrote mismatches to {mismatch_path}")

@@ -13,8 +13,8 @@ from prap_page_stream_segmentation.evaluation import (
 )
 from prap_page_stream_segmentation.pipeline import (
     _build_hybrid_history,
-    _structured_doc_info,
     _load_prompt_template,
+    _structured_doc_info,
     build_toc,
     run,
 )
@@ -72,12 +72,20 @@ def test_predictions_from_tocs():
                 date="2024-01-01",
                 page_classifications=[
                     PageClassification(
-                        sha1="abc", page_number=1, document_type="MEMO",
-                        continuation=False, meta="", reasoning="",
+                        sha1="abc",
+                        page_number=1,
+                        document_type="MEMO",
+                        continuation=False,
+                        meta="",
+                        reasoning="",
                     ),
                     PageClassification(
-                        sha1="abc", page_number=2, document_type="MEMO",
-                        continuation=True, meta="", reasoning="",
+                        sha1="abc",
+                        page_number=2,
+                        document_type="MEMO",
+                        continuation=True,
+                        meta="",
+                        reasoning="",
                     ),
                 ],
             ),
@@ -88,8 +96,12 @@ def test_predictions_from_tocs():
                 date="2024-01-02",
                 page_classifications=[
                     PageClassification(
-                        sha1="abc", page_number=3, document_type="REPORT",
-                        continuation=False, meta="", reasoning="",
+                        sha1="abc",
+                        page_number=3,
+                        document_type="REPORT",
+                        continuation=False,
+                        meta="",
+                        reasoning="",
                     ),
                 ],
             ),

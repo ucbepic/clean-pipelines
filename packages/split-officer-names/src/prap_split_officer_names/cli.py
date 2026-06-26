@@ -65,11 +65,7 @@ def prepare(
         )
 
     case_col = (
-        "case_id"
-        if "case_id" in df.columns
-        else "case_name"
-        if "case_name" in df.columns
-        else None
+        "case_id" if "case_id" in df.columns else "case_name" if "case_name" in df.columns else None
     )
 
     records = []
