@@ -1,4 +1,5 @@
-"""PRAP pipeline: extract involved / investigating / responding agencies from police case bundles."""
+"""PRAP pipeline: extract involved / investigating / responding agencies from police case
+bundles."""
 
 from .pipeline import run
 from .schemas import (

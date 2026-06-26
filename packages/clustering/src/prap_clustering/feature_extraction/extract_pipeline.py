@@ -31,7 +31,7 @@ def extract_feature(summary: str, prompts: dict[str, str]) -> str:
     logger.debug(f"Summary length: {len(summary)} chars")
 
     # Step 1: Initial extraction
-    template = Template(prompts['extraction']['extract'])
+    template = Template(prompts["extraction"]["extract"])
     prompt = template.render(source_text=summary)
 
     logger.info("Running initial extraction")
@@ -39,10 +39,10 @@ def extract_feature(summary: str, prompts: dict[str, str]) -> str:
     logger.debug(f"Initial extraction: {initial_extraction[:200]}...")
 
     # Step 2: Verification
-    template = Template(prompts['extraction']['verification'])
+    template = Template(prompts["extraction"]["verification"])
     prompt = template.render(
         initial_dates=initial_extraction,  # Generic name for now, works for all features
-        source_text=summary
+        source_text=summary,
     )
 
     logger.info("Running extraction verification")
@@ -67,13 +67,13 @@ def convert_to_standard_format(extraction_result: str, prompts: dict[str, str]) 
         Type depends on feature (dates: list of strings, names: list, etc.)
     """
     # Some features may not need format conversion
-    if prompts['extraction'].get('format_conversion') is None:
+    if prompts["extraction"].get("format_conversion") is None:
         logger.info("No format conversion template provided, returning raw extraction")
         return extraction_result
 
     logger.info("Converting extraction to standard format")
 
-    template = Template(prompts['extraction']['format_conversion'])
+    template = Template(prompts["extraction"]["format_conversion"])
     prompt = template.render(source_text=extraction_result)
 
     result = get_llm().complete(prompt).text.strip()
@@ -113,9 +113,9 @@ def extract_and_convert(summary: str, prompts: dict[str, str]) -> Any | None:
         >>> dates = extract_and_convert(summary, DATE_PROMPTS)
         >>> # Returns: ['2024-01-26', '2024-01-28'] or None
     """
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("EXTRACTION PIPELINE")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # Step 1: Extract feature
     extraction_result = extract_feature(summary, prompts)
@@ -127,10 +127,10 @@ def extract_and_convert(summary: str, prompts: dict[str, str]) -> Any | None:
     # Step 2: Convert to standard format (if template provided)
     formatted_result = convert_to_standard_format(extraction_result, prompts)
 
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("EXTRACTION COMPLETE")
     logger.info(f"Result: {formatted_result}")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     return formatted_result
 

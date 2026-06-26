@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 from azure.storage.blob import BlobServiceClient
 from prap_core.config import Settings
@@ -65,7 +64,7 @@ class PdfDownloader:
             logger.error(f"Failed to download {sha1}: {e}")
             return False
 
-    def download_to_temp(self, sha1: str, temp_dir: str) -> Optional[str]:
+    def download_to_temp(self, sha1: str, temp_dir: str) -> str | None:
         """
         Download a PDF to a temporary directory.
 

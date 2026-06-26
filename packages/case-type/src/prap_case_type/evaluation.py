@@ -11,12 +11,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from dataclasses import asdict
 from pathlib import Path
 
 import pandas as pd
-
 from prap_core.eval import BinaryPRF, binary_prf
 
 logger = logging.getLogger("prap.case_type.evaluation")
@@ -80,9 +78,7 @@ def score(merged: pd.DataFrame) -> dict[str, BinaryPRF]:
     return per_field
 
 
-def write_metrics(
-    out_dir: str | Path, model_name: str, metrics: dict[str, BinaryPRF]
-) -> None:
+def write_metrics(out_dir: str | Path, model_name: str, metrics: dict[str, BinaryPRF]) -> None:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 

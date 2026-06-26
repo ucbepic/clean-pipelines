@@ -2,12 +2,11 @@
 
 import logging
 import re
-from typing import Dict, List
 
 logger = logging.getLogger("prap.redactions.dob")
 
 
-def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
+def classify_pages_with_dob(ocr_text_pages: list[dict]) -> list[int]:
     """
     Identify pages containing dates of birth based on common DOB identifiers.
 
@@ -32,22 +31,18 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
         r"\bbirthdate\s*:?",
         r"\bd\.?\s*o\.?\s*b\.?\s*:?",  # DOB, D.O.B., D O B
         r"\bdob\b\s*:?",  # DOB with word boundary to prevent matching "DOB1", "DOBSON", etc.
-
         # Form-style labels
         r"\bdate\s+of\s+birth\s*\(?.*?\)?\s*:?",  # "Date of Birth (MM/DD/YYYY):"
         r"\bbirth\s*date\s*\(?.*?\)?\s*:?",
-
         # Narrative variations
         r"\bborn\s+on\s*:?",
         r"\bborn\b\s*:?",
         r"\bdate\s+born\s*:?",
-
         # Multi-word with optional punctuation
         r"\bpatient\s+(?:date\s+of\s+)?birth\s*:?",
         r"\bsubject\s+(?:date\s+of\s+)?birth\s*:?",
         r"\bvictim\s+(?:date\s+of\s+)?birth\s*:?",
         r"\bwitness\s+(?:date\s+of\s+)?birth\s*:?",
-
         # Abbreviated forms common in forms
         r"\bdt\.?\s+of\s+birth\s*:?",
         r"\bbirth\s+dt\.?\s*:?",
@@ -55,7 +50,9 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
 
     # Date pattern components
     # Month names (abbreviated and full)
-    months_full = r"(?:january|february|march|april|may|june|july|august|september|october|november|december)"
+    months_full = (
+        r"(?:january|february|march|april|may|june|july|august|september|october|november|december)"
+    )
     months_abbr = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)"
     months_any = f"(?:{months_full}|{months_abbr})"
 
@@ -64,7 +61,6 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
 
     # Year patterns (1900-2099 to avoid false positives)
     year_full = r"(?:19|20)\d{2}"
-    year_short = r"'\d{2}"  # '85, '99, etc.
 
     # Common separators
     sep = r"[\s\-/\.,]+"
@@ -75,29 +71,22 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
         # Numeric formats with 4-digit year
         rf"\d{{1,2}}{sep}\d{{1,2}}{sep}{year_full}",  # MM/DD/YYYY, M-D-YYYY, etc.
         rf"{year_full}{sep}\d{{1,2}}{sep}\d{{1,2}}",  # YYYY-MM-DD (ISO format)
-
         # Numeric formats with 2-digit year
         rf"\d{{1,2}}{sep}\d{{1,2}}{sep}\d{{2}}",  # MM/DD/YY, M-D-YY, etc.
-
         # Month name formats (full and abbreviated)
         rf"{months_any}{sep}{day}{opt_sep},{opt_sep}{year_full}",  # January 15, 1985
         rf"{day}{sep}{months_any}{opt_sep},{opt_sep}{year_full}",  # 15 January, 1985
         rf"{months_any}{sep}{day}{sep}{year_full}",  # January 15 1985
         rf"{day}{sep}{months_any}{sep}{year_full}",  # 15 January 1985
-
         # Month/Year only (less common but sometimes used)
         rf"{months_any}{opt_sep},{opt_sep}{year_full}",  # January, 1985
         rf"{months_any}{sep}{year_full}",  # January 1985
     ]
 
     # Compile patterns for efficiency
-    compiled_label_patterns = [
-        re.compile(label, re.IGNORECASE) for label in dob_labels
-    ]
+    compiled_label_patterns = [re.compile(label, re.IGNORECASE) for label in dob_labels]
 
-    compiled_date_patterns = [
-        re.compile(date, re.IGNORECASE) for date in date_patterns
-    ]
+    compiled_date_patterns = [re.compile(date, re.IGNORECASE) for date in date_patterns]
 
     # Process each page
     for page in ocr_text_pages:
@@ -116,7 +105,7 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
                 # This is where we expect to find the actual date
                 # DOB values typically appear immediately after the label
                 start_pos = match.end()
-                context_window = page_text[start_pos:start_pos + 25]
+                context_window = page_text[start_pos : start_pos + 25]
 
                 # Skip if the context window is too sparse (likely incomplete/truncated label)
                 # Require at least some non-whitespace content after the label
@@ -136,10 +125,11 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
                         # Allow up to 5 characters of whitespace/punctuation before the date
                         # This handles formats like "DOB: 01/15/1985" or "DOB\n01/15/1985"
                         if date_start_pos <= 5:
-                            # Additional check: the text BEFORE the date shouldn't have multiple newlines
+                            # Additional check: the text BEFORE the date shouldn't have multiple
+                            # newlines
                             # This ensures we're matching a date on the same/next line, not far away
                             text_before_date = context_window[:date_start_pos]
-                            if text_before_date.count('\n') > 1:
+                            if text_before_date.count("\n") > 1:
                                 continue  # Date is too far from label
 
                             pages_with_dob.add(page_number)
@@ -170,7 +160,7 @@ def classify_pages_with_dob(ocr_text_pages: List[Dict]) -> List[int]:
     return result
 
 
-def classify_file_for_dob(ocr_text_pages: List[Dict], sha1: str) -> Dict:
+def classify_file_for_dob(ocr_text_pages: list[dict], sha1: str) -> dict:
     """
     Classify a file for DOB presence and return structured results.
 
@@ -201,8 +191,7 @@ def classify_file_for_dob(ocr_text_pages: List[Dict], sha1: str) -> Dict:
         result["success"] = True
 
         logger.info(
-            f"Successfully classified {sha1}: "
-            f"{len(pages_with_dob)} pages with DOB references"
+            f"Successfully classified {sha1}: {len(pages_with_dob)} pages with DOB references"
         )
 
     except Exception as e:

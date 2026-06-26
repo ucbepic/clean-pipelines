@@ -75,9 +75,7 @@ def _build_hybrid_history(
             if seg["start"] == seg["end"]:
                 collapsed.append(f"Page {seg['start']}: {seg['doc_type']}")
             else:
-                collapsed.append(
-                    f"Pages {seg['start']}-{seg['end']}: {seg['doc_type']}"
-                )
+                collapsed.append(f"Pages {seg['start']}-{seg['end']}: {seg['doc_type']}")
         parts.append("Previous documents in this file:\n" + "\n".join(collapsed))
     recent_pages = page_history[-recent_window:]
     recent_start = recent_pages[0][0]
@@ -130,7 +128,11 @@ def _classify_page(
 
     lines = response.strip().splitlines()
     reasoning_start = next(
-        (i for i, line in enumerate(lines) if re.match(r"^REASONING.{0,3}", line.strip(), re.IGNORECASE)),
+        (
+            i
+            for i, line in enumerate(lines)
+            if re.match(r"^REASONING.{0,3}", line.strip(), re.IGNORECASE)
+        ),
         len(lines),
     )
     meta = "\n".join(lines[:reasoning_start]).strip()
@@ -213,9 +215,7 @@ def _pages_to_toc_entry(
 ) -> TOCEntry:
     sha1 = pages[0].sha1
     start_page = pages[0].page_number
-    prompt = toc_template.render(
-        sha1=sha1, start_page=start_page, page_classifications=pages
-    )
+    prompt = toc_template.render(sha1=sha1, start_page=start_page, page_classifications=pages)
     response = llm.complete(prompt, system=TOC_SYSTEM_MSG).text
     clean = response.replace("```json", "").replace("```", "").strip()
     try:

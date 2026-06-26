@@ -9,7 +9,6 @@ Following TDD principles:
 """
 
 
-
 # Test parse_feature_value() - Parses CSV string representations
 class TestParseFeatureValue:
     """Tests for parsing feature values from CSV strings."""
@@ -18,7 +17,7 @@ class TestParseFeatureValue:
         """Should return None for empty list string '[]'"""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
-        result = parse_feature_value('[]')
+        result = parse_feature_value("[]")
         assert result is None
 
     def test_parse_none_value(self):
@@ -29,38 +28,38 @@ class TestParseFeatureValue:
         assert result is None
 
     def test_parse_string_list_with_single_value(self):
-        """Should parse string list with single value: \"['2023-01-15']\" """
+        """Should parse string list with single value: \"['2023-01-15']\""""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
         result = parse_feature_value("['2023-01-15']")
-        assert result == ['2023-01-15']
+        assert result == ["2023-01-15"]
 
     def test_parse_string_list_with_multiple_values(self):
         """Should parse string list with multiple values"""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
         result = parse_feature_value("['IAD-2023-01', 'IAD-2023-02']")
-        assert result == ['IAD-2023-01', 'IAD-2023-02']
+        assert result == ["IAD-2023-01", "IAD-2023-02"]
 
     def test_parse_comma_separated_string(self):
         """Should parse comma-separated string: 'val1, val2'"""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
-        result = parse_feature_value('val1, val2')
-        assert result == ['val1', 'val2']
+        result = parse_feature_value("val1, val2")
+        assert result == ["val1", "val2"]
 
     def test_parse_empty_string(self):
         """Should return None for empty string"""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
-        result = parse_feature_value('')
+        result = parse_feature_value("")
         assert result is None
 
     def test_parse_string_none(self):
         """Should return None for string 'None'"""
         from prap_clustering.metadata_pipeline.clustering.cluster import parse_feature_value
 
-        result = parse_feature_value('None')
+        result = parse_feature_value("None")
         assert result is None
 
 
@@ -75,23 +74,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': "['IAD-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': "['IAD-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_no_shared_case_id_returns_0_0(self):
@@ -101,23 +100,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': "['IAD-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': "['IAD-2023-99']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-99']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 0.0
 
     def test_same_date_plus_2_names_returns_1_0(self):
@@ -127,23 +126,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-15']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-15']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-20']",  # Within 30 days
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-20']",  # Within 30 days
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_same_date_only_1_name_returns_0_0(self):
@@ -153,23 +152,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-15']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-15']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-20']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-20']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 0.0
 
     def test_2_shared_names_no_date_returns_1_0(self):
@@ -179,23 +178,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_no_overlap_returns_0_0(self):
@@ -205,23 +204,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-15']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-15']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-06-20']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-06-20']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 0.0
 
     def test_combined_mode_uses_both_sources(self):
@@ -231,23 +230,23 @@ class TestCalculateEdgeWeight:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': "['IAD-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': "['IAD-2023-01']",  # In filename instead
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": "['IAD-2023-01']",  # In filename instead
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'combined')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "combined")
         assert weight == 1.0
 
 
@@ -262,23 +261,23 @@ class TestNormalization:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': "['IAD_552']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD_552']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': "['IAD-552']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-552']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_case_id_with_different_case_should_match(self):
@@ -288,23 +287,23 @@ class TestNormalization:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': "['iad-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['iad-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': "['IAD-2023-01']",
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': None,
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": "['IAD-2023-01']",
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": None,
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_names_with_different_case_should_match(self):
@@ -314,23 +313,23 @@ class TestNormalization:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['john smith', 'jane doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['john smith', 'jane doe']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_names_with_titles_should_match_without_titles(self):
@@ -340,23 +339,23 @@ class TestNormalization:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['Officer John Smith', 'Det. Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['Officer John Smith', 'Det. Jane Doe']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': None,
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": None,
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0
 
     def test_dates_different_formats_same_day_should_match(self):
@@ -366,21 +365,21 @@ class TestNormalization:
         )
 
         doc1 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['2023-01-15']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['2023-01-15']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
         doc2 = {
-            'extracted_case_ids_fp': None,
-            'extracted_case_ids_fn': None,
-            'extracted_dates_fp': "['01/15/2023']",
-            'extracted_dates_fn': None,
-            'extracted_names_fp': "['John Smith', 'Jane Doe']",
-            'extracted_names_fn': None,
+            "extracted_case_ids_fp": None,
+            "extracted_case_ids_fn": None,
+            "extracted_dates_fp": "['01/15/2023']",
+            "extracted_dates_fn": None,
+            "extracted_names_fp": "['John Smith', 'Jane Doe']",
+            "extracted_names_fn": None,
         }
 
-        weight = calculate_edge_weight_metadata(doc1, doc2, 'filepath_only')
+        weight = calculate_edge_weight_metadata(doc1, doc2, "filepath_only")
         assert weight == 1.0

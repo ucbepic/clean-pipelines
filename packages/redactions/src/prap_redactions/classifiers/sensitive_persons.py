@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib import resources
-from typing import List
 
 import pandas as pd
 from fuzzywuzzy import fuzz
@@ -53,21 +52,15 @@ def remove_irrelevant_persons(
 def format_output(llm: LLM, verification_response: VerificationResponse) -> FormattedOutput:
     """Format the verified names into the required output structure with enhanced categories."""
     verified_names_json = verification_response.model_dump_json(indent=2)
-    prompt = _prompt_dir().render(
-        "format_output", verified_names=verified_names_json
-    )
+    prompt = _prompt_dir().render("format_output", verified_names=verified_names_json)
     return llm.complete(prompt, response_format=FormattedOutput)
 
 
-def find_addresses(
-    llm: LLM, persons: List[FormattedPerson], page_text: str
-) -> AddressResponse:
+def find_addresses(llm: LLM, persons: list[FormattedPerson], page_text: str) -> AddressResponse:
     """Use LLM to determine if addresses for multiple persons are in the text"""
     names_list = [person.name for person in persons]
     names_formatted = ", ".join(names_list)
-    prompt = _prompt_dir().render(
-        "find_addresses", names=names_formatted, page_text=page_text
-    )
+    prompt = _prompt_dir().render("find_addresses", names=names_formatted, page_text=page_text)
     return llm.complete(prompt, response_format=AddressResponse)
 
 
@@ -157,9 +150,7 @@ def deduplicate_by_fuzzy_matching(results_df, threshold=85):
 
         # Choose the most frequent name form as canonical
         name_counts = cluster_df["name"].value_counts()
-        canonical_name = (
-            name_counts.index[0] if not name_counts.empty else representative_name
-        )
+        canonical_name = name_counts.index[0] if not name_counts.empty else representative_name
 
         # Initialize the combined record with the canonical name
         combined_record = {"name": canonical_name, "original_count": len(indices)}
@@ -193,16 +184,14 @@ def deduplicate_by_fuzzy_matching(results_df, threshold=85):
                 # Remove duplicates
                 unique_values = list(set(values))
                 # Join with semicolons
-                combined_record[field] = (
-                    "; ".join(unique_values) if unique_values else ""
-                )
+                combined_record[field] = "; ".join(unique_values) if unique_values else ""
 
         # Process fields that should use the best value
         for field, value_map in best_value_fields.items():
             if field in cluster_df.columns:
                 # Map values to their numeric equivalents
                 mapped_values = cluster_df[field].map(
-                    lambda x: value_map.get(x, 0) if pd.notna(x) else 0
+                    lambda x, value_map=value_map: value_map.get(x, 0) if pd.notna(x) else 0
                 )
                 # Find the best value
                 if not mapped_values.empty:
@@ -214,12 +203,18 @@ def deduplicate_by_fuzzy_matching(results_df, threshold=85):
                     combined_record[field] = (
                         False
                         if field == "address_found"
-                        else "low" if field == "confidence" else None
+                        else "low"
+                        if field == "confidence"
+                        else None
                     )
 
         # Create a source identifiers list for traceability
         sources = cluster_df.apply(
-            lambda x: f"{x.get('provisional_case_name', 'unknown')}:{x.get('gdrive_id', 'unknown')}:{x.get('page_number', 'unknown')}",
+            lambda x: (
+                f"{x.get('provisional_case_name', 'unknown')}:"
+                f"{x.get('gdrive_id', 'unknown')}:"
+                f"{x.get('page_number', 'unknown')}"
+            ),
             axis=1,
         ).tolist()
         combined_record["sources"] = list(set(sources))
@@ -278,11 +273,11 @@ def _process_single_page(llm: LLM, page):
         identified_names = identify_names(llm, page_text)
 
         # Step 2: Remove irrelevant persons
-        irrelevant_removed_names = remove_irrelevant_persons(
-            llm, page_text, identified_names
-        )
+        irrelevant_removed_names = remove_irrelevant_persons(llm, page_text, identified_names)
 
-        logger.debug(f"Page {page_number}: Remove irrelevant persons output: {irrelevant_removed_names}")
+        logger.debug(
+            f"Page {page_number}: Remove irrelevant persons output: {irrelevant_removed_names}"
+        )
 
         # Step 3: Format the output
         formatted_output = format_output(llm, irrelevant_removed_names)
@@ -295,9 +290,7 @@ def _process_single_page(llm: LLM, page):
             # If there are persons found, look for addresses
             if persons:
                 addresses_response = find_addresses(llm, persons, page_text)
-                addresses_by_name = {
-                    entry.name: entry for entry in addresses_response.addresses
-                }
+                addresses_by_name = {entry.name: entry for entry in addresses_response.addresses}
             else:
                 addresses_by_name = {}
 
@@ -352,9 +345,18 @@ def extract_names(llm: LLM, ocr_text_pages, max_workers=10):
     if not valid_pages:
         logger.info("No valid pages to process")
         columns = [
-            "name", "person_type", "page_number", "document_name", "gdrive_id",
-            "sha1", "provisional_case_name", "reasoning", "confidence",
-            "address_found", "address", "address_context",
+            "name",
+            "person_type",
+            "page_number",
+            "document_name",
+            "gdrive_id",
+            "sha1",
+            "provisional_case_name",
+            "reasoning",
+            "confidence",
+            "address_found",
+            "address",
+            "address_context",
         ]
         return pd.DataFrame(columns=columns)
 
@@ -366,8 +368,7 @@ def extract_names(llm: LLM, ocr_text_pages, max_workers=10):
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
         future_to_page = {
-            executor.submit(_process_single_page, llm, page): page
-            for page in valid_pages
+            executor.submit(_process_single_page, llm, page): page for page in valid_pages
         }
 
         # Collect results as they complete
@@ -376,7 +377,10 @@ def extract_names(llm: LLM, ocr_text_pages, max_workers=10):
             try:
                 page_results = future.result()
                 all_results.extend(page_results)
-                logger.info(f"Completed page {page.get('page_number', '?')}: found {len(page_results)} persons")
+                logger.info(
+                    f"Completed page {page.get('page_number', '?')}: "
+                    f"found {len(page_results)} persons"
+                )
             except Exception as e:
                 page_num = page.get("page_number", "?")
                 doc_name = page.get("document_name", "Unknown")

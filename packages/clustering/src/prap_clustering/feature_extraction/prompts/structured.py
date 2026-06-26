@@ -168,8 +168,8 @@ JSON Output:"""
 
 # Export all prompts as a dictionary
 PROMPTS = {
-    'dates': DATES_STRUCTURING,
-    'case_ids': CASE_IDS_STRUCTURING,
-    'subject_names': SUBJECT_NAMES_STRUCTURING,
-    'officer_names': OFFICER_NAMES_STRUCTURING,
+    "dates": DATES_STRUCTURING,
+    "case_ids": CASE_IDS_STRUCTURING,
+    "subject_names": SUBJECT_NAMES_STRUCTURING,
+    "officer_names": OFFICER_NAMES_STRUCTURING,
 }

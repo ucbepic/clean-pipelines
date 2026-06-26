@@ -31,16 +31,12 @@ logger = logging.getLogger("prap.location")
 
 def _load_prompt(name: str) -> str:
     return (
-        resources.files("prap_location.prompts")
-        .joinpath(f"{name}.txt")
-        .read_text(encoding="utf-8")
+        resources.files("prap_location.prompts").joinpath(f"{name}.txt").read_text(encoding="utf-8")
     )
 
 
 def _initial_location_analysis(llm: LLM, concatenated_summary: str) -> str:
-    prompt = Template(_load_prompt("initial")).safe_substitute(
-        source_text=concatenated_summary
-    )
+    prompt = Template(_load_prompt("initial")).safe_substitute(source_text=concatenated_summary)
     return llm.complete(prompt).text
 
 
@@ -104,9 +100,7 @@ def _summarize_ocr_texts(llm: LLM, ocr_texts: list[str], case_name: str) -> list
             )
             truncated = ocr_text[:2000] + "..." if len(ocr_text) > 2000 else ocr_text
             summaries.append(f"OCR Summary (truncated): {truncated}")
-    logger.info(
-        f"Special case {case_name}: Generated {len(summaries)} summaries from OCR texts"
-    )
+    logger.info(f"Special case {case_name}: Generated {len(summaries)} summaries from OCR texts")
     return summaries
 
 
@@ -150,9 +144,7 @@ def process_case(
         if is_special_case and any(
             case_name.startswith(prefix) for prefix in SPECIAL_CASE_PREFIXES
         ):
-            logger.info(
-                f"Special case {case_name}: Processing OCR text, creating summaries first"
-            )
+            logger.info(f"Special case {case_name}: Processing OCR text, creating summaries first")
             summaries = _summarize_ocr_texts(llm, summaries_or_ocr_texts, case_name)
         else:
             summaries = summaries_or_ocr_texts
@@ -169,20 +161,14 @@ def process_case(
             max_allowed_summaries=5,
         )
 
-        concatenated_summary = "\n\n===== DOCUMENT BREAK =====\n\n".join(
-            important_summaries
-        )
+        concatenated_summary = "\n\n===== DOCUMENT BREAK =====\n\n".join(important_summaries)
 
         initial_analysis = _initial_location_analysis(llm, concatenated_summary)
-        validation_result = _location_validation(
-            llm, concatenated_summary, initial_analysis
-        )
+        validation_result = _location_validation(llm, concatenated_summary, initial_analysis)
         extracted_location = _convert_to_structured(llm, validation_result)
 
         logger.info(f"Case {case_name}: Extracted location: {extracted_location}")
-        logger.info(
-            f"Case {case_name}: Validation decision: {validation_result.final_decision}"
-        )
+        logger.info(f"Case {case_name}: Validation decision: {validation_result.final_decision}")
         logger.info(f"Case {case_name}: Is special case: {is_special_case}")
 
         return LocationResult(

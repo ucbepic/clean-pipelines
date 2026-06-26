@@ -123,9 +123,7 @@ def prepare(
 
     records: list[dict] = []
     for case_name, group in doc.groupby("provisional_case_name"):
-        is_special_case = any(
-            str(case_name).startswith(prefix) for prefix in SPECIAL_CASE_PREFIXES
-        )
+        is_special_case = any(str(case_name).startswith(prefix) for prefix in SPECIAL_CASE_PREFIXES)
 
         if (
             is_special_case
@@ -135,8 +133,10 @@ def prepare(
         ):
             ocr_contents: list[str] = []
             for _, row in group.iterrows():
-                if pd.notna(row["page_start"]) and pd.notna(row["page_end"]) and pd.notna(
-                    row["ocr_text"]
+                if (
+                    pd.notna(row["page_start"])
+                    and pd.notna(row["page_end"])
+                    and pd.notna(row["ocr_text"])
                 ):
                     ocr_data = row["ocr_text"]
                     start_page = int(row["page_start"])
@@ -161,9 +161,7 @@ def prepare(
                         and start_page <= m["page_number"] <= end_page
                     ]
                     if extracted_pages:
-                        ocr_contents.append(
-                            "\n\n===== PAGE BREAK =====\n\n".join(extracted_pages)
-                        )
+                        ocr_contents.append("\n\n===== PAGE BREAK =====\n\n".join(extracted_pages))
                     else:
                         all_pages = [
                             m["page_content"]
@@ -171,9 +169,7 @@ def prepare(
                             if isinstance(m, dict) and "page_content" in m
                         ]
                         if all_pages:
-                            ocr_contents.append(
-                                "\n\n===== PAGE BREAK =====\n\n".join(all_pages)
-                            )
+                            ocr_contents.append("\n\n===== PAGE BREAK =====\n\n".join(all_pages))
             if ocr_contents:
                 records.append(
                     {

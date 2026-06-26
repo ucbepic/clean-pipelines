@@ -45,11 +45,8 @@ from .regex_extract_fp_fn import (
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('extract_features.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("extract_features.log"), logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
@@ -82,8 +79,8 @@ def parse_ocr_text(ocr_data) -> str:
         if isinstance(pages, list):
             all_text = []
             for page in pages:
-                if isinstance(page, dict) and 'text' in page:
-                    all_text.append(page['text'])
+                if isinstance(page, dict) and "text" in page:
+                    all_text.append(page["text"])
             return "\n\n".join(all_text)
         else:
             # If it's not a list, just return it as string
@@ -111,43 +108,38 @@ def filter_output_columns(df: pd.DataFrame) -> pd.DataFrame:
     # Define the columns to keep (in order)
     desired_columns = [
         # Original metadata columns
-        'provisional_case_name',
-        'gdrive_path',
-        'gdrive_name',
-        'mimeType',
-        'gdrive_id',
-        'first_look_summary',
-        'file_name_from_json',
-        'ocr_text_per_page',
-
+        "provisional_case_name",
+        "gdrive_path",
+        "gdrive_name",
+        "mimeType",
+        "gdrive_id",
+        "first_look_summary",
+        "file_name_from_json",
+        "ocr_text_per_page",
         # Regex extracted features
-        'extracted_case_ids_fp',
-        'extracted_case_ids_fn',
-        'extracted_dates_fp',
-        'extracted_dates_fn',
-        'extracted_names_fp',
-        'extracted_names_fn',
-
+        "extracted_case_ids_fp",
+        "extracted_case_ids_fn",
+        "extracted_dates_fp",
+        "extracted_dates_fn",
+        "extracted_names_fp",
+        "extracted_names_fn",
         # LLM extracted features (string outputs)
-        'extracted_dates_llm',
-        'extracted_case_ids_llm',
-        'extracted_subject_names_llm',
-        'extracted_officer_names_llm',
-
+        "extracted_dates_llm",
+        "extracted_case_ids_llm",
+        "extracted_subject_names_llm",
+        "extracted_officer_names_llm",
         # LLM extracted features (structured JSON outputs)
-        'extracted_dates_llm_structured',
-        'extracted_case_ids_llm_structured',
-        'extracted_subject_names_llm_structured',
-        'extracted_officer_names_llm_structured',
-
+        "extracted_dates_llm_structured",
+        "extracted_case_ids_llm_structured",
+        "extracted_subject_names_llm_structured",
+        "extracted_officer_names_llm_structured",
         # Feature extraction flag
-        'features_extracted',
-
+        "features_extracted",
         # Summaries (at the end so they don't get in the way)
-        'dates_summary',
-        'case_ids_summary',
-        'subject_names_summary',
-        'officer_names_summary',
+        "dates_summary",
+        "case_ids_summary",
+        "subject_names_summary",
+        "officer_names_summary",
     ]
 
     # Only keep columns that exist in the dataframe
@@ -173,25 +165,25 @@ def setup_csv_columns(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame with all required columns
     """
     required_columns = [
-        'extracted_dates_fp',
-        'extracted_dates_fn',
-        'extracted_dates_llm',
-        'extracted_dates_llm_structured',
-        'extracted_case_ids_fp',
-        'extracted_case_ids_fn',
-        'extracted_case_ids_llm',
-        'extracted_case_ids_llm_structured',
-        'extracted_names_fp',
-        'extracted_names_fn',
-        'extracted_subject_names_llm',
-        'extracted_subject_names_llm_structured',
-        'extracted_officer_names_llm',
-        'extracted_officer_names_llm_structured',
-        'dates_summary',
-        'case_ids_summary',
-        'subject_names_summary',
-        'officer_names_summary',
-        'features_extracted'
+        "extracted_dates_fp",
+        "extracted_dates_fn",
+        "extracted_dates_llm",
+        "extracted_dates_llm_structured",
+        "extracted_case_ids_fp",
+        "extracted_case_ids_fn",
+        "extracted_case_ids_llm",
+        "extracted_case_ids_llm_structured",
+        "extracted_names_fp",
+        "extracted_names_fn",
+        "extracted_subject_names_llm",
+        "extracted_subject_names_llm_structured",
+        "extracted_officer_names_llm",
+        "extracted_officer_names_llm_structured",
+        "dates_summary",
+        "case_ids_summary",
+        "subject_names_summary",
+        "officer_names_summary",
+        "features_extracted",
     ]
 
     for col in required_columns:
@@ -199,10 +191,10 @@ def setup_csv_columns(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = None
 
     # Ensure features_extracted is boolean
-    if 'features_extracted' in df.columns:
-        df['features_extracted'] = df['features_extracted'].fillna(False).astype(bool)
+    if "features_extracted" in df.columns:
+        df["features_extracted"] = df["features_extracted"].fillna(False).astype(bool)
     else:
-        df['features_extracted'] = False
+        df["features_extracted"] = False
 
     return df
 
@@ -222,16 +214,16 @@ def extract_regex_features(directory_path: str, filename: str) -> dict:
     features = {}
 
     # Extract dates from directory path (fp) and filename (fn)
-    features['dates_fp'] = extract_date_from_metadata(directory_path) if directory_path else []
-    features['dates_fn'] = extract_date_from_metadata(filename) if filename else []
+    features["dates_fp"] = extract_date_from_metadata(directory_path) if directory_path else []
+    features["dates_fn"] = extract_date_from_metadata(filename) if filename else []
 
     # Extract case IDs from directory path (fp) and filename (fn)
-    features['case_ids_fp'] = extract_ids_from_metadata(directory_path) if directory_path else []
-    features['case_ids_fn'] = extract_ids_from_metadata(filename) if filename else []
+    features["case_ids_fp"] = extract_ids_from_metadata(directory_path) if directory_path else []
+    features["case_ids_fn"] = extract_ids_from_metadata(filename) if filename else []
 
     # Extract names from directory path (fp) and filename (fn)
-    features['names_fp'] = extract_names_from_metadata(directory_path) if directory_path else []
-    features['names_fn'] = extract_names_from_metadata(filename) if filename else []
+    features["names_fp"] = extract_names_from_metadata(directory_path) if directory_path else []
+    features["names_fn"] = extract_names_from_metadata(filename) if filename else []
 
     return features
 
@@ -250,7 +242,7 @@ def structure_extraction(extraction_result: str, feature_type: str) -> str:
     if not extraction_result or not extraction_result.strip():
         logger.warning(f"Empty extraction result for {feature_type}")
         # Return appropriate empty structure
-        if feature_type == 'dates':
+        if feature_type == "dates":
             return json.dumps({"incident_date": None})
         else:
             return json.dumps([])
@@ -276,14 +268,14 @@ def structure_extraction(extraction_result: str, feature_type: str) -> str:
         logger.error(f"Invalid JSON from structuring prompt for {feature_type}: {e}")
         logger.error(f"Raw output: {structured_result}")
         # Return appropriate empty structure
-        if feature_type == 'dates':
+        if feature_type == "dates":
             return json.dumps({"incident_date": None})
         else:
             return json.dumps([])
     except Exception as e:
         logger.error(f"Error structuring {feature_type}: {e}", exc_info=True)
         # Return appropriate empty structure
-        if feature_type == 'dates':
+        if feature_type == "dates":
             return json.dumps({"incident_date": None})
         else:
             return json.dumps([])
@@ -297,6 +289,7 @@ def extract_single_feature(args):
 
         # Step 1: Generate summary
         from summarize_pipeline import summarize_document
+
         summary = summarize_document(ocr_text, prompts)
 
         # Step 2: Extract from summary
@@ -331,10 +324,10 @@ def extract_llm_features(ocr_text: str) -> dict:
     try:
         # Define all feature extraction tasks
         extraction_tasks = [
-            ('dates_llm', ocr_text, DATE_PROMPTS),
-            ('subject_names_llm', ocr_text, SUBJECT_NAME_PROMPTS),
-            ('officer_names_llm', ocr_text, OFFICER_NAME_PROMPTS),
-            ('case_ids_llm', ocr_text, CASE_ID_PROMPTS),
+            ("dates_llm", ocr_text, DATE_PROMPTS),
+            ("subject_names_llm", ocr_text, SUBJECT_NAME_PROMPTS),
+            ("officer_names_llm", ocr_text, OFFICER_NAME_PROMPTS),
+            ("case_ids_llm", ocr_text, CASE_ID_PROMPTS),
         ]
 
         # Process all extractions in parallel
@@ -353,31 +346,31 @@ def extract_llm_features(ocr_text: str) -> dict:
     except Exception as e:
         logger.error(f"Error during LLM extraction: {e}", exc_info=True)
         # Set all to None if extraction fails
-        features['dates_llm'] = None
-        features['subject_names_llm'] = None
-        features['officer_names_llm'] = None
-        features['case_ids_llm'] = None
-        summaries['dates_llm'] = None
-        summaries['subject_names_llm'] = None
-        summaries['officer_names_llm'] = None
-        summaries['case_ids_llm'] = None
+        features["dates_llm"] = None
+        features["subject_names_llm"] = None
+        features["officer_names_llm"] = None
+        features["case_ids_llm"] = None
+        summaries["dates_llm"] = None
+        summaries["subject_names_llm"] = None
+        summaries["officer_names_llm"] = None
+        summaries["case_ids_llm"] = None
 
     # Step 2: Structure the extraction results
     logger.info("Starting structured output generation")
 
     try:
         # Structure each feature extraction result
-        features['dates_llm_structured'] = structure_extraction(
-            features.get('dates_llm', ''), 'dates'
+        features["dates_llm_structured"] = structure_extraction(
+            features.get("dates_llm", ""), "dates"
         )
-        features['case_ids_llm_structured'] = structure_extraction(
-            features.get('case_ids_llm', ''), 'case_ids'
+        features["case_ids_llm_structured"] = structure_extraction(
+            features.get("case_ids_llm", ""), "case_ids"
         )
-        features['subject_names_llm_structured'] = structure_extraction(
-            features.get('subject_names_llm', ''), 'subject_names'
+        features["subject_names_llm_structured"] = structure_extraction(
+            features.get("subject_names_llm", ""), "subject_names"
         )
-        features['officer_names_llm_structured'] = structure_extraction(
-            features.get('officer_names_llm', ''), 'officer_names'
+        features["officer_names_llm_structured"] = structure_extraction(
+            features.get("officer_names_llm", ""), "officer_names"
         )
 
         logger.info("Structured output generation complete")
@@ -385,16 +378,16 @@ def extract_llm_features(ocr_text: str) -> dict:
     except Exception as e:
         logger.error(f"Error during structured output generation: {e}", exc_info=True)
         # Set structured outputs to empty/null
-        features['dates_llm_structured'] = json.dumps({"incident_date": None})
-        features['case_ids_llm_structured'] = json.dumps([])
-        features['subject_names_llm_structured'] = json.dumps([])
-        features['officer_names_llm_structured'] = json.dumps([])
+        features["dates_llm_structured"] = json.dumps({"incident_date": None})
+        features["case_ids_llm_structured"] = json.dumps([])
+        features["subject_names_llm_structured"] = json.dumps([])
+        features["officer_names_llm_structured"] = json.dumps([])
 
     # Step 3: Add summaries to the features dictionary
-    features['dates_summary'] = summaries.get('dates_llm')
-    features['case_ids_summary'] = summaries.get('case_ids_llm')
-    features['subject_names_summary'] = summaries.get('subject_names_llm')
-    features['officer_names_summary'] = summaries.get('officer_names_llm')
+    features["dates_summary"] = summaries.get("dates_llm")
+    features["case_ids_summary"] = summaries.get("case_ids_llm")
+    features["subject_names_summary"] = summaries.get("subject_names_llm")
+    features["officer_names_summary"] = summaries.get("officer_names_llm")
 
     return features
 
@@ -411,7 +404,7 @@ def process_document(row: pd.Series, force: bool = False) -> dict:
         Dictionary with all extracted features
     """
     # Check idempotency
-    if not force and row.get('features_extracted', False):
+    if not force and row.get("features_extracted", False):
         logger.debug(f"Skipping already extracted document: {row.get('filepath', 'unknown')}")
         return None
 
@@ -420,8 +413,8 @@ def process_document(row: pd.Series, force: bool = False) -> dict:
     extracted = {}
 
     # Get full path and filename
-    full_path = row.get('filepath', row.get('file_path', row.get('gdrive_path', '')))
-    filename = row.get('gdrive_name', '')
+    full_path = row.get("filepath", row.get("file_path", row.get("gdrive_path", "")))
+    filename = row.get("gdrive_name", "")
 
     # If filename not in row, extract from path
     if not filename and full_path:
@@ -429,7 +422,7 @@ def process_document(row: pd.Series, force: bool = False) -> dict:
 
     # Get directory path (remove filename from full path)
     if full_path:
-        last_slash = full_path.rfind('/')
+        last_slash = full_path.rfind("/")
         if last_slash != -1:
             directory_path = full_path[:last_slash]  # Everything before last slash
         else:
@@ -441,15 +434,27 @@ def process_document(row: pd.Series, force: bool = False) -> dict:
     logger.info("Step 1: Regex extraction from directory path (fp) and filename (fn)")
     regex_features = extract_regex_features(directory_path, filename)
 
-    extracted['extracted_dates_fp'] = str(regex_features['dates_fp']) if regex_features['dates_fp'] else None
-    extracted['extracted_dates_fn'] = str(regex_features['dates_fn']) if regex_features['dates_fn'] else None
-    extracted['extracted_case_ids_fp'] = str(regex_features['case_ids_fp']) if regex_features['case_ids_fp'] else None
-    extracted['extracted_case_ids_fn'] = str(regex_features['case_ids_fn']) if regex_features['case_ids_fn'] else None
-    extracted['extracted_names_fp'] = str(regex_features['names_fp']) if regex_features['names_fp'] else None
-    extracted['extracted_names_fn'] = str(regex_features['names_fn']) if regex_features['names_fn'] else None
+    extracted["extracted_dates_fp"] = (
+        str(regex_features["dates_fp"]) if regex_features["dates_fp"] else None
+    )
+    extracted["extracted_dates_fn"] = (
+        str(regex_features["dates_fn"]) if regex_features["dates_fn"] else None
+    )
+    extracted["extracted_case_ids_fp"] = (
+        str(regex_features["case_ids_fp"]) if regex_features["case_ids_fp"] else None
+    )
+    extracted["extracted_case_ids_fn"] = (
+        str(regex_features["case_ids_fn"]) if regex_features["case_ids_fn"] else None
+    )
+    extracted["extracted_names_fp"] = (
+        str(regex_features["names_fp"]) if regex_features["names_fp"] else None
+    )
+    extracted["extracted_names_fn"] = (
+        str(regex_features["names_fn"]) if regex_features["names_fn"] else None
+    )
 
     # Step 2: LLM extraction (Priority 3)
-    ocr_data = row.get('ocr_text', row.get('text', row.get('ocr_text_per_page', '')))
+    ocr_data = row.get("ocr_text", row.get("text", row.get("ocr_text_per_page", "")))
 
     # Parse OCR text from JSON format if needed
     ocr_text = parse_ocr_text(ocr_data)
@@ -459,42 +464,54 @@ def process_document(row: pd.Series, force: bool = False) -> dict:
         llm_features = extract_llm_features(ocr_text)
 
         # Store string outputs (human-readable)
-        extracted['extracted_dates_llm'] = str(llm_features['dates_llm']) if llm_features['dates_llm'] else None
-        extracted['extracted_subject_names_llm'] = str(llm_features['subject_names_llm']) if llm_features['subject_names_llm'] else None
-        extracted['extracted_officer_names_llm'] = str(llm_features['officer_names_llm']) if llm_features['officer_names_llm'] else None
-        extracted['extracted_case_ids_llm'] = str(llm_features['case_ids_llm']) if llm_features['case_ids_llm'] else None
+        extracted["extracted_dates_llm"] = (
+            str(llm_features["dates_llm"]) if llm_features["dates_llm"] else None
+        )
+        extracted["extracted_subject_names_llm"] = (
+            str(llm_features["subject_names_llm"]) if llm_features["subject_names_llm"] else None
+        )
+        extracted["extracted_officer_names_llm"] = (
+            str(llm_features["officer_names_llm"]) if llm_features["officer_names_llm"] else None
+        )
+        extracted["extracted_case_ids_llm"] = (
+            str(llm_features["case_ids_llm"]) if llm_features["case_ids_llm"] else None
+        )
 
         # Store structured outputs (JSON strings)
-        extracted['extracted_dates_llm_structured'] = llm_features['dates_llm_structured']
-        extracted['extracted_case_ids_llm_structured'] = llm_features['case_ids_llm_structured']
-        extracted['extracted_subject_names_llm_structured'] = llm_features['subject_names_llm_structured']
-        extracted['extracted_officer_names_llm_structured'] = llm_features['officer_names_llm_structured']
+        extracted["extracted_dates_llm_structured"] = llm_features["dates_llm_structured"]
+        extracted["extracted_case_ids_llm_structured"] = llm_features["case_ids_llm_structured"]
+        extracted["extracted_subject_names_llm_structured"] = llm_features[
+            "subject_names_llm_structured"
+        ]
+        extracted["extracted_officer_names_llm_structured"] = llm_features[
+            "officer_names_llm_structured"
+        ]
 
         # Store summaries
-        extracted['dates_summary'] = llm_features['dates_summary']
-        extracted['case_ids_summary'] = llm_features['case_ids_summary']
-        extracted['subject_names_summary'] = llm_features['subject_names_summary']
-        extracted['officer_names_summary'] = llm_features['officer_names_summary']
+        extracted["dates_summary"] = llm_features["dates_summary"]
+        extracted["case_ids_summary"] = llm_features["case_ids_summary"]
+        extracted["subject_names_summary"] = llm_features["subject_names_summary"]
+        extracted["officer_names_summary"] = llm_features["officer_names_summary"]
     else:
         logger.warning(f"No OCR text available for document: {filepath}")
         # String outputs
-        extracted['extracted_dates_llm'] = None
-        extracted['extracted_subject_names_llm'] = None
-        extracted['extracted_officer_names_llm'] = None
-        extracted['extracted_case_ids_llm'] = None
+        extracted["extracted_dates_llm"] = None
+        extracted["extracted_subject_names_llm"] = None
+        extracted["extracted_officer_names_llm"] = None
+        extracted["extracted_case_ids_llm"] = None
         # Structured outputs (empty JSON)
-        extracted['extracted_dates_llm_structured'] = json.dumps({"incident_date": None})
-        extracted['extracted_case_ids_llm_structured'] = json.dumps([])
-        extracted['extracted_subject_names_llm_structured'] = json.dumps([])
-        extracted['extracted_officer_names_llm_structured'] = json.dumps([])
+        extracted["extracted_dates_llm_structured"] = json.dumps({"incident_date": None})
+        extracted["extracted_case_ids_llm_structured"] = json.dumps([])
+        extracted["extracted_subject_names_llm_structured"] = json.dumps([])
+        extracted["extracted_officer_names_llm_structured"] = json.dumps([])
         # Summaries
-        extracted['dates_summary'] = None
-        extracted['case_ids_summary'] = None
-        extracted['subject_names_summary'] = None
-        extracted['officer_names_summary'] = None
+        extracted["dates_summary"] = None
+        extracted["case_ids_summary"] = None
+        extracted["subject_names_summary"] = None
+        extracted["officer_names_summary"] = None
 
     # Mark as extracted
-    extracted['features_extracted'] = True
+    extracted["features_extracted"] = True
 
     return extracted
 
@@ -503,7 +520,7 @@ def process_document_wrapper(args):
     """Wrapper for parallel document processing."""
     idx, row, force = args
     try:
-        logger.info(f"\n{'='*80}")
+        logger.info(f"\n{'=' * 80}")
         logger.info(f"Processing document index {idx}")
 
         extracted = process_document(row, force=force)
@@ -513,7 +530,9 @@ def process_document_wrapper(args):
         return idx, None, str(e)
 
 
-CORPUS_TOTAL_DOCS = 29824  # Docs with OCR text across all 31 holdout agencies (69,767 total rows, 29,824 with OCR)
+CORPUS_TOTAL_DOCS = (
+    29824  # Docs with OCR text across all 31 holdout agencies (69,767 total rows, 29,824 with OCR)
+)
 
 # Representative sample of 5 agencies covering different types and sizes:
 # medical examiner (small), state agency (medium), police (medium),
@@ -526,13 +545,13 @@ DEFAULT_AGENCY_CSVS = [
     "../../data/input/autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42 - autofolio_1.1.0_output--Fresno County Sheriff--2024-10-05_00-33-42.csv",
 ]
 
-INPUT_COST_PER_TOKEN = 0.80 / 1_000_000   # $0.80 / 1M tokens
+INPUT_COST_PER_TOKEN = 0.80 / 1_000_000  # $0.80 / 1M tokens
 OUTPUT_COST_PER_TOKEN = 3.20 / 1_000_000  # $3.20 / 1M tokens
 
 
 def _agency_name_from_path(csv_path: str) -> str:
     """Extract human-readable agency name from autofolio CSV filename."""
-    m = re.search(r'output--(.+?)--\d{4}-\d{2}-\d{2}', Path(csv_path).name)
+    m = re.search(r"output--(.+?)--\d{4}-\d{2}-\d{2}", Path(csv_path).name)
     return m.group(1) if m else Path(csv_path).stem
 
 
@@ -546,10 +565,10 @@ def write_cost_report(report_path: str, agency_results: list):
             agency, input_csv, docs_processed,
             prompt_tokens, completion_tokens, call_count
     """
-    total_docs = sum(r['docs_processed'] for r in agency_results)
-    total_prompt = sum(r['prompt_tokens'] for r in agency_results)
-    total_completion = sum(r['completion_tokens'] for r in agency_results)
-    total_calls = sum(r['call_count'] for r in agency_results)
+    total_docs = sum(r["docs_processed"] for r in agency_results)
+    total_prompt = sum(r["prompt_tokens"] for r in agency_results)
+    total_completion = sum(r["completion_tokens"] for r in agency_results)
+    total_calls = sum(r["call_count"] for r in agency_results)
 
     total_input_cost = total_prompt * INPUT_COST_PER_TOKEN
     total_output_cost = total_completion * OUTPUT_COST_PER_TOKEN
@@ -574,8 +593,8 @@ def write_cost_report(report_path: str, agency_results: list):
         "-" * W,
     ]
     for r in agency_results:
-        ic = r['prompt_tokens'] * INPUT_COST_PER_TOKEN
-        oc = r['completion_tokens'] * OUTPUT_COST_PER_TOKEN
+        ic = r["prompt_tokens"] * INPUT_COST_PER_TOKEN
+        oc = r["completion_tokens"] * OUTPUT_COST_PER_TOKEN
         tc = ic + oc
         lines.append(
             f"{r['agency']:<38} {r['docs_processed']:>6,}"
@@ -590,7 +609,9 @@ def write_cost_report(report_path: str, agency_results: list):
         f"Total input tokens:    {total_prompt:,}",
         f"Total output tokens:   {total_completion:,}",
         f"Total LLM calls:       {total_calls:,}",
-        f"LLM calls/doc:         {total_calls / total_docs:.1f}" if total_docs > 0 else "LLM calls/doc:  N/A",
+        f"LLM calls/doc:         {total_calls / total_docs:.1f}"
+        if total_docs > 0
+        else "LLM calls/doc:  N/A",
         "",
         "AGGREGATE COSTS  (gpt-4.1-mini: input $0.80/1M tokens, output $3.20/1M tokens)",
         "-" * W,
@@ -616,11 +637,13 @@ def write_cost_report(report_path: str, agency_results: list):
     ]
 
     report_text = "\n".join(lines)
-    with open(report_path, 'w') as f:
+    with open(report_path, "w") as f:
         f.write(report_text)
 
     logger.info(f"Cost report written to: {report_path}")
-    logger.info(f"Total cost for {total_docs:,} docs across {len(agency_results)} agencies: ${total_cost:.4f}")
+    logger.info(
+        f"Total cost for {total_docs:,} docs across {len(agency_results)} agencies: ${total_cost:.4f}"
+    )
     logger.info(f"Extrapolated corpus cost ({CORPUS_TOTAL_DOCS:,} docs): ${extrap_total:.2f}")
 
 
@@ -632,7 +655,7 @@ def process_csv(input_csv: str, output_path: str, force: bool, limit: int | None
     """
     agency = _agency_name_from_path(input_csv)
 
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info(f"AGENCY: {agency}")
     logger.info(f"Input:  {input_csv}")
     logger.info(f"Output: {output_path}")
@@ -645,8 +668,12 @@ def process_csv(input_csv: str, output_path: str, force: bool, limit: int | None
     _llm.usage.cost_usd = 0.0
 
     empty_result = {
-        'agency': agency, 'input_csv': input_csv, 'docs_processed': 0,
-        'prompt_tokens': 0, 'completion_tokens': 0, 'call_count': 0,
+        "agency": agency,
+        "input_csv": input_csv,
+        "docs_processed": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "call_count": 0,
     }
 
     # Load input CSV
@@ -664,21 +691,31 @@ def process_csv(input_csv: str, output_path: str, force: bool, limit: int | None
         logger.info("Found existing output, resuming...")
         try:
             df_existing = pd.read_csv(output_path)
-            if 'sha1' in df.columns and 'sha1' in df_existing.columns:
-                processed_sha1s = set(df_existing[df_existing['features_extracted']]['sha1'].dropna())
+            if "sha1" in df.columns and "sha1" in df_existing.columns:
+                processed_sha1s = set(
+                    df_existing[df_existing["features_extracted"]]["sha1"].dropna()
+                )
                 logger.info(f"Found {len(processed_sha1s)} already processed documents")
-                df['features_extracted'] = df['sha1'].isin(processed_sha1s)
+                df["features_extracted"] = df["sha1"].isin(processed_sha1s)
                 merge_cols = [
-                    col for col in df_existing.columns
-                    if col.startswith('extracted_') or col in [
-                        'dates_summary', 'case_ids_summary',
-                        'subject_names_summary', 'officer_names_summary', 'features_extracted'
+                    col
+                    for col in df_existing.columns
+                    if col.startswith("extracted_")
+                    or col
+                    in [
+                        "dates_summary",
+                        "case_ids_summary",
+                        "subject_names_summary",
+                        "officer_names_summary",
+                        "features_extracted",
                     ]
                     if col in df_existing.columns
                 ]
                 if merge_cols:
-                    df = df.drop(columns=[c for c in merge_cols if c in df.columns], errors='ignore')
-                    df = df.merge(df_existing[['sha1'] + merge_cols], on='sha1', how='left')
+                    df = df.drop(
+                        columns=[c for c in merge_cols if c in df.columns], errors="ignore"
+                    )
+                    df = df.merge(df_existing[["sha1"] + merge_cols], on="sha1", how="left")
             else:
                 logger.warning("Cannot resume: 'sha1' column not found")
         except Exception as e:
@@ -690,7 +727,7 @@ def process_csv(input_csv: str, output_path: str, force: bool, limit: int | None
         logger.info(f"Limiting to first {limit} documents")
         df = df.head(limit)
 
-    docs_to_process = len(df) if force else (~df['features_extracted']).sum()
+    docs_to_process = len(df) if force else (~df["features_extracted"]).sum()
     logger.info(f"Documents to process: {docs_to_process}")
 
     start_time = time.time()
@@ -735,55 +772,51 @@ def process_csv(input_csv: str, output_path: str, force: bool, limit: int | None
         filter_output_columns(df).to_csv(output_path, index=False)
 
     elapsed = time.time() - start_time
-    logger.info(f"Agency complete: {processed} processed, {failed} failed, {skipped} skipped in {elapsed:.1f}s")
+    logger.info(
+        f"Agency complete: {processed} processed, {failed} failed, {skipped} skipped in {elapsed:.1f}s"
+    )
     logger.info(f"Output saved to: {output_path}")
 
     usage = get_llm().usage
     return {
-        'agency': agency,
-        'input_csv': input_csv,
-        'docs_processed': processed,
-        'prompt_tokens': usage.prompt_tokens,
-        'completion_tokens': usage.completion_tokens,
-        'call_count': 0,
+        "agency": agency,
+        "input_csv": input_csv,
+        "docs_processed": processed,
+        "prompt_tokens": usage.prompt_tokens,
+        "completion_tokens": usage.completion_tokens,
+        "call_count": 0,
     }
 
 
 def main():
     """Main entry point for multi-agency cost estimation."""
     parser = argparse.ArgumentParser(
-        description='Extract features and measure token costs across one or more agency CSVs'
+        description="Extract features and measure token costs across one or more agency CSVs"
     )
     parser.add_argument(
-        'input_csvs',
-        nargs='*',
-        help='One or more input CSVs (one per agency). Defaults to the 5 hardcoded representative agencies.'
+        "input_csvs",
+        nargs="*",
+        help="One or more input CSVs (one per agency). Defaults to the 5 hardcoded representative agencies.",
     )
     parser.add_argument(
-        '--output-dir',
-        help='Directory for output CSVs (required; or set PRAP_CLUSTERING_COSTS_DIR).',
+        "--output-dir",
+        help="Directory for output CSVs (required; or set PRAP_CLUSTERING_COSTS_DIR).",
         default=None,
     )
     parser.add_argument(
-        '--force',
-        action='store_true',
-        help='Re-extract features even if already extracted'
+        "--force", action="store_true", help="Re-extract features even if already extracted"
     )
     parser.add_argument(
-        '--limit',
+        "--limit",
         type=int,
         default=None,
-        help='Limit each agency to first N documents (for testing)'
+        help="Limit each agency to first N documents (for testing)",
     )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     parser.add_argument(
-        '--debug',
-        action='store_true',
-        help='Enable debug logging'
-    )
-    parser.add_argument(
-        '--cost-report',
-        help='Path to write the cost report (default: <output-dir>/cost_report.txt)',
-        default=None
+        "--cost-report",
+        help="Path to write the cost report (default: <output-dir>/cost_report.txt)",
+        default=None,
     )
 
     args = parser.parse_args()
@@ -794,13 +827,14 @@ def main():
     input_csvs = args.input_csvs if args.input_csvs else DEFAULT_AGENCY_CSVS
 
     import os
+
     output_dir_val = args.output_dir or os.environ.get("PRAP_CLUSTERING_COSTS_DIR")
     if not output_dir_val:
         parser.error("--output-dir is required (or set PRAP_CLUSTERING_COSTS_DIR).")
     output_dir = Path(output_dir_val)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    cost_report_path = args.cost_report or str(output_dir / 'cost_report.txt')
+    cost_report_path = args.cost_report or str(output_dir / "cost_report.txt")
 
     logger.info("Starting cost estimation run")
     logger.info(f"Agencies to process: {len(input_csvs)}")
@@ -816,5 +850,5 @@ def main():
     write_cost_report(cost_report_path, agency_results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

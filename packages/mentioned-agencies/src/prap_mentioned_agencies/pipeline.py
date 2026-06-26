@@ -42,9 +42,7 @@ def _strip_code_fences(text: str) -> str:
     return cleaned
 
 
-def _extract_page_agencies(
-    llm: LLM, prompt_template: str, page: CasePage
-) -> list[str]:
+def _extract_page_agencies(llm: LLM, prompt_template: str, page: CasePage) -> list[str]:
     page_context = f"File: {page.file_name}, Page: {page.page_number}"
     prompt = Template(prompt_template).safe_substitute(
         page_text=page.text, page_context=page_context
@@ -240,7 +238,11 @@ def run(
     with ThreadPoolExecutor(max_workers=n_threads) as ex:
         futures = {
             ex.submit(
-                process_case, llm, case, extract_prompt, validate_prompt,
+                process_case,
+                llm,
+                case,
+                extract_prompt,
+                validate_prompt,
                 dedup_threshold=dedup_threshold,
             ): i
             for i, case in enumerate(cases)

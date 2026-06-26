@@ -11,12 +11,11 @@ but not in the GT contribute a (gold=False, predicted=True) row.
 
 from __future__ import annotations
 
-import json
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib import resources
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Tuple
+from typing import TYPE_CHECKING
 
 import pandas as pd
 from jinja2 import Template
@@ -38,11 +37,9 @@ def _load_prompt(name: str) -> str:
     )
 
 
-def compare_agency_names_llm(llm: "LLM", name1: str, name2: str) -> bool:
+def compare_agency_names_llm(llm: LLM, name1: str, name2: str) -> bool:
     """LLM-based judgment of whether two agency names refer to the same entity."""
-    prompt = Template(_load_prompt("compare_agency_names")).render(
-        name1=name1, name2=name2
-    )
+    prompt = Template(_load_prompt("compare_agency_names")).render(name1=name1, name2=name2)
 
     try:
         result = llm.complete(prompt, response_format=AgencyNameMatch)
@@ -56,13 +53,13 @@ def compare_agency_names_llm(llm: "LLM", name1: str, name2: str) -> bool:
         return name1.strip().lower() == name2.strip().lower()
 
 
-def _compare_wrapper(args: Tuple["LLM", str, str, int]) -> Tuple[int, bool]:
+def _compare_wrapper(args: tuple[LLM, str, str, int]) -> tuple[int, bool]:
     llm, name1, name2, task_id = args
     return task_id, compare_agency_names_llm(llm, name1, name2)
 
 
 def match_extractions_to_groundtruth(
-    llm: "LLM",
+    llm: LLM,
     groundtruth_df: pd.DataFrame,
     extractions_df: pd.DataFrame,
     max_workers: int = 20,
@@ -83,7 +80,7 @@ def match_extractions_to_groundtruth(
 
     # Stage 1: queue every (gt_row, ext_row) pair for comparison
     comparison_tasks = []
-    comparison_index: Dict[int, Dict] = {}
+    comparison_index: dict[int, dict] = {}
 
     for case_name in all_cases:
         if case_name not in gt_by_case.groups:
@@ -91,9 +88,7 @@ def match_extractions_to_groundtruth(
 
         gt_agencies = gt_by_case.get_group(case_name)
         ext_agencies = (
-            ext_by_case.get_group(case_name)
-            if case_name in ext_by_case.groups
-            else pd.DataFrame()
+            ext_by_case.get_group(case_name) if case_name in ext_by_case.groups else pd.DataFrame()
         )
 
         for gt_idx, gt_row in gt_agencies.iterrows():
@@ -110,11 +105,9 @@ def match_extractions_to_groundtruth(
 
     logger.info(f"Queued {len(comparison_tasks)} agency name comparisons")
 
-    comparison_results: Dict[int, bool] = {}
+    comparison_results: dict[int, bool] = {}
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [
-            executor.submit(_compare_wrapper, task) for task in comparison_tasks
-        ]
+        futures = [executor.submit(_compare_wrapper, task) for task in comparison_tasks]
         for fut in as_completed(futures):
             task_id, is_match = fut.result()
             comparison_results[task_id] = is_match
@@ -129,9 +122,7 @@ def match_extractions_to_groundtruth(
 
         gt_agencies = gt_by_case.get_group(case_name)
         ext_agencies = (
-            ext_by_case.get_group(case_name)
-            if case_name in ext_by_case.groups
-            else pd.DataFrame()
+            ext_by_case.get_group(case_name) if case_name in ext_by_case.groups else pd.DataFrame()
         )
 
         for gt_idx, gt_row in gt_agencies.iterrows():
@@ -153,9 +144,7 @@ def match_extractions_to_groundtruth(
                     ):
                         task_id = tid
                         break
-                names_match = (
-                    comparison_results[task_id] if task_id is not None else False
-                )
+                names_match = comparison_results[task_id] if task_id is not None else False
                 if names_match:
                     match_found = True
                     matched_ext_name = ext_row["agency_name"]
@@ -282,9 +271,7 @@ def write_metrics(out_dir: str | Path, model_name: str, prf) -> None:
     logger.info(f"Wrote metrics summary to {txt_path}")
 
 
-def load_groundtruth(
-    gt_path: str | Path, fp_path: str | Path | None = None
-) -> pd.DataFrame:
+def load_groundtruth(gt_path: str | Path, fp_path: str | Path | None = None) -> pd.DataFrame:
     """Load + filter groundtruth CSV (and optional false-positives-labeled CSV)."""
     gt_df = pd.read_csv(gt_path)
     gt_df = gt_df[gt_df["correct"].astype(str).str.contains(r"1")]
@@ -307,15 +294,11 @@ def load_groundtruth(
     return gt_df
 
 
-def filter_extractions(
-    extractions_df: pd.DataFrame, gt_cases: set
-) -> pd.DataFrame:
+def filter_extractions(extractions_df: pd.DataFrame, gt_cases: set) -> pd.DataFrame:
     """Apply standard filters: in-GT-cases, no fire dept, citations > 0, dedup."""
     df = extractions_df[extractions_df["case_name"].isin(gt_cases)]
     df = df[~df["agency_name"].astype(str).str.contains("fire", case=False, na=False)]
     if "num_citations" in df.columns:
         df = df[df["num_citations"] > 0]
-    df = df.drop_duplicates(
-        subset=["case_name", "agency_name", "agency_type"], keep="first"
-    )
+    df = df.drop_duplicates(subset=["case_name", "agency_name", "agency_type"], keep="first")
     return df

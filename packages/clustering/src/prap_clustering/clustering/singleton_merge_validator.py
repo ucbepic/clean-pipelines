@@ -43,7 +43,12 @@ DON'T MERGE if:
 Return your decision."""
 
 
-def should_merge_singletons(directory_path: str, filenames: list[str], max_files_to_show: int = 50, output_log_path: str = None) -> bool:
+def should_merge_singletons(
+    directory_path: str,
+    filenames: list[str],
+    max_files_to_show: int = 50,
+    output_log_path: str = None,
+) -> bool:
     """
     Determine if singleton files in a directory should be merged into a cluster.
 
@@ -81,9 +86,7 @@ def should_merge_singletons(directory_path: str, filenames: list[str], max_files
         full_path_list = "\n".join(f"- {fp}" for fp in full_paths_to_show)
 
     prompt = MERGE_VALIDATION_PROMPT.format(
-        directory_path=directory_path,
-        num_files=len(just_filenames),
-        file_list=file_list
+        directory_path=directory_path, num_files=len(just_filenames), file_list=file_list
     )
 
     try:
@@ -92,13 +95,13 @@ def should_merge_singletons(directory_path: str, filenames: list[str], max_files
         should_merge = bool(response.should_merge)
 
         # Log the decision
-        decision_str = 'MERGE' if should_merge else 'SKIP'
+        decision_str = "MERGE" if should_merge else "SKIP"
         logger.info(f"  {directory_path}: {decision_str} ({len(just_filenames)} files)")
 
         # Write to log file if provided (use full paths for human review)
         if output_log_path:
-            with open(output_log_path, 'a') as f:
-                f.write(f"\n{'='*80}\n")
+            with open(output_log_path, "a") as f:
+                f.write(f"\n{'=' * 80}\n")
                 f.write(f"DIRECTORY: {directory_path}\n")
                 f.write(f"FILES: {len(filenames)} total\n")
                 f.write(f"{full_path_list}\n")
@@ -113,8 +116,8 @@ def should_merge_singletons(directory_path: str, filenames: list[str], max_files
 
         # Log error to file if provided (use full paths for human review)
         if output_log_path:
-            with open(output_log_path, 'a') as f:
-                f.write(f"\n{'='*80}\n")
+            with open(output_log_path, "a") as f:
+                f.write(f"\n{'=' * 80}\n")
                 f.write(f"DIRECTORY: {directory_path}\n")
                 f.write(f"FILES: {len(filenames)} total\n")
                 f.write(f"{full_path_list}\n")

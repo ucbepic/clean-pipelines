@@ -49,10 +49,12 @@ def concatenate_pages(pages: list[str], start_idx: int, num_pages: int) -> tuple
 
 def create_batches(pages: list[str], batch_size: int) -> list[list[str]]:
     """Create batches of pages for parallel processing."""
-    return [pages[i:i + batch_size] for i in range(0, len(pages), batch_size)]
+    return [pages[i : i + batch_size] for i in range(0, len(pages), batch_size)]
 
 
-def process_batch(batch: list[str], num_pages_to_concat: int, prompts: dict[str, str]) -> list[dict[str, Any]]:
+def process_batch(
+    batch: list[str], num_pages_to_concat: int, prompts: dict[str, str]
+) -> list[dict[str, Any]]:
     """
     Process a batch of pages by concatenating and summarizing them.
 
@@ -81,29 +83,36 @@ def process_batch(batch: list[str], num_pages_to_concat: int, prompts: dict[str,
 
         if concat_pages:
             original_document = " ".join(concat_pages)
-            logger.debug(f"Batch: Summarizing pages {page_numbers} (combined length: {len(original_document)} chars)")
+            logger.debug(
+                f"Batch: Summarizing pages {page_numbers} (combined length: {len(original_document)} chars)"
+            )
 
             # Initial summary
-            template = Template(prompts['summarization']['page_summary'])
+            template = Template(prompts["summarization"]["page_summary"])
             prompt = template.render(current_page=original_document)
             time.sleep(0.2)  # Rate limiting
             initial_summary = get_llm().complete(prompt).text
-            logger.debug(f"Batch pages {page_numbers}: Initial summary generated (length: {len(initial_summary)} chars)")
+            logger.debug(
+                f"Batch pages {page_numbers}: Initial summary generated (length: {len(initial_summary)} chars)"
+            )
 
             # Verification step
-            template = Template(prompts['summarization']['page_verification'])
+            template = Template(prompts["summarization"]["page_verification"])
             prompt = template.render(
-                original_document=original_document,
-                current_summary=initial_summary
+                original_document=original_document, current_summary=initial_summary
             )
             time.sleep(0.2)  # Rate limiting
             verified_summary = get_llm().complete(prompt).text
-            logger.debug(f"Batch pages {page_numbers}: Verified summary (length: {len(verified_summary)} chars)")
+            logger.debug(
+                f"Batch pages {page_numbers}: Verified summary (length: {len(verified_summary)} chars)"
+            )
 
-            results.append({
-                "page_content": verified_summary,
-                "page_numbers": page_numbers,
-            })
+            results.append(
+                {
+                    "page_content": verified_summary,
+                    "page_numbers": page_numbers,
+                }
+            )
 
         if not concat_pages:
             break
@@ -118,9 +127,13 @@ def process_batch_wrapper(args):
     return process_batch(batch, num_pages_to_concat, prompts)
 
 
-def generate_page_summaries(pages: list[str], prompts: dict[str, str],
-                           batch_size: int = 20, num_pages_to_concat: int = 5,
-                           max_workers: int = 3) -> list[dict[str, Any]]:
+def generate_page_summaries(
+    pages: list[str],
+    prompts: dict[str, str],
+    batch_size: int = 20,
+    num_pages_to_concat: int = 5,
+    max_workers: int = 3,
+) -> list[dict[str, Any]]:
     """
     Generate summaries for all pages using parallel processing.
 
@@ -134,7 +147,9 @@ def generate_page_summaries(pages: list[str], prompts: dict[str, str],
     Returns:
         List of page summary dictionaries
     """
-    logger.info(f"Generating summaries for {len(pages)} pages (batch_size={batch_size}, concat={num_pages_to_concat})")
+    logger.info(
+        f"Generating summaries for {len(pages)} pages (batch_size={batch_size}, concat={num_pages_to_concat})"
+    )
     batches = create_batches(pages, batch_size)
     logger.info(f"Created {len(batches)} batches for parallel processing")
 
@@ -156,7 +171,9 @@ def generate_page_summaries(pages: list[str], prompts: dict[str, str],
                 batch_results = future.result()
                 results.extend(batch_results)
                 completed += 1
-                logger.info(f"Batch {completed}/{len(futures)} completed ({len(batch_results)} summaries)")
+                logger.info(
+                    f"Batch {completed}/{len(futures)} completed ({len(batch_results)} summaries)"
+                )
             except Exception as e:
                 logger.error(f"Batch processing failed: {e}", exc_info=True)
                 completed += 1
@@ -166,7 +183,9 @@ def generate_page_summaries(pages: list[str], prompts: dict[str, str],
     return results
 
 
-def combine_and_verify_pair(summary_1: dict, summary_2: dict, prompts: dict[str, str]) -> dict[str, Any]:
+def combine_and_verify_pair(
+    summary_1: dict, summary_2: dict, prompts: dict[str, str]
+) -> dict[str, Any]:
     """
     Combine two summaries and verify the result.
 
@@ -178,24 +197,25 @@ def combine_and_verify_pair(summary_1: dict, summary_2: dict, prompts: dict[str,
     Returns:
         Combined and verified summary dict
     """
-    logger.debug(f"Combining summaries for pages {summary_1['page_numbers']} and {summary_2['page_numbers']}")
+    logger.debug(
+        f"Combining summaries for pages {summary_1['page_numbers']} and {summary_2['page_numbers']}"
+    )
 
     # Combine
-    template = Template(prompts['summarization']['combine'])
+    template = Template(prompts["summarization"]["combine"])
     prompt = template.render(
-        summary_1=summary_1["page_content"],
-        summary_2=summary_2["page_content"]
+        summary_1=summary_1["page_content"], summary_2=summary_2["page_content"]
     )
     time.sleep(0.2)  # Rate limiting
     combined_summary = get_llm().complete(prompt).text
     logger.debug(f"Combined summary generated (length: {len(combined_summary)} chars)")
 
     # Verify
-    template = Template(prompts['summarization']['verification'])
+    template = Template(prompts["summarization"]["verification"])
     prompt = template.render(
         current_combined_summary=combined_summary,
         summary_1=summary_1["page_content"],
-        summary_2=summary_2["page_content"]
+        summary_2=summary_2["page_content"],
     )
     time.sleep(0.2)  # Rate limiting
     verified_summary = get_llm().complete(prompt).text
@@ -203,7 +223,7 @@ def combine_and_verify_pair(summary_1: dict, summary_2: dict, prompts: dict[str,
 
     result = {
         "page_content": verified_summary,
-        "page_numbers": summary_1["page_numbers"] + summary_2["page_numbers"]
+        "page_numbers": summary_1["page_numbers"] + summary_2["page_numbers"],
     }
     logger.debug(f"Combined pages {result['page_numbers']}")
     return result
@@ -215,8 +235,9 @@ def combine_and_verify_pair_wrapper(args):
     return combine_and_verify_pair(summary_1, summary_2, prompts)
 
 
-def parallel_combine(summaries: list[dict], prompts: dict[str, str], depth: int = 0,
-                    max_workers: int = 3) -> dict[str, Any]:
+def parallel_combine(
+    summaries: list[dict], prompts: dict[str, str], depth: int = 0, max_workers: int = 3
+) -> dict[str, Any]:
     """
     Recursively combine summaries in parallel using a tree structure.
 
@@ -244,8 +265,10 @@ def parallel_combine(summaries: list[dict], prompts: dict[str, str], depth: int 
     logger.debug(f"{indent}Sorted {len(sorted_summaries)} summaries by page number")
 
     # Pair adjacent summaries
-    pairs = [(sorted_summaries[i], sorted_summaries[i+1])
-             for i in range(0, len(sorted_summaries) - 1, 2)]
+    pairs = [
+        (sorted_summaries[i], sorted_summaries[i + 1])
+        for i in range(0, len(sorted_summaries) - 1, 2)
+    ]
     logger.info(f"{indent}Created {len(pairs)} pairs for parallel processing")
 
     start_time = time.time()
@@ -268,7 +291,9 @@ def parallel_combine(summaries: list[dict], prompts: dict[str, str], depth: int 
                 logger.error(f"{indent}Pair combining failed: {e}", exc_info=True)
 
     elapsed = time.time() - start_time
-    logger.info(f"{indent}Parallel combining complete: {len(combined_results)} results in {elapsed:.2f}s")
+    logger.info(
+        f"{indent}Parallel combining complete: {len(combined_results)} results in {elapsed:.2f}s"
+    )
 
     # If there's an odd number of summaries, add the last one to the combined results
     if len(sorted_summaries) % 2 != 0:
@@ -301,8 +326,13 @@ def combine_summaries(summaries: list[dict], prompts: dict[str, str]) -> str:
     return final_summary.get("page_content", "")
 
 
-def process_interval(interval_index: int, interval_pages: list[str], prompts: dict[str, str],
-                    batch_size: int = 20, num_pages_to_concat: int = 5) -> dict[str, Any]:
+def process_interval(
+    interval_index: int,
+    interval_pages: list[str],
+    prompts: dict[str, str],
+    batch_size: int = 20,
+    num_pages_to_concat: int = 5,
+) -> dict[str, Any]:
     """
     Process a single interval of pages.
 
@@ -321,9 +351,7 @@ def process_interval(interval_index: int, interval_pages: list[str], prompts: di
 
     # Step 1: Generate page summaries in parallel
     page_summaries = generate_page_summaries(
-        interval_pages, prompts,
-        batch_size=batch_size,
-        num_pages_to_concat=num_pages_to_concat
+        interval_pages, prompts, batch_size=batch_size, num_pages_to_concat=num_pages_to_concat
     )
     logger.info(f"Interval {interval_index}: Generated {len(page_summaries)} page summaries")
 
@@ -334,16 +362,15 @@ def process_interval(interval_index: int, interval_pages: list[str], prompts: di
     elapsed = time.time() - start_time
     logger.info(f"Interval {interval_index}: Complete in {elapsed:.2f}s")
 
-    return {
-        "page_content": combined_summary_text,
-        "interval_index": interval_index
-    }
+    return {"page_content": combined_summary_text, "interval_index": interval_index}
 
 
 def process_interval_wrapper(args):
     """Wrapper for multiprocessing - unpacks arguments."""
     interval_index, interval_pages, prompts, batch_size, num_pages_to_concat = args
-    return process_interval(interval_index, interval_pages, prompts, batch_size, num_pages_to_concat)
+    return process_interval(
+        interval_index, interval_pages, prompts, batch_size, num_pages_to_concat
+    )
 
 
 def concatenate_interval_summaries(interval_summaries: list[dict]) -> str:
@@ -359,7 +386,7 @@ def concatenate_interval_summaries(interval_summaries: list[dict]) -> str:
     logger.info(f"Concatenating {len(interval_summaries)} interval summaries")
 
     # Sort by interval index to maintain order
-    sorted_summaries = sorted(interval_summaries, key=lambda x: x.get('interval_index', 0))
+    sorted_summaries = sorted(interval_summaries, key=lambda x: x.get("interval_index", 0))
 
     all_content = []
     for interval_summary in sorted_summaries:
@@ -369,14 +396,20 @@ def concatenate_interval_summaries(interval_summaries: list[dict]) -> str:
             logger.debug(f"Interval {interval_summary.get('interval_index')}: {len(content)} chars")
 
     concatenated = "\n\n".join(all_content)
-    logger.info(f"Concatenated summary: {len(concatenated)} chars from {len(all_content)} intervals")
+    logger.info(
+        f"Concatenated summary: {len(concatenated)} chars from {len(all_content)} intervals"
+    )
 
     return concatenated
 
 
-def summarize_document(ocr_text: str, prompts: dict[str, str],
-                      batch_size: int = 20, num_pages_to_concat: int = 5,
-                      num_intervals: int = 4) -> str:
+def summarize_document(
+    ocr_text: str,
+    prompts: dict[str, str],
+    batch_size: int = 20,
+    num_pages_to_concat: int = 5,
+    num_intervals: int = 4,
+) -> str:
     """
     Main entry point: Summarize a document's OCR text into bulletpoint summary.
 
@@ -422,8 +455,7 @@ def summarize_document(ocr_text: str, prompts: dict[str, str],
     base_interval_size = total_pages // num_intervals
     extra_pages = total_pages % num_intervals
     interval_sizes = [
-        base_interval_size + (1 if i < extra_pages else 0)
-        for i in range(num_intervals)
+        base_interval_size + (1 if i < extra_pages else 0) for i in range(num_intervals)
     ]
 
     logger.info(f"Divided into {num_intervals} intervals: {interval_sizes}")
@@ -441,7 +473,7 @@ def summarize_document(ocr_text: str, prompts: dict[str, str],
     start_time = time.time()
 
     interval_summaries = []
-    max_workers = 1 # Max 2 parallel intervals to manage API rate limits
+    max_workers = 1  # Max 2 parallel intervals to manage API rate limits
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Prepare arguments for each interval
@@ -452,7 +484,9 @@ def summarize_document(ocr_text: str, prompts: dict[str, str],
 
         # Submit all interval jobs
         futures = [executor.submit(process_interval_wrapper, args) for args in interval_args]
-        logger.info(f"Submitted {len(futures)} interval jobs to ThreadPoolExecutor (max {max_workers} parallel)")
+        logger.info(
+            f"Submitted {len(futures)} interval jobs to ThreadPoolExecutor (max {max_workers} parallel)"
+        )
 
         # Collect results as they complete
         completed = 0

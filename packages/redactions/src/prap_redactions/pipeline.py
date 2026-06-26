@@ -10,7 +10,6 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Tuple
 
 import pandas as pd
 from prap_core.config import Settings
@@ -30,14 +29,14 @@ logger = logging.getLogger("prap.redactions")
 def load_case_file(json_path: Path) -> dict:
     """Load a case file JSON."""
     try:
-        with open(json_path, "r") as f:
+        with open(json_path) as f:
             return json.load(f)
     except Exception as e:
         logger.error(f"Failed to load {json_path}: {e}")
         return None
 
 
-def prepare_ocr_pages(case_data: dict, case_name: str) -> List[dict]:
+def prepare_ocr_pages(case_data: dict, case_name: str) -> list[dict]:
     """
     Convert case file data into the format expected by extract_names.
     Returns a list of pages with their metadata.
@@ -83,7 +82,7 @@ def load_processed_cases(checkpoint_file: Path) -> set:
         return set()
 
     try:
-        with open(checkpoint_file, 'r') as f:
+        with open(checkpoint_file) as f:
             return set(line.strip() for line in f if line.strip())
     except Exception as e:
         logger.warning(f"Failed to load checkpoint file: {e}")
@@ -93,7 +92,7 @@ def load_processed_cases(checkpoint_file: Path) -> set:
 def save_processed_case(checkpoint_file: Path, case_name: str):
     """Append a case name to the checkpoint file."""
     try:
-        with open(checkpoint_file, 'a') as f:
+        with open(checkpoint_file, "a") as f:
             f.write(f"{case_name}\n")
     except Exception as e:
         logger.error(f"Failed to save checkpoint for {case_name}: {e}")
@@ -107,7 +106,7 @@ def append_results_to_csv(results_df: pd.DataFrame, output_path: Path):
     try:
         if output_path.exists():
             # Append to existing file
-            results_df.to_csv(output_path, mode='a', header=False, index=False)
+            results_df.to_csv(output_path, mode="a", header=False, index=False)
             logger.info(f"Appended {len(results_df)} rows to {output_path}")
         else:
             # Create new file with header
@@ -163,9 +162,7 @@ def process_case(json_path: Path, llm: LLM, settings: Settings) -> pd.DataFrame:
 
         # Step 2: Run sensitive persons classifier only if penal codes found
         if has_penal_codes:
-            logger.info(
-                f"Penal codes found in {sha1}, running sensitive persons classifier..."
-            )
+            logger.info(f"Penal codes found in {sha1}, running sensitive persons classifier...")
             try:
                 results_df = extract_names(llm, file_pages)
 
@@ -182,17 +179,18 @@ def process_case(json_path: Path, llm: LLM, settings: Settings) -> pd.DataFrame:
                                 # Add classifier to this page's reasons
                                 if page_num not in redaction_pages_with_reasons:
                                     redaction_pages_with_reasons[page_num] = []
-                                redaction_pages_with_reasons[page_num].append("sensitive_persons_classifier")
+                                redaction_pages_with_reasons[page_num].append(
+                                    "sensitive_persons_classifier"
+                                )
                         logger.info(
-                            f"Found {len(sensitive_persons_pages)} pages with sensitive persons in {sha1}"
+                            f"Found {len(sensitive_persons_pages)} pages with "
+                            f"sensitive persons in {sha1}"
                         )
 
             except Exception as e:
                 logger.error(f"Error extracting names from {sha1}: {e}", exc_info=True)
         else:
-            logger.info(
-                f"No penal codes found in {sha1}, skipping sensitive persons classifier"
-            )
+            logger.info(f"No penal codes found in {sha1}, skipping sensitive persons classifier")
 
         # Step 3: Run graphic imagery classifier (only on pages with low word count)
         # Filter pages to only those with <=20 words (likely image pages)
@@ -220,22 +218,24 @@ def process_case(json_path: Path, llm: LLM, settings: Settings) -> pd.DataFrame:
                         for page_num in graphic_pages:
                             if page_num not in redaction_pages_with_reasons:
                                 redaction_pages_with_reasons[page_num] = []
-                            redaction_pages_with_reasons[page_num].append("graphic_imagery_classifier")
+                            redaction_pages_with_reasons[page_num].append(
+                                "graphic_imagery_classifier"
+                            )
                         logger.info(
                             f"Found {len(graphic_pages)} pages with graphic imagery in {sha1}"
                         )
                 else:
                     logger.warning(
-                        f"Graphic imagery classification failed for {sha1}: {graphic_result.get('error')}"
+                        f"Graphic imagery classification failed for {sha1}: "
+                        f"{graphic_result.get('error')}"
                     )
 
             except Exception as e:
-                logger.error(
-                    f"Error classifying graphic imagery for {sha1}: {e}", exc_info=True
-                )
+                logger.error(f"Error classifying graphic imagery for {sha1}: {e}", exc_info=True)
         else:
             logger.info(
-                f"Skipping graphic imagery classifier for {sha1} - all {len(file_pages)} pages have >20 words"
+                f"Skipping graphic imagery classifier for {sha1} - "
+                f"all {len(file_pages)} pages have >20 words"
             )
 
         # Step 4: Run DOB classifier on all pages
@@ -307,7 +307,7 @@ def process_case(json_path: Path, llm: LLM, settings: Settings) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def process_case_wrapper(args: Tuple) -> Tuple[str, str, int, object]:
+def process_case_wrapper(args: tuple) -> tuple[str, str, int, object]:
     """
     Wrapper function for parallel case processing.
 
@@ -325,22 +325,22 @@ def process_case_wrapper(args: Tuple) -> Tuple[str, str, int, object]:
     case_name = json_path.stem.replace("agency_case_file_bundle-", "")
 
     try:
-        logger.info(f"{'='*80}")
+        logger.info(f"{'=' * 80}")
         logger.info(f"Case {idx}/{total_cases}: {case_name}")
-        logger.info(f"{'='*80}")
+        logger.info(f"{'=' * 80}")
 
         results_df = process_case(json_path, llm, settings)
 
         if not results_df.empty:
             logger.info(f"Case {case_name}: Found redactions needed ({len(results_df)} files)")
-            return ('success', case_name, idx, results_df)
+            return ("success", case_name, idx, results_df)
         else:
             logger.info(f"Case {case_name}: No redactions needed")
-            return ('success', case_name, idx, pd.DataFrame())
+            return ("success", case_name, idx, pd.DataFrame())
 
     except Exception as e:
         logger.error(f"Error processing case {case_name}: {e}", exc_info=True)
-        return ('error', case_name, idx, e)
+        return ("error", case_name, idx, e)
 
 
 def run(
@@ -397,7 +397,8 @@ def run(
 
     # Filter out already-processed cases
     remaining_files = [
-        f for f in json_files
+        f
+        for f in json_files
         if f.stem.replace("agency_case_file_bundle-", "") not in processed_cases
     ]
 
@@ -438,15 +439,17 @@ def run(
             try:
                 status, case_name, idx, data = future.result()
 
-                if status == 'error':
+                if status == "error":
                     # data is the exception
                     cases_with_errors += 1
-                    error_details.append({
-                        'case_name': case_name,
-                        'idx': idx,
-                        'error': str(data),
-                        'error_type': type(data).__name__
-                    })
+                    error_details.append(
+                        {
+                            "case_name": case_name,
+                            "idx": idx,
+                            "error": str(data),
+                            "error_type": type(data).__name__,
+                        }
+                    )
                 else:
                     # data is the results DataFrame
                     results_df = data
@@ -464,19 +467,23 @@ def run(
                         batch_df = pd.concat(pending_results, ignore_index=True)
                         append_results_to_csv(batch_df, output_path)
                         pending_results = []
-                        logger.info(f"{'='*60}")
-                        logger.info(f"CHECKPOINT: {cases_processed}/{len(json_files)} cases processed")
-                        logger.info(f"{'='*60}")
+                        logger.info(f"{'=' * 60}")
+                        logger.info(
+                            f"CHECKPOINT: {cases_processed}/{len(json_files)} cases processed"
+                        )
+                        logger.info(f"{'=' * 60}")
 
             except Exception as e:
                 cases_with_errors += 1
                 logger.error(f"Case processing exception: {e}", exc_info=True)
-                error_details.append({
-                    'case_name': 'unknown',
-                    'idx': 0,
-                    'error': str(e),
-                    'error_type': type(e).__name__
-                })
+                error_details.append(
+                    {
+                        "case_name": "unknown",
+                        "idx": 0,
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                    }
+                )
 
     # Save any remaining results
     if pending_results:
@@ -486,27 +493,29 @@ def run(
 
     # Write error log if there were any errors
     if error_details:
-        with open(error_log_path, 'w') as error_log:
+        with open(error_log_path, "w") as error_log:
             error_log.write("REDACTION IDENTIFICATION ERRORS\n")
-            error_log.write("="*80 + "\n")
+            error_log.write("=" * 80 + "\n")
             error_log.write(f"Generated: {pd.Timestamp.now()}\n")
-            error_log.write("="*80 + "\n\n")
+            error_log.write("=" * 80 + "\n\n")
 
             for error in error_details:
                 error_log.write(f"Case: {error['case_name']}\n")
                 error_log.write(f"Index: {error['idx']}\n")
                 error_log.write(f"Error: {error['error']}\n")
                 error_log.write(f"Error type: {error['error_type']}\n")
-                error_log.write("-"*80 + "\n\n")
+                error_log.write("-" * 80 + "\n\n")
 
             # Write summary to error log
-            error_log.write("\n" + "="*80 + "\n")
+            error_log.write("\n" + "=" * 80 + "\n")
             error_log.write("SUMMARY\n")
-            error_log.write("="*80 + "\n")
+            error_log.write("=" * 80 + "\n")
             error_log.write(f"Total cases processed: {len(json_files)}\n")
             error_log.write(f"Cases with errors: {cases_with_errors}\n")
-            error_log.write(f"Cases successfully processed: {len(json_files) - cases_with_errors}\n")
-            error_log.write("="*80 + "\n")
+            error_log.write(
+                f"Cases successfully processed: {len(json_files) - cases_with_errors}\n"
+            )
+            error_log.write("=" * 80 + "\n")
 
         logger.info(f"Error log saved to {error_log_path}")
     else:

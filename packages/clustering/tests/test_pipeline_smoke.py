@@ -104,4 +104,3 @@ def test_metrics_evaluate_clusters_on_synthetic():
     # evaluate_clusters has a specific signature; just verify it's callable.
     assert callable(evaluate_clusters)
     _ = pd  # silence the unused-import warning if dataframes are removed
-

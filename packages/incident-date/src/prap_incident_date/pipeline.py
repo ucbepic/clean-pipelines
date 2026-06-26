@@ -1,4 +1,5 @@
-"""Incident-date extraction pipeline: three-stage extract → verify → ISO-8601 prompt chain over a chunked summary filter."""
+"""Incident-date extraction pipeline: three-stage extract → verify → ISO-8601 prompt chain
+over a chunked summary filter."""
 
 from __future__ import annotations
 

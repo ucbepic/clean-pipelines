@@ -6,7 +6,6 @@ import json
 import logging
 from pathlib import Path
 
-import pandas as pd
 import typer
 from prap_core.io import read_jsonl
 
@@ -33,9 +32,15 @@ def run(
     input: Path = typer.Option(..., "--input", help="jsonl of DocText (sha1 + pre-OCR'd pages)."),
     output: Path = typer.Option(..., "--output", help="jsonl of DocumentTOC."),
     n_threads: int = typer.Option(8, "--n-threads"),
-    no_domain: bool = typer.Option(False, "--no-domain", help="Disable the SB-1421 domain preamble."),
-    no_history: bool = typer.Option(False, "--no-history", help="Disable rolling page-history context."),
-    no_context: bool = typer.Option(False, "--no-context", help="Disable previous-page tail context."),
+    no_domain: bool = typer.Option(
+        False, "--no-domain", help="Disable the SB-1421 domain preamble."
+    ),
+    no_history: bool = typer.Option(
+        False, "--no-history", help="Disable rolling page-history context."
+    ),
+    no_context: bool = typer.Option(
+        False, "--no-context", help="Disable previous-page tail context."
+    ),
     recent_window: int = typer.Option(15, "--recent-window"),
     log_level: str = typer.Option("INFO", "--log-level"),
 ) -> None:

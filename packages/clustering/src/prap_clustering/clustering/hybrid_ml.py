@@ -82,12 +82,22 @@ def _extract_pair_features_for_ml_wrapper(pair_tuple):
     # Tier availability flags — mirrors learn_matching_rules.py extract_pair_features.
     # True only when BOTH docs in the pair had extractable data for that tier.
     features["tier1_has_any_data"] = int(
-        bool(doc1.tier1_case_ids or doc1.tier1_dates or doc1.tier1_names) and
-        bool(doc2.tier1_case_ids or doc2.tier1_dates or doc2.tier1_names)
+        bool(doc1.tier1_case_ids or doc1.tier1_dates or doc1.tier1_names)
+        and bool(doc2.tier1_case_ids or doc2.tier1_dates or doc2.tier1_names)
     )
     features["tier2_has_any_data"] = int(
-        bool(doc1.tier2_case_ids or doc1.tier2_dates or doc1.tier2_subject_names or doc1.tier2_officer_names) and
-        bool(doc2.tier2_case_ids or doc2.tier2_dates or doc2.tier2_subject_names or doc2.tier2_officer_names)
+        bool(
+            doc1.tier2_case_ids
+            or doc1.tier2_dates
+            or doc1.tier2_subject_names
+            or doc1.tier2_officer_names
+        )
+        and bool(
+            doc2.tier2_case_ids
+            or doc2.tier2_dates
+            or doc2.tier2_subject_names
+            or doc2.tier2_officer_names
+        )
     )
 
     # Replace -1 sentinel with 9999 so missing dates fall outside all thresholds
@@ -164,9 +174,7 @@ def load_ml_ablation_config(config_name: str) -> MLAblationConfig:
                 disable_officer_names=ablation.get("disable_officer_names", False),
             )
 
-    raise ValueError(
-        f"ML ablation config '{config_name}' not found. Available: {available}"
-    )
+    raise ValueError(f"ML ablation config '{config_name}' not found. Available: {available}")
 
 
 # ============================================================================
@@ -200,15 +208,17 @@ def _run_batch_joint(
     matches = []
     for idx, pred in enumerate(preds):
         if pred == 1:
-            matches.append(MatchResult(
-                matched=True,
-                tier=1,
-                weight=1.0,
-                reason="joint_model match",
-                doc_ids=batch_doc_ids[idx],
-                match_type="joint_model",
-                shared_features={},
-            ))
+            matches.append(
+                MatchResult(
+                    matched=True,
+                    tier=1,
+                    weight=1.0,
+                    reason="joint_model match",
+                    doc_ids=batch_doc_ids[idx],
+                    match_type="joint_model",
+                    shared_features={},
+                )
+            )
     return matches
 
 
@@ -254,15 +264,17 @@ def _run_batch_cascade(
     for idx, pred in enumerate(t1_preds):
         if pred > 0:
             match_type = "cascade_tier2_match" if pred == 2 else "cascade_tier1_match"
-            matches.append(MatchResult(
-                matched=True,
-                tier=1 if pred == 1 else 2,
-                weight=1.0,
-                reason=match_type,
-                doc_ids=batch_doc_ids[idx],
-                match_type=match_type,
-                shared_features={},
-            ))
+            matches.append(
+                MatchResult(
+                    matched=True,
+                    tier=1 if pred == 1 else 2,
+                    weight=1.0,
+                    reason=match_type,
+                    doc_ids=batch_doc_ids[idx],
+                    match_type=match_type,
+                    shared_features={},
+                )
+            )
     return matches
 
 
@@ -309,13 +321,13 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
         t1_bundle = load_trained_model(config.cascade_tier1_model_path)
         t2_bundle = load_trained_model(config.cascade_tier2_model_path)
 
-        tier1_model        = t1_bundle["model"]
+        tier1_model = t1_bundle["model"]
         tier1_feature_names = list(t1_bundle["feature_cols"])
-        tier1_use_nan       = t1_bundle.get("use_nan", False)
+        tier1_use_nan = t1_bundle.get("use_nan", False)
 
-        tier2_model        = t2_bundle["model"]
+        tier2_model = t2_bundle["model"]
         tier2_feature_names = list(t2_bundle["feature_cols"])
-        tier2_use_nan       = t2_bundle.get("use_nan", False)
+        tier2_use_nan = t2_bundle.get("use_nan", False)
 
         logger.info(f"  Tier 1: {type(tier1_model).__name__}, {len(tier1_feature_names)} features")
         logger.info(f"  Tier 2: {type(tier2_model).__name__}, {len(tier2_feature_names)} features")
@@ -323,23 +335,25 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
     else:
         logger.info("Loading joint model...")
         bundle = load_trained_model(config.model_path)
-        joint_model         = bundle["model"]
+        joint_model = bundle["model"]
         joint_feature_names = list(bundle["feature_cols"])
-        joint_use_nan       = bundle.get("use_nan", False)
-        joint_threshold     = bundle.get("threshold", 0.5)
-        logger.info(f"  Model: {type(joint_model).__name__}, {len(joint_feature_names)} features ({config.feature_subset}), threshold={joint_threshold}")
+        joint_use_nan = bundle.get("use_nan", False)
+        joint_threshold = bundle.get("threshold", 0.5)
+        logger.info(
+            f"  Model: {type(joint_model).__name__}, {len(joint_feature_names)} features ({config.feature_subset}), threshold={joint_threshold}"
+        )
 
     # ========== STEP 3: Batched pair inference ==========
-    doc_ids    = list(features_map.keys())
+    doc_ids = list(features_map.keys())
     total_pairs = len(doc_ids) * (len(doc_ids) - 1) // 2
     logger.info(f"\nProcessing {total_pairs:,} pairs (batch size 1M)...")
 
-    BATCH_SIZE      = 1_000_000
-    all_edges       = []
-    tier1_blocked   = 0
+    BATCH_SIZE = 1_000_000
+    all_edges = []
+    tier1_blocked = 0
     pairs_processed = 0
 
-    batch_pairs   = []
+    batch_pairs = []
     batch_doc_ids = []
 
     pbar = tqdm(
@@ -361,22 +375,32 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
 
         if config.use_cascade_model:
             matches = _run_batch_cascade(
-                feature_dicts, batch_doc_ids,
-                tier1_model, tier1_feature_names, tier1_use_nan,
-                tier2_model, tier2_feature_names, tier2_use_nan,
+                feature_dicts,
+                batch_doc_ids,
+                tier1_model,
+                tier1_feature_names,
+                tier1_use_nan,
+                tier2_model,
+                tier2_feature_names,
+                tier2_use_nan,
             )
         else:
             matches = _run_batch_joint(
-                feature_dicts, batch_doc_ids,
-                joint_model, joint_feature_names, joint_use_nan,
+                feature_dicts,
+                batch_doc_ids,
+                joint_model,
+                joint_feature_names,
+                joint_use_nan,
                 threshold=joint_threshold,
             )
 
         all_edges.extend(matches)
-        pbar.set_postfix({
-            "blocked": f"{tier1_blocked:,}",
-            "matches": f"{len(all_edges):,}",
-        })
+        pbar.set_postfix(
+            {
+                "blocked": f"{tier1_blocked:,}",
+                "matches": f"{len(all_edges):,}",
+            }
+        )
         batch_pairs.clear()
         batch_doc_ids.clear()
 
@@ -401,7 +425,7 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
     pbar.close()
 
     elapsed = time.time() - phase_start
-    rate    = total_pairs / elapsed if elapsed > 0 else 0
+    rate = total_pairs / elapsed if elapsed > 0 else 0
     logger.info(f"\nInference complete in {elapsed:.1f}s ({rate:,.0f} pairs/s)")
     logger.info(f"  Blocked by dir filter: {tier1_blocked:,}")
     logger.info(f"  Matches: {len(all_edges):,}")
@@ -425,12 +449,15 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
 
     if ENABLE_VALIDATION:
         clusters = validate_and_split_clusters(
-            candidate_clusters, G,
+            candidate_clusters,
+            G,
             threshold=VALIDATION_THRESHOLD,
             debug=False,
             features_map=features_map,
         )
-        logger.info(f"After validation: {len(clusters):,} clusters ({len(clusters)-len(candidate_clusters):+,} net splits)")
+        logger.info(
+            f"After validation: {len(clusters):,} clusters ({len(clusters) - len(candidate_clusters):+,} net splits)"
+        )
     else:
         clusters = candidate_clusters
 
@@ -442,32 +469,34 @@ async def cluster_documents_ml(data: list[dict], config: MLAblationConfig) -> di
 
     results = []
     for doc in data:
-        doc_id   = str(doc.get("gdrive_id", doc.get("id")))
+        doc_id = str(doc.get("gdrive_id", doc.get("id")))
         doc_copy = doc.copy()
         doc_copy["Parent Clusters"] = [node_to_cluster.get(doc_id, -1)]
         results.append(doc_copy)
 
     cluster_sizes = [len(c) for c in clusters]
 
-    t1_matches = sum(1 for e in all_edges if "tier1" in e.match_type or e.match_type == "joint_model")
+    t1_matches = sum(
+        1 for e in all_edges if "tier1" in e.match_type or e.match_type == "joint_model"
+    )
     t2_matches = sum(1 for e in all_edges if "tier2" in e.match_type)
 
     return {
         "results": results,
         "statistics": {
-            "total_documents":  len(data),
-            "total_pairs":      total_pairs,
-            "total_clusters":   len(clusters),
+            "total_documents": len(data),
+            "total_pairs": total_pairs,
+            "total_clusters": len(clusters),
             "singleton_clusters": sum(1 for s in cluster_sizes if s == 1),
             "multi_doc_clusters": sum(1 for s in cluster_sizes if s > 1),
-            "edges_added":      len(all_edges),
-            "tier1_blocked":    tier1_blocked,
-            "tier1_matches":    t1_matches,
-            "tier2_matches":    t2_matches,
-            "tier3_matches":    0,
+            "edges_added": len(all_edges),
+            "tier1_blocked": tier1_blocked,
+            "tier1_matches": t1_matches,
+            "tier2_matches": t2_matches,
+            "tier3_matches": 0,
             "tier3_comparisons": 0,
         },
-        "edges":        all_edges,
+        "edges": all_edges,
         "features_map": features_map,
     }
 
@@ -503,7 +532,7 @@ async def main(
     df = df[~(df.provisional_case_name.fillna("?").str.contains(r"n\/a|\?"))]
     logger.info(f"{len(df):,} documents after filtering unassigned rows")
 
-    df   = rerun_regex_extraction(df)
+    df = rerun_regex_extraction(df)
     data = df.to_dict("records")
 
     output = await cluster_documents_ml(data, config)

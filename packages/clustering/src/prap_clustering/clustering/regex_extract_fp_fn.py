@@ -3,7 +3,7 @@ import re
 
 from pydantic import BaseModel, Field
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -25,43 +25,40 @@ class Names(BaseModel):
 # ============================================================================
 
 EXCLUDE_CASE_ID_PATTERNS = [
-    r'^F\d{1,3}$',           # F313, F990, F101 (form numbers)
-    r'^TF\d+[A-Z]?$',        # TF967, TF752, TF967B, TF1050A (traffic forms)
-    r'^FMT\d+$',             # FMT5 (form codes)
-    r'^\d{1,6}$',            # 109, 1208, 190416 (too short, likely not unique)
-    r'^[A-Z]{1,2}\d{1,2}$',  # V1, V2, W3 (too generic)
-    r'^[A-Z]{2,6}$',         # OISLL, COM, RAVA (abbreviations without numbers)
-    r'^FILE\d+$',            # FILE20150803011837 (file system timestamps)
-    r'^IADFORM\d*$',         # IADFORM13, IADFORM11 (IA form templates)
-    r'^INCIDENT\d*$',        # INCIDENT1 (generic incident placeholders)
-    r'^REPORT\d*$',          # REPORT (generic report IDs)
-    r'^FORM\d*$',            # FORM (generic form references)
-    r'^OIS(19|20)\d{2}$',    # OIS2013, OIS2015 (year-only markers, too broad)
+    r"^F\d{1,3}$",  # F313, F990, F101 (form numbers)
+    r"^TF\d+[A-Z]?$",  # TF967, TF752, TF967B, TF1050A (traffic forms)
+    r"^FMT\d+$",  # FMT5 (form codes)
+    r"^\d{1,6}$",  # 109, 1208, 190416 (too short, likely not unique)
+    r"^[A-Z]{1,2}\d{1,2}$",  # V1, V2, W3 (too generic)
+    r"^[A-Z]{2,6}$",  # OISLL, COM, RAVA (abbreviations without numbers)
+    r"^FILE\d+$",  # FILE20150803011837 (file system timestamps)
+    r"^IADFORM\d*$",  # IADFORM13, IADFORM11 (IA form templates)
+    r"^INCIDENT\d*$",  # INCIDENT1 (generic incident placeholders)
+    r"^REPORT\d*$",  # REPORT (generic report IDs)
+    r"^FORM\d*$",  # FORM (generic form references)
+    r"^OIS(19|20)\d{2}$",  # OIS2013, OIS2015 (year-only markers, too broad)
 ]
 
 EXCLUDE_NAME_PATTERNS = [
     # Redaction patterns
-    r'^b\s*\d+\s*b',                    # b 6 b, b 5 b (redacted)
-    r'^\d+\s*\d+\s*b\s*\d+\s*[a-z]',    # 832 7 b 6 b, 832 7 b 6 a (redacted)
-    r'subject\s*b\s*\d+\s*b',           # subject b 6 b
-    r'name\s*redacted',                 # name redacted
-
+    r"^b\s*\d+\s*b",  # b 6 b, b 5 b (redacted)
+    r"^\d+\s*\d+\s*b\s*\d+\s*[a-z]",  # 832 7 b 6 b, 832 7 b 6 a (redacted)
+    r"subject\s*b\s*\d+\s*b",  # subject b 6 b
+    r"name\s*redacted",  # name redacted
     # Placeholder/generic names (match anywhere in string, not just exact)
-    r'victim',                          # victim, victim 1, victim a (changed from ^victim$)
-    r'suspect',                         # suspect, suspect 1, suspect b (changed from ^suspect$)
-    r'unnamed',                         # unnamed, unnamed suspect (changed from unnamed\s+...)
-    r'^unknown',                        # unknown person, unknown subject (new)
-    r'\bdoe\b',                         # john doe, jane doe, baby doe (new)
-    r'witness\s+\d+',                   # witness 1, witness 3
-    r'officer\s*\d+',                   # officer 1, officer 2 (new, for generic placeholders)
-
+    r"victim",  # victim, victim 1, victim a (changed from ^victim$)
+    r"suspect",  # suspect, suspect 1, suspect b (changed from ^suspect$)
+    r"unnamed",  # unnamed, unnamed suspect (changed from unnamed\s+...)
+    r"^unknown",  # unknown person, unknown subject (new)
+    r"\bdoe\b",  # john doe, jane doe, baby doe (new)
+    r"witness\s+\d+",  # witness 1, witness 3
+    r"officer\s*\d+",  # officer 1, officer 2 (new, for generic placeholders)
     # Confidential informants
-    r'^confidential\s+informant',       # confidential informant ci
-    r'\bci\b',                          # CI (confidential informant)
-
+    r"^confidential\s+informant",  # confidential informant ci
+    r"\bci\b",  # CI (confidential informant)
     # Too short/ambiguous
-    r'^[a-z]+$',                        # Single word names (too ambiguous alone)
-    r'^\w{1,2}$',                       # Very short 1-2 char names like V1, AB (new)
+    r"^[a-z]+$",  # Single word names (too ambiguous alone)
+    r"^\w{1,2}$",  # Very short 1-2 char names like V1, AB (new)
 ]
 
 
@@ -158,7 +155,6 @@ def extract_ids_from_metadata(text: str) -> list[str]:
         r"\b(OIS[-_]?\d{4,})\b",  # Require at least 4 digits
     ]
 
-
     all_ids = []
     for pattern in id_patterns:
         matches = re.findall(pattern, text, re.IGNORECASE)
@@ -236,10 +232,18 @@ def extract_names_from_metadata(text: str) -> list[str]:
                         # These are fragments like "of Police", "of Police Commissioners", etc.
                         name_lower = name.lower()
                         org_fragments = [
-                            "of police", "or police", "of the police",
-                            "police department", "police commission", "police board",
-                            "city of", "county of", "state of",
-                            "department of", "board of", "bureau of"
+                            "of police",
+                            "or police",
+                            "of the police",
+                            "police department",
+                            "police commission",
+                            "police board",
+                            "city of",
+                            "county of",
+                            "state of",
+                            "department of",
+                            "board of",
+                            "bureau of",
                         ]
                         if not any(fragment in name_lower for fragment in org_fragments):
                             all_names.append(name)
