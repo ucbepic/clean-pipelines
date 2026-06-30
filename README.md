@@ -18,6 +18,7 @@ library for LLM calls, OCR, PDF handling, and evaluation.
   - [`prap-case-type`](#prap-case-type)
   - [`prap-location`](#prap-location)
   - [`prap-involved-agency`](#prap-involved-agency)
+  - [`prap-post-entity-resolution`](#prap-post-entity-resolution)
   - [Pipelines without ground truth](#pipelines-without-ground-truth)
 - [`misc/`](#misc)
 - [License](#license)
@@ -58,6 +59,7 @@ documented in each package's README.
 | [`prap-clustering`](packages/clustering/README.md) | `prap-clustering` | F1 = **0.76** on 31-agency / 4,937-case GT corpus (pre-refactor hybrid baseline) |
 | [`prap-split-officer-names`](packages/split-officer-names/README.md) | `prap-split-officer-names` | 88.4 % valid on 155 records — no GT (three-check sanity gate) |
 | [`prap-mentioned-agencies`](packages/mentioned-agencies/README.md) | `prap-mentioned-agencies` | no GT in v1; real-LLM corrections-bundle run pending |
+| [`prap-post-entity-resolution`](packages/post-entity-resolution/README.md) | `prap-post-entity-resolution` | `eval` verb implemented; headline F1 pending a staged GT table |
 | [`prap-redactions`](packages/redactions/README.md) | `prap-redactions` | 🚧 **work in progress** — relies on Azure Content Safety for violent-imagery classification; open-source replacement planned |
 
 ## Evaluations
@@ -327,6 +329,47 @@ evaluated at the (case, agency) pair level against 367 GT pairs with
 | gpt-4.1-mini | 367 | **0.8394** | **0.8822** | **0.8602** |
 
 See [`packages/involved-agency/README.md`](packages/involved-agency/README.md).
+
+### `prap-post-entity-resolution`
+
+Resolves LLM-extracted officer mentions in a case to specific people in
+California's POST (Peace Officer Standards and Training) employment
+database — i.e., deciding that "Officer J. Smith" in this report is the
+same certified officer as POST record `#12345`, disambiguating same-name
+officers by their employment timeline at the relevant agency. Candidate
+people are scored by a trained XGBoost model, with an LLM agency-validation
+stage (model-agnostic via `prap_core.llm.LLM`) gating auto-matches; the rest
+are routed to human review.
+
+This package is structured differently from the other pipelines, in two
+ways worth calling out:
+
+- **Two halves — inference *and* the full retraining chain.** `resolve/`
+  is the §4-compliant inference pipeline (Typer `prepare` / `run` / `eval`,
+  jsonl I/O via `prap_core.io`, `schemas.py`, offline tests). `training/`
+  is a complete offline Makefile chain
+  (`clean → train-data → ts-blocking → ts-features → ts-train`) that
+  regenerates the XGBoost model **from scratch** — every stage's source is
+  in-tree, so the shipped `models/*.pkl` are fully reproducible. Only the
+  raw POST/CPDP input dumps (tens of MB) are not vendored; the code that
+  consumes them is.
+- **No hard external-service lock-in.** By default `resolve/` fetches
+  candidate employment records from an NPI employment API (`NPI_API_URL`),
+  but that API only serves California's publicly available CPDP employment
+  table — downloadable at
+  [`national.cpdp.co/states/california?activeOnly=false`](https://national.cpdp.co/states/california?activeOnly=false).
+  The `NPIClient` call can be swapped for a local CSV read, so the pipeline
+  is fully runnable offline from public data. (This is unlike
+  `prap-redactions`, which is genuinely blocked on a proprietary service.)
+
+**Eval status.** An `eval` verb is implemented — it scores link-level
+precision / recall / F1 of auto-matches against a
+`officer_uid → post_person_nbr` ground-truth table via `prap_core.eval.prf`,
+and is unit-tested on synthetic GT. The only thing missing for a headline
+number is a real staged GT table; the code, the trained model, and the
+data path are all in place.
+
+See [`packages/post-entity-resolution/README.md`](packages/post-entity-resolution/README.md).
 
 ### Pipelines without ground truth
 
